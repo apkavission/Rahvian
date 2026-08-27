@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ExternalLink } from "lucide-react";
 import { PreviewPane } from "@/components/admin/preview-pane";
-import { requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import {
   caseStudyPickers,
   getAdminCaseStudies,
@@ -33,7 +33,7 @@ type Props = {
  * to one study is a link someone can send.
  */
 export default async function CaseStudiesScreen({ searchParams }: Props) {
-  await requireStaff();
+  await requireMenu("case-studies");
 
   const query = await searchParams;
   const requested = typeof query.study === "string" ? query.study : null;

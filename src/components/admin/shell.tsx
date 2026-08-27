@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ExternalLink, LogOut, Menu, X } from "lucide-react";
+import { ExternalLink, LogOut, Menu, UserCog, X } from "lucide-react";
 import { AdminNav } from "@/components/admin/sidebar";
 import type { AdminNavGroup } from "@/components/admin/nav";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
@@ -141,7 +141,12 @@ function Brand({ onClose }: { onClose?: () => void }) {
 }
 
 /**
- * Who is signed in, and the way out.
+ * Who is signed in, and the two things they can do about it.
+ *
+ * The name is a link to their own account screen, which is where anybody
+ * changes their own password. It lives here rather than in the menu because it
+ * is the one screen no owner can take away — everybody who can sign in must be
+ * able to reach it — and the menu is a list of things that can be.
  *
  * Sign-out is a form posting to a Server Action rather than a link: it changes
  * state, and a GET that ends a session can be triggered by any image tag on
@@ -156,7 +161,10 @@ function UserPanel({
 }) {
   return (
     <div className="shrink-0 border-t border-border p-3">
-      <div className="flex items-center gap-3 rounded-lg px-2 py-2">
+      <Link
+        href="/admin/account"
+        className="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-surface-2"
+      >
         <span
           aria-hidden
           className="grid size-9 shrink-0 place-items-center rounded-full bg-accent-soft font-medium text-accent"
@@ -167,7 +175,9 @@ function UserPanel({
           <p className="truncate text-sm font-medium">{user.name}</p>
           <p className="truncate text-xs text-text-subtle">{user.role}</p>
         </div>
-      </div>
+        <UserCog className="size-4 shrink-0 text-text-subtle" aria-hidden />
+        <span className="sr-only">Your account</span>
+      </Link>
 
       <form action={signOutAction}>
         <button

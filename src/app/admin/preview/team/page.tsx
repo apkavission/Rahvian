@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import { getAdminTeamCards } from "@/lib/queries/team-admin";
 import { MemberCard } from "@/components/team/member-card";
 import { cn } from "@/lib/utils";
@@ -26,7 +26,7 @@ type Props = {
  * It sits outside the `(dashboard)` group so the admin chrome does not wrap it.
  */
 export default async function TeamPreview({ searchParams }: Props) {
-  await requireStaff();
+  await requireMenu("team");
 
   const query = await searchParams;
   const selectedId = typeof query.member === "string" ? query.member : null;

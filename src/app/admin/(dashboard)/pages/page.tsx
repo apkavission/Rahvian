@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowUpRight, ExternalLink } from "lucide-react";
-import { requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import { getAdminPages } from "@/lib/queries/pages-admin";
 import { formatDate } from "@/lib/utils";
 import { NewPageForm } from "./new-page-form";
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
  * why the database refuses to delete one and the builder refuses to rename it.
  */
 export default async function PagesIndex() {
-  await requireStaff();
+  await requireMenu("pages");
   const pages = await getAdminPages();
 
   return (

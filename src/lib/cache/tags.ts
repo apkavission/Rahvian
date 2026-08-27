@@ -21,6 +21,9 @@ export const CACHE_TAGS = {
   /** Header, footer and mobile menus. */
   navigation: "navigation",
 
+  /** The role master list: labels, capabilities and default menus. */
+  roles: "roles",
+
   /** Title template, default description, verification codes. */
   seoDefaults: "seo-defaults",
 
@@ -80,6 +83,11 @@ export const INVALIDATION_MAP = {
   siteSettings: () => [CACHE_TAGS.siteSettings],
 
   navigation: () => [CACHE_TAGS.navigation],
+
+  // A role change moves people between menus, so nothing static depends on it
+  // — but the admin shell reads the list on every request and would otherwise
+  // keep resolving menus from the version before the edit.
+  roles: () => [CACHE_TAGS.roles],
 
   seoDefaults: () => [CACHE_TAGS.seoDefaults],
 

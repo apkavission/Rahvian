@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Mail, MessageCircle, Phone } from "lucide-react";
 import { StatusBadge } from "@/components/admin/status-badge";
-import { canManageLeads, requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import { getAssignableStaff, getLead } from "@/lib/queries/leads";
 import type { LeadActivityRow, LeadDetail } from "@/lib/queries/leads";
 import { isLeadStatus, LEAD_STATUS_LABEL } from "@/lib/validation/leads";
@@ -27,8 +27,7 @@ type Params = { params: Promise<{ id: string }> };
  * it to be set before anyone has.
  */
 export default async function LeadPage({ params }: Params) {
-  const { profile } = await requireStaff();
-  if (!canManageLeads(profile)) notFound();
+  await requireMenu("leads");
 
   const { id } = await params;
   const [lead, staff] = await Promise.all([getLead(id), getAssignableStaff()]);

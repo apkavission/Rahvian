@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ExternalLink } from "lucide-react";
 import { PreviewPane } from "@/components/admin/preview-pane";
-import { requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import { getAdminService, getAdminServices } from "@/lib/queries/services-admin";
 import { getMediaOptions } from "@/lib/queries/media-admin";
 import { getAdminTechnologies } from "@/lib/queries/technologies";
@@ -34,7 +34,7 @@ type Props = {
  * to one service is a link someone can send.
  */
 export default async function ServicesScreen({ searchParams }: Props) {
-  await requireStaff();
+  await requireMenu("services");
 
   const query = await searchParams;
   const requested = typeof query.service === "string" ? query.service : null;

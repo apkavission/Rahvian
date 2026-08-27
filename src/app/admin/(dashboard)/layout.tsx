@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/shell";
-import { navForRole } from "@/components/admin/nav";
-import { requireStaff, ROLE_LABEL } from "@/lib/auth/session";
+import { navForProfile } from "@/lib/auth/menu";
+import { requireStaff } from "@/lib/auth/session";
 import { signOut } from "@/app/admin/login/actions";
 
 /**
@@ -24,20 +24,20 @@ export const metadata: Metadata = {
  * The session is established here rather than in each page. The middleware
  * already turned anonymous requests away, but it cannot read a profile, so it
  * does not know a role: this is the first point at which "who is asking" is
- * actually known, and the menu is filtered from it.
+ * actually known, and the menu is resolved from it.
  */
 export default async function AdminLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const { profile, email } = await requireStaff();
+  const { profile, email, role } = await requireStaff();
 
   return (
     <AdminShell
-      groups={navForRole(profile.role)}
+      groups={navForProfile(profile, role)}
       user={{
         name: profile.full_name || (email ?? "Signed in"),
         email,
-        role: ROLE_LABEL[profile.role],
+        role: role.label,
       }}
       signOutAction={signOut}
     >

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ServiceDetail } from "@/components/services/service-detail";
-import { requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import { getAdminService, getAdminServices } from "@/lib/queries/services-admin";
 import { getAdminTechnologies } from "@/lib/queries/technologies";
 
@@ -33,7 +33,7 @@ export default async function ServicePreview({
 }) {
   // The admin layout does not wrap this route, so it establishes the session
   // for itself. A preview of an unpublished service is not public content.
-  await requireStaff();
+  await requireMenu("services");
 
   const { id } = await params;
   const service = await getAdminService(id);

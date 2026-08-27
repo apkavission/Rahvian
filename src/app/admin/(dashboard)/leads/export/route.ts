@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 
   // A route handler is reachable directly, so it authorises for itself rather
   // than trusting that the layout would have turned this request away.
-  if (!session || !canManageLeads(session.profile)) {
+  if (!session || !canManageLeads(session)) {
     return new NextResponse("Not found", { status: 404 });
   }
 

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AssetPreview } from "@/components/admin/asset-preview";
-import { requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import {
   darkVariantOptions,
   getAdminMedia,
@@ -47,7 +47,7 @@ type Props = {
  * year and never hand back something stale.
  */
 export default async function MediaScreen({ searchParams }: Props) {
-  await requireStaff();
+  await requireMenu("media");
 
   const query = await searchParams;
 

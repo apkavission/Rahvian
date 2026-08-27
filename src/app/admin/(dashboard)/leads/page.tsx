@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowUpRight, Download } from "lucide-react";
 import { StatusBadge } from "@/components/admin/status-badge";
-import { canManageLeads, requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import {
   getAssignableStaff,
   getLeads,
@@ -32,8 +31,7 @@ type Search = { searchParams: Promise<Record<string, string | string[] | undefin
  * Access to content must not imply access to commercial data.
  */
 export default async function LeadsPage({ searchParams }: Search) {
-  const { profile } = await requireStaff();
-  if (!canManageLeads(profile)) notFound();
+  await requireMenu("leads");
 
   const params = await searchParams;
   const filters = readFilters(params);

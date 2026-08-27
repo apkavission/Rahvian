@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { SectionRenderer } from "@/components/sections/renderer";
-import { requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import { getAdminPage } from "@/lib/queries/pages-admin";
 
 export const metadata: Metadata = {
@@ -36,7 +36,7 @@ export default async function PreviewPage({
 }) {
   // The admin layout does not wrap this route, so it establishes the session
   // for itself. A preview of an unpublished page is not public content.
-  await requireStaff();
+  await requireMenu("pages");
 
   const { id } = await params;
   const result = await getAdminPage(id);

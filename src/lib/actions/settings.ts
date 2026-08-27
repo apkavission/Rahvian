@@ -35,7 +35,7 @@ export async function saveSettings(
     return { status: "error", message: "Your session has expired. Sign in again." };
   }
 
-  if (!isOwner(session.profile)) {
+  if (!isOwner(session)) {
     return {
       status: "error",
       message: "Only an owner can change these settings.",

@@ -1,16 +1,31 @@
 import "server-only";
 
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import type { MenuKey } from "@/components/admin/nav";
+import { canReach } from "@/lib/auth/menu";
+import { roleByKey, type RoleDefinition } from "@/lib/auth/roles";
+import { getRoles } from "@/lib/queries/roles";
 import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/types/database";
 
 export type Profile = Tables<"profiles">;
-export type Role = Profile["role"];
+
+export type { Role, RoleDefinition } from "@/lib/auth/roles";
 
 export interface StaffSession {
   userId: string;
   email: string | null;
   profile: Profile;
+  /**
+   * The role, resolved against the master list.
+   *
+   * Carried on the session rather than looked up again by every caller: a
+   * capability question asked twice in one request is a capability question
+   * that can be answered two ways. Undefined when the account points at a role
+   * that has been deleted — which `getStaffSession` refuses outright, so
+   * anything holding a session has a role.
+   */
+  role: RoleDefinition;
 }
 
 /**
@@ -49,7 +64,18 @@ export async function getStaffSession(): Promise<StaffSession | null> {
   if (!profile || !profile.is_active) return null;
   if (!profile.app_access.includes("company")) return null;
 
-  return { userId: user.id, email: user.email ?? null, profile };
+  /*
+    The role is master data, and it is capable of being switched off.
+
+    An account whose role has been deleted, deactivated, or had `is_staff`
+    taken from it is treated exactly as a deactivated account is: signed out on
+    the next request. Suspending a whole class of account by editing one role
+    row has to mean that, or it is a label change with a reassuring name.
+  */
+  const role = roleByKey(await getRoles(), profile.role);
+  if (!role || !role.is_active || !role.is_staff) return null;
+
+  return { userId: user.id, email: user.email ?? null, profile, role };
 }
 
 /**
@@ -66,34 +92,48 @@ export async function requireStaff(): Promise<StaffSession> {
   return session;
 }
 
-/** Roles that may read and act on leads. Mirrors `company.can_manage_leads()`. */
-const LEAD_ROLES: Role[] = ["super_admin", "owner", "admin"];
-
-/** Roles that may manage users and change global settings. Mirrors `company.is_owner()`. */
-const OWNER_ROLES: Role[] = ["super_admin", "owner"];
-
-export function canManageLeads(profile: Profile): boolean {
-  return LEAD_ROLES.includes(profile.role);
-}
-
-export function isOwner(profile: Profile): boolean {
-  return OWNER_ROLES.includes(profile.role);
+/**
+ * The session, or a 404, for one screen.
+ *
+ * What every admin page calls instead of `requireStaff()`. The resolved menu
+ * is the permission (spec §15.2): if a screen is not in it, typing its URL
+ * answers exactly as a route that does not exist would, rather than opening a
+ * form that refuses to save at the end of filling it in.
+ *
+ * `notFound()` rather than a "you may not" page, deliberately. A refusal
+ * confirms the screen is there and that someone else can reach it, which is a
+ * fact an account that may not use it has no business learning.
+ *
+ * This is the routing layer of three. The middleware turned anonymous requests
+ * away, and RLS refuses the rows underneath whatever this decides.
+ */
+export async function requireMenu(key: MenuKey): Promise<StaffSession> {
+  const session = await requireStaff();
+  if (!canReach(session.profile, session.role, key)) notFound();
+  return session;
 }
 
 /**
- * What a role is called on screen.
+ * May this account see and act on enquiries?
  *
- * Every value in the enum is listed, including the ones that never reach this
- * application: the enum is shared with the client portal and the demo estate,
- * and a label map with a hole in it fails at exactly the moment someone
- * creates that account.
+ * The resolved menu, not a role list. A role carries the screen by default and
+ * any individual can be granted it, which is the point of a per-person menu —
+ * and `company.can_manage_leads()` reads the same role flag and the same two
+ * arrays, so a grant means the same thing at the table as it does in the
+ * sidebar. Two answers to this question that could disagree is how a screen
+ * ends up listing nothing and being believed.
  */
-export const ROLE_LABEL: Record<Role, string> = {
-  super_admin: "Super admin",
-  owner: "Owner",
-  admin: "Admin",
-  editor: "Editor",
-  client: "Client",
-  developer: "Developer",
-  demo_viewer: "Demo viewer",
-};
+export function canManageLeads(session: StaffSession): boolean {
+  return canReach(session.profile, session.role, "leads");
+}
+
+/**
+ * May this account manage accounts and roles?
+ *
+ * One flag on the role, and the same flag `company.is_owner()` reads. Not a
+ * list of role keys: the whole point of roles being master data is that a role
+ * nobody had thought of yet can carry this.
+ */
+export function isOwner(session: StaffSession): boolean {
+  return session.role.is_owner;
+}

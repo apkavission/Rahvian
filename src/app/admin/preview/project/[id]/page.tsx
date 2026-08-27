@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ProjectDetail, readGallery } from "@/components/portfolio/project-detail";
-import { requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import { getAdminProject } from "@/lib/queries/projects-admin";
 import { getMediaByIds, getProjects } from "@/lib/queries/projects";
 import { getAdminTechnologies } from "@/lib/queries/technologies";
@@ -39,7 +39,7 @@ export default async function ProjectPreview({
 }) {
   // The admin layout does not wrap this route, so it establishes the session
   // for itself. A preview of an unpublished project is not public content.
-  await requireStaff();
+  await requireMenu("portfolio");
 
   const { id } = await params;
   const project = await getAdminProject(id);

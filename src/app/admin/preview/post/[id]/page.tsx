@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { PostDetail } from "@/components/blog/post-detail";
-import { requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import { getAdminPost } from "@/lib/queries/blog-admin";
 import { getBlogPosts } from "@/lib/queries/blog";
 
@@ -26,7 +26,7 @@ export default async function PostPreview({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireStaff();
+  await requireMenu("blog");
 
   const { id } = await params;
   const post = await getAdminPost(id);

@@ -1,6 +1,5 @@
-import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { isOwner, requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import { getMediaOptions } from "@/lib/queries/media-admin";
 import { createClient } from "@/lib/supabase/server";
 import { SettingsForm, type SettingsFormValues } from "./settings-form";
@@ -19,12 +18,10 @@ export const metadata: Metadata = {
  * which reads as the save having failed.
  */
 export default async function SettingsPage() {
-  const { profile } = await requireStaff();
-
-  // An editor is not shown this in the menu; reaching it by typing the URL
-  // gets the same answer as a route that does not exist, rather than a form
-  // that will refuse to save at the end of filling it in.
-  if (!isOwner(profile)) notFound();
+  // Owners have this by default and anyone can be granted it. Reaching it
+  // without it gets the same answer as a route that does not exist, rather
+  // than a form that will refuse to save at the end of filling it in.
+  await requireMenu("settings");
 
   const supabase = await createClient();
 

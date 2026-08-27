@@ -1,5 +1,8 @@
 import "server-only";
 
+import { canReach } from "@/lib/auth/menu";
+import { roleByKey } from "@/lib/auth/roles";
+import { getRoles } from "@/lib/queries/roles";
 import { createClient } from "@/lib/supabase/server";
 import type { Tables } from "@/types/database";
 import type { LeadFilters, LeadStatus } from "@/lib/validation/leads";
@@ -188,28 +191,41 @@ export async function getLead(id: string): Promise<LeadDetail | null> {
 /**
  * Who a lead can be assigned to.
  *
- * Editors are excluded: they cannot see leads at all, and offering them in an
- * assignment list would produce an assignment the assignee could never open.
+ * Everyone whose resolved menu includes the enquiries screen, which is exactly
+ * the set `company.can_manage_leads()` will let through at the table. Not a
+ * list of role names: roles are master data, and an editor who has been granted
+ * enquiries on their own account is a real answer to this question — offering
+ * only the built-in roles would leave them out of the list while the database
+ * happily let them read the rows.
+ *
+ * The same resolver the sidebar and the route guards use, so an assignment can
+ * never be offered to somebody who would then open a page that does not exist
+ * for them.
  */
 export async function getAssignableStaff(): Promise<StaffOption[]> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("id, full_name, role")
-    .eq("is_active", true)
-    .in("role", ["super_admin", "owner", "admin"])
-    .order("full_name", { ascending: true });
+  const [{ data, error }, roles] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("id, full_name, role, menu_extra, menu_denied, app_access")
+      .eq("is_active", true)
+      .order("full_name", { ascending: true }),
+    getRoles(),
+  ]);
 
   if (error) {
     console.error("[leads] staff list failed:", error.message);
     return [];
   }
 
-  return (data ?? []).map((row) => ({
-    id: row.id,
-    name: row.full_name || "Unnamed account",
-  }));
+  return (data ?? [])
+    .filter((row) => (row.app_access ?? []).includes("company"))
+    .filter((row) => canReach(row, roleByKey(roles, row.role), "leads"))
+    .map((row) => ({
+      id: row.id,
+      name: row.full_name || "Unnamed account",
+    }));
 }
 
 /** Counts for the view tabs, so a tab can say how much is behind it. */

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PreviewPane } from "@/components/admin/preview-pane";
-import { requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import { faqScopeOptions, getAdminFaqs } from "@/lib/queries/faqs-admin";
 import { faqToValues } from "@/lib/records/faqs";
 import { cn } from "@/lib/utils";
@@ -36,7 +36,7 @@ type Props = {
  * belongs on three pages, and three copies of it would drift apart.
  */
 export default async function FaqsScreen({ searchParams }: Props) {
-  await requireStaff();
+  await requireMenu("faqs");
 
   const query = await searchParams;
 

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ExternalLink } from "lucide-react";
 import { PreviewPane } from "@/components/admin/preview-pane";
-import { requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import { getAdminPricingPlan, getAdminPricingPlans } from "@/lib/queries/pricing-admin";
 import { planToValues } from "@/lib/records/pricing";
 import { NewPlanForm } from "./new-plan-form";
@@ -31,7 +31,7 @@ type Props = {
  * single card would hide the only thing worth checking.
  */
 export default async function PricingScreen({ searchParams }: Props) {
-  await requireStaff();
+  await requireMenu("pricing");
 
   const query = await searchParams;
   const requested = typeof query.plan === "string" ? query.plan : null;

@@ -66,6 +66,68 @@ will not reset one; it comes from the Supabase dashboard or from the owner.
 | `/admin/team` | Create · edit and save · duplicate (LinkedIn and GitHub must **not** carry across) · move · the delete dialog · the preview grid with drafts marked |
 | `/admin/media` | **Upload a real file** · the dimension readout before sending · the under-400px warning · the over-8MB refusal · rename and re-save · the folder pills · the delete dialog naming what it will blank · the preview on white and on near-black |
 
+### The image fields and the no-upscale rule
+
+Wired 2026-08-27, none of it seen working:
+
+- **A picker on every one of the nine fields** — the size printed before
+  choosing, the thumbnail drawn at the field's ratio, the warning naming both
+  numbers, remove and re-choose.
+- **The quality warning in all three places** — upload form, picker, library —
+  saying the same thing about the same file.
+- **The no-upscale rule, which is the point of the exercise.** Upload something
+  deliberately small — 200px wide — put it in a card field, and look at the
+  public page. It must render **small and sharp, with space around it**. If it
+  fills the frame and looks soft, `components/media/image.tsx` is not doing its
+  job and the whole rule is broken.
+- **A wrong-shaped file** in a card field: visible space along one edge, and
+  nothing cut off.
+- **An SVG logo** in the settings fields: it must scale up to fill its space,
+  not be capped at its viewBox size. This is the exemption, and it is the one
+  most likely to have been got backwards.
+- **Both themes** for the library preview's white and near-black stages.
+
+### Accounts, roles and menus
+
+Built 2026-08-27, none of it seen working — **and none of it can be, until the
+two migrations are run.** Before them the screen renders from the roles compiled
+into the application and every save fails on a missing column, which is the
+expected behaviour and not the thing to test.
+
+Once they are run, in this order:
+
+- **The Roles tab first.** The seven seeded roles are there, Owner and Super
+  admin outrank the rest, and the system ones say they cannot be deleted.
+- **Make a role.** "Content lead": tick *reaches this admin*, tick *sees
+  enquiries*, leave *manages accounts* clear, give it the content screens plus
+  Enquiries. Save.
+- **Make an account** on that role, at `kumarnitish4384@gmail.com` — the only
+  address any test ever uses. With SMTP unconfigured the password appears on
+  screen once with a warning; **check that it does not appear when the email
+  does go out.** Copy it.
+- **Sign in as them in a private window.** The sidebar must show exactly what
+  the role gives. Then type `/admin/settings` and `/admin/users` by hand: both
+  must answer as pages that do not exist, not as a refusal.
+- **Adjust one person.** Take Media away from them and give them nothing else.
+  Their sidebar loses it; `/admin/media` 404s; the accounts screen's third
+  column says *Removed: Media*.
+- **The grant that reaches the database.** Enquiries was granted through the
+  role here — the harder case is granting `leads` to a plain **editor** on their
+  own account. The screen must appear *and list real enquiries*. If it appears
+  and is empty, `can_manage_leads()` is not reading `menu_extra` and the whole
+  point of the per-person menu is broken.
+- **Block them.** They are signed out on their next click, cannot sign in, and
+  nothing they wrote has gone. Then let them back in.
+- **Reset their password** and check the old one stops working.
+- **The refusals.** Try to block yourself, to change your own role, and to take
+  *manages accounts* off the only role that has it. All three must be refused
+  with a sentence, not a stack trace.
+- **`/admin/account`** as that person: it is reachable, it shows what they can
+  see, and changing the password works with the current one and is refused
+  without it.
+- **Both themes and a phone**, for the tabs, the checkbox grid and the
+  password-once panel.
+
 ### Server paths never exercised at runtime
 
 - `uploadMedia` end to end **through the application**. R2 was proved with the

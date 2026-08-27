@@ -6,7 +6,7 @@ import {
   getRecentLeads,
   getSeoGaps,
 } from "@/lib/queries/admin-dashboard";
-import { canManageLeads, requireStaff } from "@/lib/auth/session";
+import { canManageLeads, requireMenu } from "@/lib/auth/session";
 import { formatDate } from "@/lib/utils";
 
 /**
@@ -22,8 +22,9 @@ import { formatDate } from "@/lib/utils";
  * one padded with sample figures.
  */
 export default async function AdminDashboard() {
-  const { profile, email } = await requireStaff();
-  const showLeads = canManageLeads(profile);
+  const session = await requireMenu("dashboard");
+  const { profile, email } = session;
+  const showLeads = canManageLeads(session);
 
   const [content, leads, recent, gaps] = await Promise.all([
     getContentCounts(),

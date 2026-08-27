@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import { getAdminCategories, getAdminCategory } from "@/lib/queries/blog-admin";
 import { categoryToValues } from "@/lib/records/blog";
 import { CategoryEditor } from "./category-editor";
@@ -27,7 +27,7 @@ type Props = {
  * who just typed it.
  */
 export default async function BlogCategoriesScreen({ searchParams }: Props) {
-  await requireStaff();
+  await requireMenu("blog");
 
   const query = await searchParams;
   const requested = typeof query.category === "string" ? query.category : null;

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { FaqList } from "@/components/sections/faq-list";
-import { requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import { faqScopeOptions, getAdminFaqs } from "@/lib/queries/faqs-admin";
 
 export const metadata: Metadata = {
@@ -31,7 +31,7 @@ type Props = {
  * It sits outside the `(dashboard)` group so the admin chrome does not wrap it.
  */
 export default async function FaqPreview({ searchParams }: Props) {
-  await requireStaff();
+  await requireMenu("faqs");
 
   const query = await searchParams;
   const scope = typeof query.scope === "string" ? query.scope : "";

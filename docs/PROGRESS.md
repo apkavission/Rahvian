@@ -5,13 +5,21 @@
 **Current phase:** 1 — Public site
 **Current plan:** none written; this file is the working list. `docs/plans/` is
 empty — the plan file the earlier entry pointed at was never created.
-**Next action:** the image fields. The media library itself is **built** — the
-storage, the upload, the serving route and `/admin/media` — so what remains is
-the other half of [image-rules.md](image-rules.md): a picker control that every
-image field uses, each field declaring the exact pixel size it wants and warning
-when the file given does not match. Nine fields across services, portfolio, case
-studies, the blog, team and settings are waiting for it, and each is currently
-absent from its form with a note saying why.
+**Next action:** **two migrations are waiting to be run** — see the block at
+the top of "What is waiting on the owner" below. Until they are, the users
+screen renders from the roles compiled into the application and refuses to save.
+After that: the navigation screen and the SEO screen, the last two entries in
+the menu still marked *Not built*. The smaller piece left over from the image
+work is `projects.gallery` and `case_studies.screenshots`, which are lists of
+images rather than one and need the picker to become a repeater.
+
+**Accounts, roles and menus are built.** `/admin/users` is two tabs — People
+and Roles — and it is the estate's control plane: an owner opens an account, a
+password is generated and emailed and can never be read back, blocking is one
+absolute switch, and every person's menu is their role's menu plus or minus
+whatever that individual is given. **Roles themselves are master data** since
+2026-08-27, on the owner's instruction: their names, authority, capabilities and
+default menus all live in `company.roles` and are edited from that same screen.
 
 **All seven content lists are built**, and so is the media library. Pricing,
 FAQs and team landed on 2026-08-27, joining services, portfolio, case studies
@@ -63,9 +71,32 @@ on this list blocks building any more.
 | 4 | **Write up the case studies** at `/admin/case-studies`. | `/case-studies` is a working page with nothing on it. The table is empty. | at the end |
 | 5 | **Fill in the contact details** at `/admin/settings` — phone, WhatsApp, address, CIN, GST, social links. | Email footers, the "Call us" links, the quote page's contact panel, and the Organization data search engines read. | ~10 min |
 
-**No SQL to run.** All eleven migrations are applied and nothing built since has
-needed a twelfth. If that changes, the migration file and the words "run this in
-the Supabase SQL editor" will be at the top of the summary, not buried here.
+### ⚠ Two migrations to run in the Supabase SQL editor
+
+This is the one thing on this page that blocks the next session. Run them in
+this order, both in full:
+
+1. `supabase/migrations/20260827000012_profile_menu.sql` — adds `menu_extra`
+   and `menu_denied` to `company.profiles`. Two columns and a constraint.
+2. `supabase/migrations/20260827000013_roles_master.sql` — creates
+   `company.roles`, seeds the seven roles, turns `profiles.role` from an enum
+   into a foreign key into it, and rewrites the three RLS helper functions to
+   read the table.
+
+**Until they are run**, the admin still works — it falls back to the roles
+compiled into the application, which are identical to what the migration seeds —
+but `/admin/users` cannot save anything, because the columns it writes to do not
+exist yet. Nothing else is affected.
+
+After running them, from the project directory:
+
+```
+npm run db:types
+```
+
+That regenerates `src/types/database.ts` from the live schema. The two new
+tables' types are hand-written in that file today so the build is honest before
+the migration lands; regenerating replaces them with the real thing.
 
 ---
 
@@ -80,10 +111,13 @@ Say one of these. Nothing else is needed — this file carries the context.
 | Jump to a specific thing | **`<the thing> karo`** — e.g. `about page karo`, `admin panel shuru karo` |
 | Change something already built | **`<what> me <change> karo`** — e.g. `email template ka text badlo` |
 
-**`aage karo` right now means:** the image fields — the picker control, the
-declared size on every field, and wiring the nine image columns that are
-currently absent from their forms. Say `users screen karo`, `navigation karo`,
-`seo screen karo` or any other admin screen by name to take that one instead.
+**`aage karo` right now means:** the navigation screen — `nav_items` is a
+seeded table the header and footer already read, and `/admin/navigation` is the
+last content screen in the menu still marked *Not built*. After it, the SEO
+screen. Say `seo screen karo`, `gallery repeater karo` or any other screen by
+name to take that one instead.
+
+**Before either, the owner has two migrations to run.** See the block above.
 
 Whoever picks this up should read this file first. **Update the two lines below
 "Next action" at the top when you finish something** — they are what the next
@@ -286,6 +320,30 @@ Hiding a link is never the mechanism. The route checks the resolved menu, and
 RLS refuses the data underneath it regardless. Three layers, and the sidebar is
 the weakest of them by design.
 
+**Roles are master data, not a list in the code.** Added by the owner on
+2026-08-27: *"role wala bhi jo master se aayega — matlab wo bhi admin set
+karega, DB me jayega."* A role is a row in `company.roles` carrying a label, a
+description, an **authority rank**, three capability flags — reaches this panel,
+sees enquiries, manages accounts — and a **default menu**. All of it is edited
+from `/admin/users`, on the Roles tab beside the people it applies to.
+
+Three consequences, and each is why it was done this way:
+
+- **A new role needs no deploy.** "Content lead" — every content screen plus
+  enquiries, no settings — is four ticks and a name. The RLS helpers read the
+  flags rather than a list of role names, so the database honours it the moment
+  it is saved.
+- **Nothing outranks its author.** Nobody may create or edit an account, or a
+  role, above their own rank — so an owner cannot mint a super admin and nobody
+  can promote themselves.
+- **The last way in is never closed.** At least one active role must carry
+  "manages accounts", and at least one active account must hold such a role.
+  Refused in the form, and refused again by a deferred trigger in the database.
+
+The seven original roles are seeded as **system roles**: everything about them
+is editable — name, rank, capabilities, menu — except their key, and they cannot
+be deleted. Switching one off suspends everybody holding it at once.
+
 **Two employee panels, and they are not the same thing.** The employee who
 manages this services site and the employee who manages the task tracker are
 separate people with separate panels. `profiles.app_access` is what keeps them
@@ -380,7 +438,7 @@ panel (Phase 3), the super admin and the client portal.
 | **A. Company website** | 0. Foundation | ✅ **Done, verified against the live database** |
 | | 1. Public site | ✅ **Done** — 16 routes built, seeded and verified; responsive, contrast and keyboard access measured in both themes |
 | | 2. 3D layer | ⚪ Not started |
-| | 3. Admin panel | 🟡 Auth, shell, dashboard, settings, enquiries, the page builder, **all seven content lists** and the **media library** built. Image fields next, then users, navigation and SEO |
+| | 3. Admin panel | 🟡 Auth, shell, dashboard, settings, enquiries, the page builder, **all seven content lists**, the **media library**, the **image fields** and **users, roles and menus** built. Navigation and SEO are the last two screens |
 | | 4. Launch | ⚪ Not started |
 | **B. Client delivery** | 5. Messaging centre stage 1 | ⚪ Not started |
 | | 6. Client portal core | ⚪ Not started |
@@ -391,6 +449,159 @@ panel (Phase 3), the super admin and the client portal.
 ---
 
 ## Done so far
+
+### 2026-08-27 — accounts, roles as master data, and the per-person menu
+
+**`/admin/users` is built, in two tabs on one screen.** People and Roles are one
+subject — deciding what somebody may do means moving between "what is this
+person" and "what does that role mean" several times a minute — so they are two
+tabs rather than two menu entries, and the roles tab lists who holds each role
+beside the switches that change them.
+
+**Roles became master data, on the owner's instruction.** They were a Postgres
+enum and three lists of role names written into RLS helper functions. They are
+now `company.roles`: a label, a description, an authority rank, three capability
+flags and a default menu, per row, all edited from the admin. `profiles.role`
+stopped being an enum and became a foreign key into it.
+
+The reason an enum was the wrong shape: every new value is a migration, and a
+value can never be renamed because it is stored in every row that uses it. A key
+with a label beside it can be renamed on screen a hundred times and mean the
+same thing underneath.
+
+- **The three RLS helpers now read the table.** `is_staff()`,
+  `can_manage_leads()` and `is_owner()` join `company.roles` and read a flag
+  instead of matching a list of names. A role invented in the admin panel is
+  therefore honoured by every policy in the schema the moment it is saved, with
+  no migration and no deploy.
+- **`can_manage_leads()` also reads the per-person menu.** The standing rule's
+  own example is "a senior employee who also handles enquiries". Granting that
+  person the screen while the helper read only their role would have handed them
+  a working page listing nothing — a worse answer than refusing the page, since
+  they would report that there are no enquiries and be believed.
+- **Two safety nets in the database, not only in the form.** A trigger refuses
+  to delete a system role or change its key; a deferred constraint trigger
+  refuses to leave the estate with no active role that can manage accounts.
+
+**The per-person menu.** `profiles.menu_extra` and `profiles.menu_denied` hold
+the *difference* from the role's default menu, never a snapshot of it. That is
+the whole design decision: a stored list would mean that adding a screen to the
+panel next month silently never reaches anybody whose menu was saved before it
+existed. Storing only the difference means a new screen reaches everyone whose
+role should have it, without touching a row. A check constraint refuses to hold
+a key in both arrays at once, and the resolver fails closed if one ever appears
+in both anyway.
+
+**Three layers, and each is real.** `requireMenu(key)` replaced `requireStaff()`
+on every admin page including the eight preview routes: a screen not in your
+resolved menu answers with a 404, not a refusal — a refusal confirms the screen
+exists and that somebody else can reach it. RLS refuses the rows underneath
+whatever the route decides. The middleware is still the weakest of the three,
+deliberately.
+
+**The accounts screen is not a grant that can be given.** Handing somebody
+`/admin/users` is handing them every other screen — they could raise their own
+role and take the rest — so it is tied to the role's `is_owner` flag and cannot
+appear in anybody's extras, whatever is written into the column by hand.
+
+**Passwords.** Generated, never chosen: twenty characters from an alphabet with
+no `0`/`O` or `1`/`l`/`I` in it, grouped in fives so it can be transcribed from
+an email or read down a phone. Supabase stores only the hash, so from the moment
+it is sent nobody — including the owner who pressed the button — can read it
+back. It is emailed; it appears on screen **only** when the email could not go
+out, with a copy button and a line saying it cannot be recovered. Resetting
+issues a new one to the account's own address rather than letting an owner type
+one, because an owner who types a colleague's password knows it.
+
+**Blocking is one switch and it is never a deletion.** It refuses to let you
+block yourself, to block an account that outranks you, or to block the last
+account that can manage accounts. Same three refusals on the role editor.
+
+**`/admin/account`** is the one screen no owner can take away: everybody who can
+sign in reaches it, it shows what they are and what they reach, and it changes
+their own password after confirming the current one. Linked from the name in the
+sidebar rather than from the menu, because the menu is a list of things that can
+be taken away and this is not one of them.
+
+**Verified:** `tsc` clean, `npm run build` clean, **92 tests passing** (up from
+65 — 27 new ones covering menu resolution, the grant/deny round trip, the
+owner-only screen, a role that has been deleted out from under an account, and
+the rank ceiling), `npm run lint` back at its exact pre-existing baseline of 11
+problems in seven untouched files.
+
+**Not verified:** none of it in a browser, and the two migrations have not been
+run. See [testing.md](testing.md).
+
+**Owner action:** two migrations, then `npm run db:types`. Called out in full
+near the top of this file.
+
+### 2026-08-27 — image fields, and the bug that would have blurred every small picture
+
+**All nine image fields are wired**, and with them the second half of
+[image-rules.md](image-rules.md). A service's social image, a portfolio
+thumbnail and social image, a case study's header, a post's featured and social
+images, a team photo, and the two logos in settings — each declared in one
+table, each printing the exact size it wants before a file is chosen.
+
+- `src/lib/media/image-fields.ts` — the one table of declared sizes, plus
+  `describeFit()` (does this file suit *this field*) and `assessQuality()` (is
+  this file any good at all). Both pure, both tested.
+- A tenth field kind, `image`, in the descriptor vocabulary. Its value is a
+  media id validated against the assets the form actually offered, so a posted
+  request naming something else is refused rather than written.
+- `MediaPicker` — the control. It says the size before the folder of
+  photographs is opened, draws every thumbnail in a box at the *field's* ratio
+  so a wrong-shaped file shows its empty edges at the moment of choosing, and
+  warns naming both numbers. It never blocks.
+- Settings is not a descriptor form, so the two logos get a small `LogoPicker`
+  that holds the choice and writes it into a hidden field — the same shared
+  `MediaPicker` inside, so it behaves identically to the other nine.
+
+**And a real bug, found while wiring it.** The site was about to do exactly what
+the owner had warned against. `object-contain` on a `size-full` image does not
+mean "draw it at its own size" — it means "scale it until it fits", **up as well
+as down**. A 400px logo in a 1200px frame would have been blown up to 1200px and
+gone soft, and nothing about the markup looked wrong.
+
+Fixed by making the natural size a ceiling, so the browser may only ever scale
+down. `src/components/media/image.tsx` holds the two components — `FramedImage`
+for a fixed-shape box, `NaturalImage` for one that flows — and **every stored
+image on the public site now goes through one of them**: the portfolio card, the
+case study card, both blog cards, the team portrait, and the four free-standing
+images on the detail pages. Vectors are exempt and must be; an SVG's viewBox
+size is a couple of dozen units and capping a logo at 24px would ruin the one
+format that scales perfectly.
+
+Two related things went with it:
+
+- **Every `object-cover` on a photograph became `object-contain`.** With a
+  correctly-sized file the two are indistinguishable; they differ only when the
+  file is the wrong shape, and then `cover` silently cuts the edges off while
+  `contain` leaves visible space. A crop nobody can see is worse than a gap
+  everybody can, because only one of them gets fixed.
+- **The hover zoom on card images was removed.** Scaling a photograph inside a
+  clipped box enlarges *and* crops it for as long as the pointer is on it —
+  both of the things the rules forbid. The cards already lift and their borders
+  strengthen on hover, which carries the interaction without touching the
+  picture.
+
+**Warnings, in all three places a file can be chosen** — the upload form, the
+picker on every content screen, and the media library — from one
+`assessQuality()` and one `QualityNote` component, so the same file is never
+described two different ways. The wording of the "too small" case is asserted by
+a test: it must say the picture will look *small*, not blurry, because the page
+has already made blurry impossible, and a warning about a problem the code
+prevents teaches the owner to distrust the warnings that are real.
+
+**Verified:** `tsc` clean, `npm run build` clean, **65 tests passing** (up from
+22 — `describeFit`, `assessQuality`, the ratio labels and the declared-size
+table are all covered), `npm run lint` back at its exact pre-existing baseline
+of 11 problems in seven untouched files.
+
+**Not verified:** none of it in a browser. See [testing.md](testing.md).
+
+**Still open:** `projects.gallery` and `case_studies.screenshots` are lists of
+images rather than one, so they need the picker to become a repeater.
 
 ### 2026-08-27 — the media library
 
@@ -1929,7 +2140,16 @@ In the order that pays off soonest:
   because of it — a service's social image, a portfolio thumbnail and social
   image, a case study's header image, a post's featured and social images, a
   team photo, and the two logos in settings.
-- **Users** — until it exists, accounts come from `npm run admin:create`.
+- ~~**Users**~~ — **built 2026-08-27**, see the entry above, and with it roles
+  as master data and the per-person menu. `npm run admin:create` still works and
+  is still the way the *first* account is made on a fresh database, but nothing
+  else needs it. Still missing from that screen: an audit trail of who changed
+  whose access and when, and an invitation flow that lets somebody set their own
+  first password instead of being sent a generated one.
+- **Navigation** — `nav_items` is seeded and read by the header and footer;
+  nothing edits it yet.
+- **SEO** — `seo_defaults` is read by every page through `buildMetadata()`;
+  nothing edits it yet.
 - **Command palette (Ctrl+K)** and the keyboard layer from spec §15.3.
 
 ### Still to do in phase 1

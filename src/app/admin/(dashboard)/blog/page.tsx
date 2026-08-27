@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { ExternalLink, Tag } from "lucide-react";
 import { PreviewPane } from "@/components/admin/preview-pane";
-import { requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import {
   categoryOptions,
   getAdminPost,
@@ -36,7 +36,7 @@ type Props = {
  * here would have been a second shape on one screen.
  */
 export default async function BlogScreen({ searchParams }: Props) {
-  await requireStaff();
+  await requireMenu("blog");
 
   const query = await searchParams;
   const requested = typeof query.post === "string" ? query.post : null;

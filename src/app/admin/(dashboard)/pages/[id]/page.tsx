@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ExternalLink } from "lucide-react";
-import { requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import { getAdminPage } from "@/lib/queries/pages-admin";
 import { PreviewPane } from "@/components/admin/preview-pane";
 import { PageMetaForm } from "./page-meta-form";
@@ -29,7 +29,7 @@ type Props = {
  * someone can send.
  */
 export default async function PageBuilder({ params, searchParams }: Props) {
-  await requireStaff();
+  await requireMenu("pages");
 
   const { id } = await params;
   const query = await searchParams;

@@ -914,39 +914,53 @@ export type Database = {
           id: string
           full_name: string
           avatar_url: string | null
-          role: Database["company"]["Enums"]["user_role"]
+          role: string
           app_access: string[]
           is_active: boolean
           preferred_mode: Database["company"]["Enums"]["theme_mode"]
           last_login_at: string | null
           created_at: string
           updated_at: string
+          menu_extra: string[]
+          menu_denied: string[]
         }
         Insert: {
           id: string
           full_name?: string
           avatar_url?: string | null
-          role?: Database["company"]["Enums"]["user_role"]
+          role?: string
           app_access: string[]
           is_active?: boolean
           preferred_mode?: Database["company"]["Enums"]["theme_mode"]
           last_login_at?: string | null
           created_at?: string
           updated_at?: string
+          menu_extra: string[]
+          menu_denied: string[]
         }
         Update: {
           id?: string
           full_name?: string
           avatar_url?: string | null
-          role?: Database["company"]["Enums"]["user_role"]
+          role?: string
           app_access?: string[]
           is_active?: boolean
           preferred_mode?: Database["company"]["Enums"]["theme_mode"]
           last_login_at?: string | null
           created_at?: string
           updated_at?: string
+          menu_extra?: string[]
+          menu_denied?: string[]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_role_fkey"
+            columns: ["role"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["key"]
+          }
+        ]
       }
       projects: {
         Row: {
@@ -1099,6 +1113,54 @@ export type Database = {
           hit_count?: number
           note?: string | null
           is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      roles: {
+        Row: {
+          key: string
+          label: string
+          description: string
+          rank: number
+          is_staff: boolean
+          can_manage_leads: boolean
+          is_owner: boolean
+          default_menu: string[]
+          is_system: boolean
+          is_active: boolean
+          sort_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          key: string
+          label: string
+          description?: string
+          rank?: number
+          is_staff?: boolean
+          can_manage_leads?: boolean
+          is_owner?: boolean
+          default_menu: string[]
+          is_system?: boolean
+          is_active?: boolean
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          key?: string
+          label?: string
+          description?: string
+          rank?: number
+          is_staff?: boolean
+          can_manage_leads?: boolean
+          is_owner?: boolean
+          default_menu?: string[]
+          is_system?: boolean
+          is_active?: boolean
+          sort_order?: number
           created_at?: string
           updated_at?: string
         }
@@ -1570,7 +1632,6 @@ export type Database = {
       nav_location: "header" | "footer_primary" | "footer_secondary" | "footer_legal" | "mobile"
       project_type: "inhouse" | "demo" | "client" | "previous"
       theme_mode: "light" | "dark" | "system"
-      user_role: "super_admin" | "owner" | "admin" | "editor" | "client" | "developer" | "demo_viewer"
     }
     CompositeTypes: Record<never, never>
   }

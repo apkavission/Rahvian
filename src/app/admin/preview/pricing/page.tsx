@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { PlanCard } from "@/components/pricing/plan-card";
-import { requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import { getAdminPricingCards } from "@/lib/queries/pricing-admin";
 import { cn } from "@/lib/utils";
 
@@ -29,7 +29,7 @@ type Props = {
  * It sits outside the `(dashboard)` group so the admin chrome does not wrap it.
  */
 export default async function PricingPreview({ searchParams }: Props) {
-  await requireStaff();
+  await requireMenu("pricing");
 
   const query = await searchParams;
   const selectedId = typeof query.plan === "string" ? query.plan : null;

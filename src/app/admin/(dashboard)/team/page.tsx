@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ExternalLink } from "lucide-react";
 import { PreviewPane } from "@/components/admin/preview-pane";
-import { requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import { getMediaOptions } from "@/lib/queries/media-admin";
 import { getAdminTeamMember, getAdminTeamMembers } from "@/lib/queries/team-admin";
 import { memberToValues } from "@/lib/records/team";
@@ -30,7 +30,7 @@ type Props = {
  * that.
  */
 export default async function TeamScreen({ searchParams }: Props) {
-  await requireStaff();
+  await requireMenu("team");
 
   const query = await searchParams;
   const requested = typeof query.member === "string" ? query.member : null;

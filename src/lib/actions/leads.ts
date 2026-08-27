@@ -33,7 +33,7 @@ async function guard(): Promise<LeadActionState | null> {
   if (!session) {
     return { status: "error", message: "Your session has expired. Sign in again." };
   }
-  if (!canManageLeads(session.profile)) {
+  if (!canManageLeads(session)) {
     return { status: "error", message: "You do not have access to enquiries." };
   }
   return null;

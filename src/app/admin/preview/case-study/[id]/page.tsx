@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { CaseStudyDetail, readGallery } from "@/components/case-studies/case-study-detail";
-import { requireStaff } from "@/lib/auth/session";
+import { requireMenu } from "@/lib/auth/session";
 import { getAdminCaseStudy } from "@/lib/queries/case-studies-admin";
 import { getCaseStudies } from "@/lib/queries/case-studies";
 import { getMediaByIds } from "@/lib/queries/projects";
@@ -28,7 +28,7 @@ export default async function CaseStudyPreview({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireStaff();
+  await requireMenu("case-studies");
 
   const { id } = await params;
   const study = await getAdminCaseStudy(id);
