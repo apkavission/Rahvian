@@ -89,12 +89,11 @@ Wired 2026-08-27, none of it seen working:
 
 ### Accounts, roles and menus
 
-Built 2026-08-27, none of it seen working — **and none of it can be, until the
-two migrations are run.** Before them the screen renders from the roles compiled
-into the application and every save fails on a missing column, which is the
-expected behaviour and not the thing to test.
+Built 2026-08-27, none of it seen working. Both migrations are applied and the
+database types were regenerated from the live schema, so there is nothing left
+in the way — this is a browser pass and nothing else.
 
-Once they are run, in this order:
+In this order:
 
 - **The Roles tab first.** The seven seeded roles are there, Owner and Super
   admin outrank the rest, and the system ones say they cannot be deleted.

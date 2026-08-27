@@ -5,13 +5,13 @@
 **Current phase:** 1 — Public site
 **Current plan:** none written; this file is the working list. `docs/plans/` is
 empty — the plan file the earlier entry pointed at was never created.
-**Next action:** **two migrations are waiting to be run** — see the block at
-the top of "What is waiting on the owner" below. Until they are, the users
-screen renders from the roles compiled into the application and refuses to save.
-After that: the navigation screen and the SEO screen, the last two entries in
-the menu still marked *Not built*. The smaller piece left over from the image
-work is `projects.gallery` and `case_studies.screenshots`, which are lists of
-images rather than one and need the picker to become a repeater.
+**Next action:** the **navigation screen**. `company.nav_items` is a seeded
+table the header, the footer and the mobile menu already read; nothing edits it
+yet, so `/admin/navigation` is the last content screen in the menu still marked
+*Not built*. After it, the **SEO screen** — `seo_defaults` is read by every page
+through `buildMetadata()` and is likewise not editable. The piece left over from
+the image work is `projects.gallery` and `case_studies.screenshots`, which are
+lists of images rather than one and need the picker to become a repeater.
 
 **Accounts, roles and menus are built.** `/admin/users` is two tabs — People
 and Roles — and it is the estate's control plane: an owner opens an account, a
@@ -34,9 +34,12 @@ Everything is dynamic and verified: 6 pricing plans, 4 blog categories, 14 FAQs,
 7 services and 11 pages with 45 sections between them, all read from the
 database at build time.
 
-**All eleven migrations are applied.** `20260826000010_email_templates.sql`
-and `20260827000011_staff_select_grants.sql` were both run by the owner on
-2026-08-27. The admin panel has been signed in to and used end to end since.
+**All thirteen migrations are applied.** `20260826000010_email_templates.sql`
+and `20260827000011_staff_select_grants.sql` were run by the owner on
+2026-08-27, and `20260827000012_profile_menu.sql` and
+`20260827000013_roles_master.sql` the same day. The admin panel has been signed
+in to and used end to end since. The generated types were refreshed from the
+live schema afterwards — 25 tables, 5 enums.
 
 **The owner's account exists:** `apkavission@gmail.com`, role `owner`. A test
 account also exists — `kumarnitish4384@gmail.com`, same role — which should be
@@ -71,32 +74,16 @@ on this list blocks building any more.
 | 4 | **Write up the case studies** at `/admin/case-studies`. | `/case-studies` is a working page with nothing on it. The table is empty. | at the end |
 | 5 | **Fill in the contact details** at `/admin/settings` — phone, WhatsApp, address, CIN, GST, social links. | Email footers, the "Call us" links, the quote page's contact panel, and the Organization data search engines read. | ~10 min |
 
-### ⚠ Two migrations to run in the Supabase SQL editor
+**No SQL to run.** All thirteen migrations are applied. `20260827000012`
+(the per-person menu columns) and `20260827000013` (the roles master table, the
+enum-to-foreign-key change and the three rewritten RLS helpers) were both run by
+the owner on 2026-08-27, and `npm run db:types` regenerated
+`src/types/database.ts` from the live schema — **25 tables, 5 enums**, and the
+generated file agrees with the hand-written types the code was built against.
+`tsc`, the tests and the build were all re-run against it and are clean.
 
-This is the one thing on this page that blocks the next session. Run them in
-this order, both in full:
-
-1. `supabase/migrations/20260827000012_profile_menu.sql` — adds `menu_extra`
-   and `menu_denied` to `company.profiles`. Two columns and a constraint.
-2. `supabase/migrations/20260827000013_roles_master.sql` — creates
-   `company.roles`, seeds the seven roles, turns `profiles.role` from an enum
-   into a foreign key into it, and rewrites the three RLS helper functions to
-   read the table.
-
-**Until they are run**, the admin still works — it falls back to the roles
-compiled into the application, which are identical to what the migration seeds —
-but `/admin/users` cannot save anything, because the columns it writes to do not
-exist yet. Nothing else is affected.
-
-After running them, from the project directory:
-
-```
-npm run db:types
-```
-
-That regenerates `src/types/database.ts` from the live schema. The two new
-tables' types are hand-written in that file today so the build is honest before
-the migration lands; regenerating replaces them with the real thing.
+If a migration is ever needed again, the file name and the words "run this in
+the Supabase SQL editor" go at the top of the summary, not buried here.
 
 ---
 
@@ -112,12 +99,13 @@ Say one of these. Nothing else is needed — this file carries the context.
 | Change something already built | **`<what> me <change> karo`** — e.g. `email template ka text badlo` |
 
 **`aage karo` right now means:** the navigation screen — `nav_items` is a
-seeded table the header and footer already read, and `/admin/navigation` is the
-last content screen in the menu still marked *Not built*. After it, the SEO
-screen. Say `seo screen karo`, `gallery repeater karo` or any other screen by
-name to take that one instead.
+seeded table the header, the footer and the mobile menu already read, and
+`/admin/navigation` is the last content screen in the menu still marked *Not
+built*. After it, the SEO screen. Say `seo screen karo`, `gallery repeater
+karo` or any other screen by name to take that one instead.
 
-**Before either, the owner has two migrations to run.** See the block above.
+**Nothing is waiting on the owner.** There is no SQL to run and nothing to
+configure; the next session can start writing code immediately.
 
 Whoever picks this up should read this file first. **Update the two lines below
 "Next action" at the top when you finish something** — they are what the next
@@ -529,11 +517,11 @@ owner-only screen, a role that has been deleted out from under an account, and
 the rank ceiling), `npm run lint` back at its exact pre-existing baseline of 11
 problems in seven untouched files.
 
-**Not verified:** none of it in a browser, and the two migrations have not been
-run. See [testing.md](testing.md).
+**Applied the same day.** The owner ran both migrations and regenerated the
+database types; `tsc`, the 92 tests and the build were re-run against the live
+schema and are clean. Nothing about this entry is waiting on anybody.
 
-**Owner action:** two migrations, then `npm run db:types`. Called out in full
-near the top of this file.
+**Not verified:** none of it in a browser. See [testing.md](testing.md).
 
 ### 2026-08-27 — image fields, and the bug that would have blurred every small picture
 
