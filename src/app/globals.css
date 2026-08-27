@@ -1,0 +1,622 @@
+@import "tailwindcss";
+
+/* ===========================================================================
+   Design tokens.
+
+   Light and dark are two designed themes, not one palette and its inverse.
+   Every colour used anywhere in the application resolves through these
+   variables. No component may contain a literal colour value.
+
+   Three layers, in order:
+     1. :root                       light theme (the default)
+     2. @media prefers-color-scheme  dark, only when no explicit choice is set
+     3. [data-theme="..."]           explicit user choice, wins over both
+
+   Variant branding overrides --accent-* and --radius-base at runtime by
+   inlining them on the <html> element from the server. Nothing here needs to
+   change for that to work.
+   =========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* -- Surface ----------------------------------------------------------- */
+  --bg: #fcfcfd;
+  --surface: #ffffff;
+  --surface-2: #f4f5f7;
+  --surface-3: #eaecf0;
+  --overlay: rgb(11 18 32 / 0.45);
+
+  /* -- Skeleton ----------------------------------------------------------
+     The placeholder a piece of content leaves while it is on its way, and
+     the light that travels across it. Two tokens rather than reused surface
+     steps, because the surface scale inverts between the themes: in light,
+     a higher number is darker; in dark, lighter. A skeleton built out of
+     `surface-2` and `surface-3` would sweep a highlight in one theme and a
+     shadow in the other.                                                  */
+  --skeleton: #eaecf0;
+  --skeleton-sheen: rgb(255 255 255 / 0.75);
+
+  /* -- Border ------------------------------------------------------------ */
+  --border: #e4e7ec;
+  --border-strong: #d0d5dd;
+  --ring: #0c6f6e;
+
+  /* -- Text -------------------------------------------------------------- */
+  --text: #0b1220;
+  --text-muted: #475467;
+  --text-subtle: #5d6675;
+  --text-inverse: #ffffff;
+
+  /* -- Accent ------------------------------------------------------------ */
+  --accent: #0c6f6e;
+  --accent-hover: #0a6362;
+  --accent-fg: #ffffff;
+  --accent-soft: #e6f4f4;
+
+  /* -- Semantic ---------------------------------------------------------- */
+  --success: #067647;
+  --success-soft: #e7f6ee;
+  --success-fg: #ffffff;
+  --warning: #b54708;
+  --warning-soft: #fdf3e7;
+  --warning-fg: #ffffff;
+  --danger: #c92a1d;
+  --danger-soft: #fdeceb;
+  --danger-fg: #ffffff;
+  --info: #175cd3;
+  --info-soft: #eaf1fd;
+  --info-fg: #ffffff;
+
+  /* -- Depth -------------------------------------------------------------
+     Light mode builds elevation with real shadows.
+     --highlight is transparent here; it only does work in dark mode.        */
+  --shadow-1: 0 1px 2px rgb(16 24 40 / 0.05);
+  --shadow-2: 0 4px 8px -2px rgb(16 24 40 / 0.08), 0 2px 4px -2px rgb(16 24 40 / 0.05);
+  --shadow-3: 0 20px 24px -4px rgb(16 24 40 / 0.08), 0 8px 8px -4px rgb(16 24 40 / 0.03);
+  --glow: none;
+  --highlight: transparent;
+
+  /* -- Grain -------------------------------------------------------------
+     Dark surfaces get a faint grain to kill banding and add depth.
+     Light mode gets none — it would read as dirt.                          */
+  --grain-opacity: 0;
+
+  /* -- WebGL scenes ------------------------------------------------------
+     The same accent is far more assertive on white than on near-black, so
+     the scenes are dialled back in light mode. Without this the lattice
+     reads as clutter behind the headline rather than atmosphere.           */
+  --scene-opacity: 0.62;
+
+  /* -- Geometry ----------------------------------------------------------
+     --radius-base is variant-controlled. The rest derive from it.          */
+  --radius-base: 0.75rem;
+  --radius-sm: calc(var(--radius-base) * 0.5);
+  --radius-md: calc(var(--radius-base) * 0.75);
+  --radius-lg: var(--radius-base);
+  --radius-xl: calc(var(--radius-base) * 1.5);
+  --radius-2xl: calc(var(--radius-base) * 2);
+
+  /* -- Motion ------------------------------------------------------------ */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 500ms;
+}
+
+/* Dark, applied only when the visitor has expressed no explicit preference. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --bg: #07090c;
+    --surface: #0e1218;
+    --surface-2: #151b23;
+    --surface-3: #1d242e;
+    --overlay: rgb(3 5 8 / 0.7);
+
+    --skeleton: #1d242e;
+    --skeleton-sheen: rgb(255 255 255 / 0.07);
+
+    --border: #232b36;
+    --border-strong: #323c4a;
+    --ring: #2dd4bf;
+
+    --text: #e8edf4;
+    --text-muted: #98a5b6;
+    --text-subtle: #808fa2;
+    --text-inverse: #07090c;
+
+    --accent: #2dd4bf;
+    --accent-hover: #5eead4;
+    --accent-fg: #04201f;
+    --accent-soft: rgb(45 212 191 / 0.12);
+
+    --success: #34d399;
+    --success-soft: rgb(52 211 153 / 0.12);
+    --success-fg: #04201a;
+    --warning: #fbbf24;
+    --warning-soft: rgb(251 191 36 / 0.12);
+    --warning-fg: #2a1c02;
+    --danger: #f87171;
+    --danger-soft: rgb(248 113 113 / 0.12);
+    --danger-fg: #2a0a0a;
+    --info: #60a5fa;
+    --info-soft: rgb(96 165 250 / 0.12);
+    --info-fg: #05152e;
+
+    /* Shadows are invisible on near-black. Elevation comes from a lighter
+       surface plus a 1px top highlight that simulates a light source.      */
+    --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow-2: 0 4px 12px rgb(0 0 0 / 0.45);
+    --shadow-3: 0 24px 48px rgb(0 0 0 / 0.55);
+    --glow: 0 0 48px rgb(45 212 191 / 0.15);
+    --highlight: rgb(255 255 255 / 0.08);
+
+    --grain-opacity: 0.03;
+    --scene-opacity: 0.95;
+  }
+}
+
+/* Explicit choice. Wins over the media query in both directions. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #07090c;
+  --surface: #0e1218;
+  --surface-2: #151b23;
+  --surface-3: #1d242e;
+  --overlay: rgb(3 5 8 / 0.7);
+
+  --skeleton: #1d242e;
+  --skeleton-sheen: rgb(255 255 255 / 0.07);
+
+  --border: #232b36;
+  --border-strong: #323c4a;
+  --ring: #2dd4bf;
+
+  --text: #e8edf4;
+  --text-muted: #98a5b6;
+  --text-subtle: #808fa2;
+  --text-inverse: #07090c;
+
+  --accent: #2dd4bf;
+  --accent-hover: #5eead4;
+  --accent-fg: #04201f;
+  --accent-soft: rgb(45 212 191 / 0.12);
+
+  --success: #34d399;
+  --success-soft: rgb(52 211 153 / 0.12);
+  --success-fg: #04201a;
+  --warning: #fbbf24;
+  --warning-soft: rgb(251 191 36 / 0.12);
+  --warning-fg: #2a1c02;
+  --danger: #f87171;
+  --danger-soft: rgb(248 113 113 / 0.12);
+  --danger-fg: #2a0a0a;
+  --info: #60a5fa;
+  --info-soft: rgb(96 165 250 / 0.12);
+  --info-fg: #05152e;
+
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-2: 0 4px 12px rgb(0 0 0 / 0.45);
+  --shadow-3: 0 24px 48px rgb(0 0 0 / 0.55);
+  --glow: 0 0 48px rgb(45 212 191 / 0.15);
+  --highlight: rgb(255 255 255 / 0.08);
+
+  --grain-opacity: 0.03;
+  --scene-opacity: 0.95;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+/* ===========================================================================
+   Tailwind theme mapping.
+
+   `inline` is required because every value references another custom
+   property. Without it Tailwind would freeze the value at build time and
+   runtime theme switching would stop working.
+   =========================================================================== */
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-overlay: var(--overlay);
+  --color-skeleton: var(--skeleton);
+  --color-skeleton-sheen: var(--skeleton-sheen);
+
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-ring: var(--ring);
+
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-text-subtle: var(--text-subtle);
+  --color-text-inverse: var(--text-inverse);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-fg: var(--success-fg);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-fg: var(--warning-fg);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-fg: var(--danger-fg);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-fg: var(--info-fg);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+
+  --shadow-1: var(--shadow-1);
+  --shadow-2: var(--shadow-2);
+  --shadow-3: var(--shadow-3);
+
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, monospace;
+
+  --ease-out: var(--ease-out);
+  --ease-in-out: var(--ease-in-out);
+}
+
+/* ===========================================================================
+   Base layer
+   =========================================================================== */
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Grain overlay. Zero-opacity in light mode, so it costs nothing there.
+     Pointer-events none and fixed, so it never interferes with anything.  */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: var(--grain-opacity);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+    transition: opacity var(--duration-base) var(--ease-out);
+  }
+
+  /* Headings get the display face and optical tracking correction. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
+    text-wrap: balance;
+    letter-spacing: -0.02em;
+  }
+
+  h1 {
+    letter-spacing: -0.035em;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* One focus treatment, legible in both themes. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: var(--accent-fg);
+  }
+
+  /* Scrollbar follows the theme rather than the operating system. */
+  ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bg);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border: 3px solid var(--bg);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-subtle);
+  }
+
+  /* Reduced motion is a designed state, not merely disabled motion.
+     Content still reveals — it appears instead of travelling.            */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ===========================================================================
+   Utilities
+   =========================================================================== */
+
+/* ===========================================================================
+   Keyframes
+
+   Only transform and opacity animate. Anything touching layout properties
+   would force reflow on every frame and blow the interaction budget.
+   =========================================================================== */
+
+@keyframes fade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Toasts enter from above, because that is where they appear. `fade-rise`
+   moves the other way and would read as sliding out of the header. */
+/* The brand loader. The mark resolves in the centre while the two halves of
+   the name close in on it from either side — the same gesture every time, so
+   a wait is recognisably ours rather than a borrowed spinner.
+
+   The global reduced-motion rule collapses these to their end state, which is
+   the finished lockup. Nothing is hidden behind an animation. */
+@keyframes brand-mark-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The two halves of the name start behind the mark and settle outward, so
+   the name looks like it comes out of the logo rather than flying at it. */
+@keyframes brand-word-left {
+  from {
+    opacity: 0;
+    transform: translateX(2rem) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes brand-word-right {
+  from {
+    opacity: 0;
+    transform: translateX(-2rem) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Runs while the wait continues, so a slow response never looks frozen. */
+@keyframes brand-breathe {
+  0%,
+  100% {
+    opacity: 0.75;
+    transform: scale(0.985);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.015);
+  }
+}
+
+/* The mark's own rising arrow, drawing itself and clearing, for as long as
+   the wait lasts. It replaced a sliding progress bar: a generic indicator
+   under a brand lockup is the one part of the screen that could belong to
+   anyone. */
+@keyframes brand-arrow-draw {
+  0% {
+    stroke-dashoffset: 100;
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  62% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  86% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+  100% {
+    stroke-dashoffset: 100;
+    opacity: 0;
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@layer utilities {
+  /* -------------------------------------------------------------------------
+     Scroll-driven reveal.
+
+     Content is visible by default. The animation is added only where the
+     browser supports scroll-driven timelines, and only when the visitor has
+     not asked for reduced motion.
+
+     This ordering is the whole point. An earlier version started at
+     `opacity: 0` and revealed with JavaScript, which meant the entire page was
+     invisible until hydration finished — and permanently invisible if a script
+     failed. Progressive enhancement here is not a nicety; it is the difference
+     between a page that degrades and a page that disappears.
+
+     Zero JavaScript: no observer, no listener, no client component.
+     ------------------------------------------------------------------------- */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        animation: fade-rise linear both;
+        animation-timeline: view();
+        animation-range: entry 4% entry 46%;
+      }
+
+      /* Stagger. Each child starts its range slightly later, so a row of cards
+         resolves in sequence rather than together. Expressed as nth-child
+         rules because a scroll timeline has no time-based delay to offset. */
+      .reveal-group > *:nth-child(1)  { animation-range: entry 4%  entry 46%; }
+      .reveal-group > *:nth-child(2)  { animation-range: entry 8%  entry 50%; }
+      .reveal-group > *:nth-child(3)  { animation-range: entry 12% entry 54%; }
+      .reveal-group > *:nth-child(4)  { animation-range: entry 16% entry 58%; }
+      .reveal-group > *:nth-child(5)  { animation-range: entry 20% entry 62%; }
+      .reveal-group > *:nth-child(6)  { animation-range: entry 24% entry 66%; }
+      .reveal-group > *:nth-child(n+7){ animation-range: entry 28% entry 70%; }
+    }
+  }
+
+  /* Elevated dark surfaces carry a 1px top highlight to fake a light source.
+     In light mode --highlight is transparent, so this is inert.           */
+  .surface-raised {
+    background-color: var(--surface);
+    box-shadow:
+      inset 0 1px 0 0 var(--highlight),
+      var(--shadow-2);
+  }
+
+  .container-page {
+    width: 100%;
+    max-width: 80rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .container-page {
+      padding-inline: 2rem;
+    }
+  }
+
+  /* Body copy never exceeds a comfortable measure. */
+  .measure {
+    max-width: 68ch;
+  }
+
+  /* -------------------------------------------------------------------------
+     Theme-paired assets.
+
+     A two-colour logo cannot be recoloured with `currentColor`, so the light
+     and dark files are both in the HTML and one is hidden. CSS decides which,
+     which means the correct mark is painted in the first frame — no
+     hydration, no flash, and it still works with JavaScript off.
+
+     The three-state ordering mirrors the token blocks at the top of this file:
+     light by default, dark under the media query only when no explicit choice
+     has been made, then the explicit attribute winning in both directions.
+     ------------------------------------------------------------------------- */
+  .theme-dark-only {
+    display: none;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .theme-light-only {
+      display: none;
+    }
+    :root:not([data-theme="light"]) .theme-dark-only {
+      display: revert-layer;
+    }
+  }
+
+  :root[data-theme="light"] .theme-light-only {
+    display: revert-layer;
+  }
+  :root[data-theme="light"] .theme-dark-only {
+    display: none;
+  }
+
+  :root[data-theme="dark"] .theme-light-only {
+    display: none;
+  }
+  :root[data-theme="dark"] .theme-dark-only {
+    display: revert-layer;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Skeleton sweep.
+
+   The light that travels across a placeholder while its content is on its way.
+   Transform only, like every other keyframe here, so it costs no reflow — and
+   under reduced motion the global rule lands it at its end position, off the
+   right-hand edge, leaving a still grey block. That is the correct degraded
+   state: the shape of the page is still communicated, without the movement.
+   --------------------------------------------------------------------------- */
+@keyframes skeleton-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
