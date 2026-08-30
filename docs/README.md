@@ -1,5 +1,9 @@
 # Apka Saathi Private Limited — Documentation
 
+**Start here: [STATUS.md](STATUS.md)** — one page. Every project, how much is
+built, how much is actually tested, and what is waiting on the owner. The
+reasoning behind any line of it is in estate-status.md below.
+
 **Where the whole estate stands right now, checked rather than remembered:**
 **[estate-status.md](estate-status.md)** — all eight applications, every check
 that was run and what it said, which SQL is outstanding (none), and the four
