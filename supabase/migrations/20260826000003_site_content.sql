@@ -55,7 +55,7 @@ create table company.site_settings (
   -- path that already exists for mobile, with no deploy required.
   three_d_enabled   boolean not null default true,
 
-  -- 'full' | 'reduced' | 'off'. Lets motion be dialled back site-wide without
+  -- ’full’ | ’reduced’ | ’off’. Lets motion be dialled back site-wide without
   -- a code change if it ever causes a problem.
   motion_level      text not null default 'full'
                       check (motion_level in ('full', 'reduced', 'off')),
@@ -229,7 +229,7 @@ create table company.page_sections (
   id                 uuid primary key default gen_random_uuid(),
   page_id            uuid not null references company.pages(id) on delete cascade,
 
-  -- Matches a key in the application's section registry. Kept as text rather
+  -- Matches a key in the application’s section registry. Kept as text rather
   -- than an enum on purpose: adding a section type must not require a
   -- migration, only a new component and its Zod schema.
   type               text not null check (length(btrim(type)) > 0),
@@ -237,7 +237,7 @@ create table company.page_sections (
   sort_order         integer not null default 0,
   is_active          boolean not null default true,
 
-  -- Payload, validated by the section type's Zod schema before it is written.
+  -- Payload, validated by the section type’s Zod schema before it is written.
   content            jsonb not null default '{}'::jsonb,
 
   custom_class       text,

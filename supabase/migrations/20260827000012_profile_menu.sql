@@ -14,7 +14,7 @@
 -- role should have it, without touching a single row.
 --
 -- The keys are the ones declared in `src/components/admin/nav.ts`. They are
--- code, not content: the menu is this panel's own structure, and a key that no
+-- code, not content: the menu is this panel’s own structure, and a key that no
 -- longer exists resolves to nothing rather than to a broken link.
 --
 -- Note what this does NOT do. It grants no data. RLS decides which rows an

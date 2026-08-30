@@ -558,6 +558,30 @@
     }
   }
 
+  /*
+    Two steps up on a wide monitor.
+
+    Capped at 80rem until a 1600px viewport, because that is where a laptop
+    stops and a desk monitor starts. Above it the frame grows so the admin's
+    tables stop truncating; prose does not follow it, because `.measure` below
+    caps body copy at 68ch whatever the container does.
+
+    Steps rather than a fluid width: a layout that is never twice the same
+    cannot be checked, and "it looked fine on mine" is how the 1280px cap
+    survived this long.
+  */
+  @media (min-width: 100rem) {
+    .container-page {
+      max-width: 90rem;
+    }
+  }
+
+  @media (min-width: 120rem) {
+    .container-page {
+      max-width: 100rem;
+    }
+  }
+
   /* Body copy never exceeds a comfortable measure. */
   .measure {
     max-width: 68ch;

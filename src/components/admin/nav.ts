@@ -22,7 +22,8 @@ export type MenuKey =
   | "media"
   | "settings"
   | "seo"
-  | "users";
+  | "users"
+  | "estate";
 
 export interface AdminNavItem {
   key: MenuKey;
@@ -102,6 +103,27 @@ export const ADMIN_NAV: AdminNavGroup[] = [
         label: "Users",
         href: "/admin/users",
         icon: "user-cog",
+        ownerOnly: true,
+      },
+    ],
+  },
+  {
+    label: "The estate",
+    items: [
+      {
+        /*
+          Phase 10, and the reason it is owner-only is the same as `users`.
+
+          These screens read across every schema in the estate — six demos, the
+          panel, and this website. Somebody who can see all of it can see every
+          enquiry every business has ever received. That is not a grant to hand
+          out screen by screen; it is what being accountable for the estate
+          means, which is what `is_owner` already identifies.
+        */
+        key: "estate",
+        label: "Estate",
+        href: "/admin/estate",
+        icon: "layers",
         ownerOnly: true,
       },
     ],

@@ -73,12 +73,26 @@ await check(
   (r) => Number(r[0].n) > 0,
 );
 
+/*
+  Three businesses per demo schema.
+
+  This is the check that catches a content migration which did not run, and it
+  is the only one that can: a file of `insert` statements creates nothing a
+  catalogue can be asked about, so `verify:estate` honestly reports it as "not
+  checkable" and moves on.
+
+  The store demo proved the point on 2026-08-31. Its schema was applied, its
+  functions were applied, `verify:estate` said 0 still to run — and every table
+  in it was empty, because the content file had failed on a paste and nothing
+  was watching the row counts.
+*/
 for (const [schema, expected] of [
   ["demo_clinic", 3],
   ["demo_resto", 3],
   ["demo_school", 3],
   ["demo_estate", 3],
   ["demo_crm", 3],
+  ["demo_shop", 3],
 ]) {
   await check(
     `${schema} has ${expected} businesses`,
@@ -86,6 +100,17 @@ for (const [schema, expected] of [
     (r) => Number(r[0].n) === expected,
   );
 }
+
+await check(
+  "the store has stock on its shelves",
+  `select (select count(*) from demo_shop.products) as products,
+          (select count(*) from demo_shop.collections) as collections,
+          (select count(*) from demo_shop.coupons) as coupons`,
+  (r) =>
+    Number(r[0].products) >= 18 &&
+    Number(r[0].collections) >= 9 &&
+    Number(r[0].coupons) >= 6,
+);
 
 console.log("\nThe approval backfill — nothing converted without an approval");
 

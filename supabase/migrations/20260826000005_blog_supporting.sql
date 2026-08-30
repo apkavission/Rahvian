@@ -99,7 +99,7 @@ create table company.faqs (
   question   text not null check (length(btrim(question)) > 0),
   answer     text not null check (length(btrim(answer)) > 0),
 
-  -- Which pages this FAQ belongs to: 'home', 'pricing', 'contact', or a
+  -- Which pages this FAQ belongs to: ’home’, ’pricing’, ’contact’, or a
   -- service slug. One FAQ can serve several pages.
   scope      text[] not null default '{}',
 

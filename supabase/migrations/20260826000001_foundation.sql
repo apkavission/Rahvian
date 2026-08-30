@@ -9,7 +9,7 @@
 -- IMPORTANT: `company` must be added to the exposed schemas list before
 -- PostgREST will serve it. Locally that is `[api] schemas` in config.toml.
 -- On a hosted project it is Dashboard -> Project Settings -> API -> Exposed
--- schemas. The application also sets `db: { schema: 'company' }` on its
+-- schemas. The application also sets `db: { schema: ’company’ }` on its
 -- Supabase clients.
 -- ===========================================================================
 

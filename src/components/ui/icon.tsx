@@ -19,6 +19,7 @@ import {
   Image as ImageIcon,
   Images,
   Inbox,
+  Layers,
   Menu,
   NotebookText,
   Tag,
@@ -41,6 +42,7 @@ import {
 const CONTENT_ICONS: Record<string, LucideIcon> = {
   globe: Globe,
   "layout-dashboard": LayoutDashboard,
+  layers: Layers,
   smartphone: Smartphone,
   "settings-2": Settings2,
   sparkles: Sparkles,

@@ -15,8 +15,8 @@ create table company.profiles (
   full_name    text not null default '',
   avatar_url   text,
   role         company.user_role not null default 'editor',
-  -- Which applications this account may reach: 'company', 'clinic', 'resto',
-  -- 'school', 'estate', 'crm'. One login serves the whole estate; this array
+  -- Which applications this account may reach: ’company’, ’clinic’, ’resto’,
+  -- ’school’, ’estate’, ’crm’. One login serves the whole estate; this array
   -- is what scopes it.
   app_access   text[] not null default array['company']::text[],
   is_active    boolean not null default true,
@@ -40,7 +40,7 @@ create trigger profiles_set_updated_at
 -- Create a profile automatically whenever an auth user is created, so no code
 -- path can produce a user without one.
 --
--- Deliberately conservative defaults: 'editor', company-only access. Elevation
+-- Deliberately conservative defaults: ’editor’, company-only access. Elevation
 -- is always an explicit act by an owner, never an accident of signup.
 create or replace function company.handle_new_auth_user()
 returns trigger

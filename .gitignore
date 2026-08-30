@@ -74,3 +74,8 @@ CLAUDE.md
 
 # nightly database export, when written with --local
 /backups
+
+# Playwright output. A run artefact, not source — and `.last-run.json` changes
+# on every run, which makes every commit look like it touched the tests.
+/test-results/
+/playwright-report/

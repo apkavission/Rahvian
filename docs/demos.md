@@ -1,9 +1,15 @@
 # The demo portfolio
 
-**What it is.** Five demonstration applications, each showing the same codebase
-running as three completely different businesses. Fifteen visibly distinct sites
-from five projects, every one of them working — the booking form books, the panel
+**What it is.** Six demonstration applications, each showing the same codebase
+running as three completely different businesses. Eighteen visibly distinct sites
+from six projects, every one of them working — the booking form books, the panel
 shows it, the receptionist screen moves it along.
+
+**Five were the plan; the sixth is an online store**, added 2026-09-02 and the
+only one that transacts. A basket that survives a reload, stock that really comes
+down, discount codes that explain why they failed, and a checkout that takes an
+address and asks nothing about a card. It is the demo a retail prospect asks for,
+and the other five could not answer that question at all.
 
 **Why it exists.** A prospect who is shown a slide deck is being asked to
 imagine. A prospect who fills in a booking form on a site branded as their own

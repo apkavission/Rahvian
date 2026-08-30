@@ -39,6 +39,7 @@ const PROJECTS = [
   { name: "demo-school", dir: "c:/Users/kumar/demo-school" },
   { name: "demo-realestate", dir: "c:/Users/kumar/demo-realestate" },
   { name: "demo-crm", dir: "c:/Users/kumar/demo-crm" },
+  { name: "demo-ecommerce", dir: "c:/Users/kumar/demo-ecommerce" },
 ];
 
 const config = Object.fromEntries(
@@ -175,13 +176,35 @@ for (const project of PROJECTS) {
 
   const removed = dropped(everySql);
 
+  /* Set by the first migration in this project that has not been applied. */
+  let behind = false;
+
   for (const file of files) {
     const sql = readFileSync(`${dir}/${file}`, "utf8");
     const objects = wanted(sql);
 
     if (objects.length === 0) {
-      unknown += 1;
-      lines.push(`  ?  ${file}  (creates nothing this can check — see the note above)`);
+      /*
+        A file that creates nothing checkable is normally reported as unknown
+        and left out of the list of things to run — which is right when the rest
+        of its project is applied, and wrong the moment it is not.
+
+        The store demo found this: its content migration only inserts rows, so
+        it was called unverifiable and silently dropped from "still to run",
+        while the two migrations before it were listed. Somebody working down
+        that list would have created the schema and never seeded it.
+
+        So: once a project has a pending migration, every later file in it is
+        pending too. It comes after something that has not run, which is all
+        that needs to be known to decide whether to run it.
+      */
+      if (behind) {
+        pending.push({ project: project.name, file, missing: [] });
+        lines.push(`  NO ${file}  (nothing to check by name, but it follows one that has not run)`);
+      } else {
+        unknown += 1;
+        lines.push(`  ?  ${file}  (creates nothing this can check — see the note above)`);
+      }
       continue;
     }
 
@@ -193,6 +216,7 @@ for (const project of PROJECTS) {
       applied += 1;
       lines.push(`  ok ${file}`);
     } else {
+      behind = true;
       pending.push({ project: project.name, file, missing });
       lines.push(
         `  NO ${file}  — missing: ${missing.slice(0, 4).map((m) => m.name).join(", ")}${missing.length > 4 ? ` and ${missing.length - 4} more` : ""}`,

@@ -45,12 +45,21 @@ export function AccountForm({
   roles,
   assignable,
   isSelf,
+  applications = APP_ACCESS_OPTIONS,
 }: {
   values: AccountFormValues;
   roles: RoleDefinition[];
   /** The roles this owner may hand out. Never more authority than their own. */
   assignable: RoleDefinition[];
   isSelf: boolean;
+  /**
+   * The estate's own list, from `control.applications`.
+   *
+   * Falls back to the built-in array when that schema is not there yet -- a
+   * Users screen with no tick boxes at all is a worse failure than one showing
+   * a label a week out of date.
+   */
+  applications?: readonly { value: string; label: string; hint: string }[];
 }) {
   const [state, formAction, pending] = useActionState(saveAccount, initialAccountState);
   const [roleKey, setRoleKey] = useState(values.role);
@@ -149,12 +158,17 @@ export function AccountForm({
         </h3>
         <p className="measure mt-2 text-sm leading-relaxed text-text-muted">
           One login serves the whole estate, and this is what scopes it. An
-          account granted the task tracker does not reach this panel, and an
-          account granted this one does not reach the tracker.
+          account granted a demo does not reach this panel, and an account
+          granted this one does not reach the demos.
+        </p>
+        <p className="measure mt-2 text-sm leading-relaxed text-text-muted">
+          The task tracker is deliberately not on this list: it decides who may
+          sign in by looking for a staff record, not by reading this. A tick box
+          that changed nothing would be worse than none.
         </p>
 
         <div className="mt-4 grid gap-x-6 gap-y-2 sm:grid-cols-2">
-          {APP_ACCESS_OPTIONS.map((app) => (
+          {applications.map((app) => (
             <label key={app.value} className="flex items-start gap-3 rounded-lg px-2 py-1.5 text-sm">
               <input
                 type="checkbox"

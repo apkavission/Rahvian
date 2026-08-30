@@ -663,10 +663,15 @@ owner to pick between two options. Everything else is
 and a lawyer on the legal pages.
 
 **The whole estate is seventeen phases (0–16)**, so counting the same way:
-**twelve done, about 71%** — verified on 2026-08-30 by asking the database and
-building every project, not by reading this file. Blocks B and C are largely
-built: the client portal and the task tracker are each at 100% of their own
-tables, and five demo applications are built, seeded and running.
+**thirteen done, about 76%** — verified by asking the database and building every
+project, not by reading this file. Blocks B and C are done: the client portal and
+the task tracker are each at 100% of their own tables, all fifteen demo sites are
+built and tested, and phase 10 — the super admin — landed on 2026-09-02 after
+being the one phase in Block C that had never started.
+
+A sixth demo application was added on the same day, outside the plan: an online
+store, which is the one demo that transacts and the one a retail prospect asks
+for. It is at 83%, waiting on its migrations being run.
 
 **What is left across the estate is four phases and one part-phase**, and it is
 worth naming them rather than leaving a percentage to imply them:
@@ -675,14 +680,23 @@ worth naming them rather than leaving a percentage to imply them:
 |---|---|---|
 | 4. Company launch | Domain, deploy, accounts, a lawyer on the legal pages | Almost none of it is code — [owner-checklist.md](owner-checklist.md) |
 | 5. Messaging stage 1 | **Part done.** WhatsApp click-to-chat with page context is built and email sends; threaded inbound over Cloudflare Email Routing is not | Needs the domain from phase 4 |
-| 10. Super admin | `control` schema, app registry, unified inbox across all eight applications, audit log, estate dashboard | Never started. It is what makes running eight panels practical, and today each one is opened by hand |
 | 15. Messaging stage 2 | WhatsApp Cloud API, two-way threading | Needs Meta business verification and a dedicated number |
 | 16. Growth | Blog posts, cost estimator, profile PDF, location pages | Content work, after launch |
 
-**Ten of the fifteen planned demo sites are also not built.** Five applications
-exist with three businesses each; the plan was fifteen. That is a deliberate
-stop, not an oversight — five cover the five markets worth showing, and the
-sixth onwards is a decision to take after somebody has been shown these.
+**Three of those four are not developer work at all**, which is the useful thing
+the count does not say on its own. What is left of this estate that somebody
+could sit down and write is one half-phase: inbound email threading, and it
+cannot be built before the domain exists.
+
+**Correcting a mistake made in this file on 2026-08-30.** It said ten of the
+fifteen planned demo sites were not built. They were: the spec's Block C is
+**five demo applications with three variants each**, and five times three is the
+fifteen. All fifteen have existed since 2026-09-01, and the sentence claiming
+otherwise came from reading "fifteen demo sites" as fifteen applications.
+
+Worth writing down rather than quietly deleting, because it is the exact failure
+this file's counting rule exists to prevent — a number typed from memory,
+believed for two days, and repeated into the owner's summary.
 
 **What the number does not say**, and should be read beside it. The admin has
 now been clicked through, twice: once by hand on 2026-08-28, and once more when
@@ -737,8 +751,9 @@ inbox or a spam folder is not yet knowable.
 | | 6. Client portal core | ✅ **Done** — `portal` at 24 of 24 items and the task tracker at 32 of 32, both counted from their own tables. Projects, phases, tasks, requirements, derived progress, the client dashboard, the developer board and request triage all exist. **Not yet clicked through by a person** |
 | | 7. Portal collaboration | ✅ **Done** — the project conversation, internal notes a client cannot see, the change-request flow with an approval gate before any developer sees it, transfers with accept and reject, geofenced clocking in, and leave from master data. Verified by `check:schema` and `check:policies`, which plant real rows rather than counting empty tables |
 | **C. Demos** | 8. Variant framework | ✅ **Done** — built inside the clinic and then copied, not extracted to a shared package. That is the owner's rule: no project depends on another, so the plumbing is duplicated on purpose |
-| | 9, 11–14. The five demos | ✅ **Built, seeded and running** — clinic, restaurant, school, property, CRM, three businesses each, on ports 3300–3700. Each carries its own `docs/PROGRESS.md`, each at 83%: everything but a browser suite. Ten of the fifteen planned sites are not built, deliberately |
-| | 10. Super admin | ⚪ **Not started** — the `control` schema, the app registry, one inbox across the estate, the audit log. Eight panels are opened by hand today |
+| | 9, 11–14. The five demos | ✅ **Done** — clinic, restaurant, school, property, CRM, three businesses each, on ports 3300–3700. That is the fifteen demo sites the spec asked for. Each carries its own `docs/PROGRESS.md`, each at 100%: 42 browser tests apiece added 2026-09-02 |
+| | A sixth, unplanned | ✅ **Built** — an online store on 3800, three shops, with a real basket, real stock, coupons and a checkout. The spec did not ask for it; it is the one demo that transacts, and it is the one a retail prospect asks for. **Its migrations have not been run** |
+| | 10. Super admin | ✅ **Built 2026-09-02** — the `control` schema, the application registry, one inbox across every schema in the estate, and an append-only audit log. The Users screen now reads which applications exist from the registry rather than from a hardcoded array, which is where it had already drifted twice. **Its migration has not been run** |
 | **D. Growth** | 15–16 | ⚪ Not started |
 
 ---

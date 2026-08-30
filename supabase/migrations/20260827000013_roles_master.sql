@@ -29,7 +29,7 @@
 -- The seven original enum values are inserted as system rows before the column
 -- changes type, so every existing profile still points at something. The four
 -- that this panel offers are the four staff roles; client, developer and
--- demo_viewer are seeded reaching nothing here — they exist so the estate's
+-- demo_viewer are seeded reaching nothing here — they exist so the estate’s
 -- other panels have their rows waiting (spec section 14).
 -- ===========================================================================
 
@@ -249,7 +249,7 @@ comment on function company.is_staff() is
 
 -- Enquiries, made to agree with the menu.
 --
--- The standing rule's own example is "a senior employee who also handles
+-- The standing rule’s own example is "a senior employee who also handles
 -- enquiries". Granting that person the screen while this helper read only
 -- their role would have handed them a working page listing nothing — a worse
 -- answer than refusing the page, because they would report that there are no
@@ -310,7 +310,7 @@ comment on function company.is_owner() is
 --
 -- Every signed-in account reads the roles: the admin shell resolves its own
 -- menu from them on every request, so a staff member who could not read their
--- own role's default menu would see an empty sidebar. Only an owner writes.
+-- own role’s default menu would see an empty sidebar. Only an owner writes.
 --
 -- Readable by anon as well, because getRoles() is a cached read and a cached
 -- read is shared with requests that carry no session. Nothing here is

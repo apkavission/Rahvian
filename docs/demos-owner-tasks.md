@@ -1,11 +1,17 @@
 # The demos — what only you can do
 
-All five are built, seeded and running. Everything below is short.
+**This file is now the demos' half of a bigger one.** Everything across all nine
+applications — what was built, what was found wrong, and the ten SQL files
+waiting — is in [estate-status.md](estate-status.md). Read that first; this is
+the demo detail behind it.
 
-**For the whole estate rather than the demos alone** — all eight applications,
-every check that was run on 2026-08-30 and what it said — see
-[estate-status.md](estate-status.md). Each demo also now carries its own
-`docs/PROGRESS.md` and `docs/testing.md`.
+**Six demos now, not five.** An online store was added on 2026-09-02, on port
+3800, and it is the only one that transacts: a real basket, real stock, discount
+codes and a checkout. Its migrations have not been run yet, which is why it
+answers `Invalid schema` until you do.
+
+Each demo now carries its own `docs/PROGRESS.md` and `docs/testing.md`, which
+did not exist when this file was written.
 
 ---
 
@@ -16,8 +22,9 @@ applications list. Right now that is **everybody, including you** — which is
 correct, and looks like a broken panel if you were not expecting it.
 
 1. Company website admin → **Users** → your own account.
-2. Under **Applications**, tick the five demos: clinic, resto, school, estate,
-   crm.
+2. Under **Applications**, tick all six demos: clinic, resto, school, estate,
+   crm, shop. The store only appears once its migration and the registry
+   migration have been run.
 3. Save.
 
 Then open any panel and sign in with the same account you use everywhere else:
@@ -29,6 +36,7 @@ Then open any panel and sign in with the same account you use everywhere else:
 | School | `http://localhost:3500/admin` |
 | Property | `http://localhost:3600/admin` |
 | CRM | `http://localhost:3700/admin` |
+| Store | `http://localhost:3800/admin` |
 
 Your role decides what you see. **Owner or super admin** gets the whole panel,
 including *Businesses* and *Share links*. Anything else with demo access gets
@@ -37,10 +45,18 @@ than greyed out.
 
 ---
 
-## 2. Nothing to run in SQL
+## 2. There is SQL to run now
 
-Fifteen migrations are applied and verified — four for the clinic, three each for
-the other four. Every schema was checked afterwards by asking it, as an anonymous
+**This section said "nothing to run in SQL" and that was true on 2026-08-30.**
+Since then a sixth demo and five clone functions have been written, and none of
+them is applied. The list, in order, is in
+[estate-status.md](estate-status.md) §5 — or ask the database rather than a file:
+
+```
+cd services && npm run verify:estate
+```
+
+Sixteen migrations are applied and verified across the five older demos. Every schema was checked afterwards by asking it, as an anonymous
 visitor, whether the content is readable and the enquiries are not:
 
 ```
@@ -133,9 +149,12 @@ table and no photographs in it. That is a content job — a stock photograph of 
 smiling stranger would make these look like every other template, and a real
 photograph of a real clinic would be a lie.
 
-**Cloning a business from the panel.** Adding a fourth variant is a database job
-today. The clone function has to walk every table in dependency order and remap
-the ids, and it is the next thing worth a button.
+**Photographs.** Still true, and still deliberate.
 
-**Browser tests for the demos.** The three older applications have suites; these
-five have none yet.
+~~**Cloning a business from the panel.**~~ Built on 2026-09-02 — it is a *Copy
+this one* button on the Businesses screen of every demo. The walk lives in the
+database because it has to be one transaction. It needs its migration run.
+
+~~**Browser tests for the demos.**~~ Written on 2026-09-02: 42 per demo at
+desktop and phone widths, 52 for the store. 210 are green; the store's cannot
+run until its schema exists.

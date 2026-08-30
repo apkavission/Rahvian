@@ -63,6 +63,10 @@ const OWNER_MENU: MenuKey[] = [
   "settings",
   "seo",
   "users",
+  /* The estate screens, added with phase 10. Owner-only for the same reason
+     `users` is: somebody who can read across all eight applications can read
+     every enquiry every business has ever received. */
+  "estate",
 ];
 
 /**

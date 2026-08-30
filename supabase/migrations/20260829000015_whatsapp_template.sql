@@ -8,7 +8,7 @@
 --
 -- Stage 1 of the messaging centre (spec §25.5) is pre-filling that sentence
 -- from the page the visitor was on. The wording belongs to the owner rather
--- than to a developer's guess, so it lives here rather than in the code, like
+-- than to a developer’s guess, so it lives here rather than in the code, like
 -- every other word on this site.
 --
 -- `{context}` is replaced at render time with what the visitor was looking at —
@@ -16,7 +16,7 @@
 -- is used exactly as written, because deleting it is a decision somebody made.
 --
 -- Nothing about this column costs money or needs an account. Click-to-chat is a
--- link; the paid, verified path is Meta's Cloud API in phase 15 and nothing
+-- link; the paid, verified path is Meta’s Cloud API in phase 15 and nothing
 -- here depends on it.
 -- ---------------------------------------------------------------------------
 

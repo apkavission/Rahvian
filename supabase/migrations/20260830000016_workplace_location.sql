@@ -1,7 +1,7 @@
 -- ===========================================================================
 -- Where somebody works, so the tracker can check they are there.
 --
--- The owner's instruction, 2026-08-30:
+-- The owner’s instruction, 2026-08-30:
 --
 --   > jo clock in aur clock out hai wo radius ke hisaab se hoga. Employee ne jo
 --   > address diya hai wo maine services me daala tha — tracker me login karke
@@ -12,7 +12,7 @@
 -- ---------------------------------------------------------------------------
 -- Why it lives here.
 --
--- Employees are created in this admin panel — that is already the owner's rule
+-- Employees are created in this admin panel — that is already the owner’s rule
 -- for roles, and the address is the same kind of fact about a person: it belongs
 -- with the employee record, not with whatever application happens to read it.
 -- The tracker reads it through a view, the same thin one-way window that
@@ -23,8 +23,8 @@
 --
 -- **Coordinates, not a geocoded address.** The address is written down for
 -- people to read; the fence is a point and a radius. Turning an address into a
--- point automatically means sending every employee's home address to somebody
--- else's geocoding service, and the owner's standing rule is that this estate
+-- point automatically means sending every employee’s home address to somebody
+-- else’s geocoding service, and the owner’s standing rule is that this estate
 -- keeps its data to itself. So the point is set by hand — stand at the place and
 -- press the button, or paste the coordinates from a map — which is also more
 -- accurate than a geocoder, because a geocoder returns the middle of a street.
@@ -36,7 +36,7 @@
 -- ---------------------------------------------------------------------------
 -- The honest limitation, written down so nobody is surprised by it later.
 --
--- A browser's location can be faked — developer tools will do it in a few
+-- A browser’s location can be faked — developer tools will do it in a few
 -- clicks, and there are phone apps for it. **This is a check, not proof.** It
 -- stops the ordinary case (clocking in from bed) and it does not stop somebody
 -- determined. Anything that would be proof needs hardware nobody here has.

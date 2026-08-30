@@ -27,18 +27,35 @@ const roleKey = z
 /**
  * The applications one login can be scoped to.
  *
- * `company` is this admin. The rest are the demo estate and the task tracker,
- * which have their own panels — an account granted one of those does not reach
- * this one, and that separation is the whole reason the column is an array
- * rather than a boolean (spec §14).
+ * `company` is this admin. The rest are the demo estate — each has its own
+ * panel, and an account granted one of those does not reach this one. That
+ * separation is the whole reason the column is an array rather than a boolean
+ * (spec §14).
+ *
+ * ---------------------------------------------------------------------------
+ * **`estate` was labelled "Task tracker" until 2026-08-30, and it never was.**
+ *
+ * The task tracker does not read this column at all — it decides who may sign
+ * in by looking for a row in `portal.staff`. What `estate` actually unlocks is
+ * the property demo, whose `is_admin()` asks for exactly that value. So the
+ * checkbox did something real and told the owner it did something else, which
+ * is the worst of the three possible states.
+ *
+ * The value is left alone and only the label corrected: renaming it would
+ * quietly revoke the property demo from every account that already has it.
+ *
+ * **The task tracker has no entry here on purpose.** A switch that changes
+ * nothing is worse than an absent one — somebody eventually ticks it, nothing
+ * happens, and the panel loses a little credibility it does not get back.
  */
 export const APP_ACCESS_OPTIONS = [
   { value: "company", label: "Company admin", hint: "This panel." },
-  { value: "estate", label: "Task tracker", hint: "The project and task tracker." },
   { value: "clinic", label: "Clinic demo", hint: "" },
   { value: "resto", label: "Restaurant demo", hint: "" },
   { value: "school", label: "School demo", hint: "" },
+  { value: "estate", label: "Property demo", hint: "" },
   { value: "crm", label: "CRM demo", hint: "" },
+  { value: "shop", label: "Store demo", hint: "" },
 ] as const;
 
 const APP_VALUES = APP_ACCESS_OPTIONS.map((app) => app.value) as string[];

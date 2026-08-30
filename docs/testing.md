@@ -339,6 +339,23 @@ SPF, DKIM and DMARC are still unset, and they are what decide it.
 
 ## What has never been checked
 
+### The estate screens — built 2026-09-02, opened by nobody
+
+Phase 10. Three screens under `/admin/estate`, all owner-only, and **none of
+them can render until `20260902000018_control_estate.sql` has been run** — until
+then each shows an explanation of what to run rather than a PostgREST error.
+
+| Screen | What to click |
+|---|---|
+| `/admin/estate` | Nine cards, one per application · a dash where an application has no such table and a zero where it has one and is empty — those are different facts and the screen must not conflate them · the warning strip naming any application whose schema is missing, which should be **the store demo** until its four migrations are run · each `Open` link, which must open that application's own port in a new tab |
+| `/admin/estate/inbox` | Every enquiry and message from every application, newest first · a name, a line, and where it came from — **and no phone numbers or addresses**, which is the whole reason this screen is allowed to exist · check a demo's own panel shows the same message, so the union is not silently dropping one |
+| `/admin/estate/audit` | Empty today, and the screen must say that means nothing has been *recorded* rather than that nothing has *happened* · after any action that calls `control.note`, the line names a real email rather than "unknown" |
+
+**And the thing that is not a screen:** sign in as an `admin` rather than an
+owner and type `/admin/estate` directly. It must answer as though the route does
+not exist — not as a refusal, which would confirm the screen is there.
+
+
 ### The seven screens, in a browser
 
 Plus one thing that is on every screen rather than being one:

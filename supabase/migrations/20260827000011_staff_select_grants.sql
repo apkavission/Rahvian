@@ -41,7 +41,7 @@ grant select on
 to authenticated;
 
 -- `company.form_submissions` is deliberately absent. It holds the salted
--- hashes behind the public forms' rate limiting, is written and read only by
+-- hashes behind the public forms’ rate limiting, is written and read only by
 -- the service role, and no screen has a reason to show it.
 
 -- No `alter default privileges` for authenticated, on purpose. A future table

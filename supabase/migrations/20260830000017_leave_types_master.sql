@@ -1,7 +1,7 @@
 -- ===========================================================================
 -- Leave types stop being an enum and become master data, like roles.
 --
--- The owner's instruction, 2026-08-30:
+-- The owner’s instruction, 2026-08-30:
 --
 --   > jo leave type bhi static mat rakhna samjhe ?? wo bhi admin panel se hi
 --   > aayega samjhe ?? master
@@ -68,7 +68,7 @@ create trigger leave_types_set_updated_at
 -- ---------------------------------------------------------------------------
 -- The five that already exist.
 --
--- Exactly the values of `portal.leave_kind`, with the same keys, so the tracker's
+-- Exactly the values of `portal.leave_kind`, with the same keys, so the tracker’s
 -- existing rows carry straight over and nothing has to be mapped.
 --
 -- `on conflict do nothing` so re-running never overwrites an edit somebody has

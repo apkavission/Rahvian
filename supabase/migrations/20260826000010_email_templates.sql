@@ -9,7 +9,7 @@
 -- What stays in code is the rendering: the table layout, the inline styles and
 -- the escaping. Those are constraints of the medium, not editorial decisions,
 -- and putting raw HTML in a database column would hand an admin the ability to
--- break every client's inbox rendering with one paste.
+-- break every client’s inbox rendering with one paste.
 --
 -- The application keeps a hardcoded fallback for every key here. A missing or
 -- deactivated row degrades to that fallback rather than sending an email with

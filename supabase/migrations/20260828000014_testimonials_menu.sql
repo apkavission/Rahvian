@@ -9,18 +9,18 @@
 -- could never appear.
 --
 -- Declaring the screen in `ADMIN_NAV` is not enough to make it reachable. A
--- menu is a permission (spec §15.2): `resolveMenu()` starts from the role's
--- `default_menu`, and a key that is in the code but in nobody's default menu is
--- a screen that 404s for every account, including the owner's.
+-- menu is a permission (spec §15.2): `resolveMenu()` starts from the role’s
+-- `default_menu`, and a key that is in the code but in nobody’s default menu is
+-- a screen that 404s for every account, including the owner’s.
 --
--- Added next to 'case-studies' rather than appended, so the stored array reads
+-- Added next to ’case-studies’ rather than appended, so the stored array reads
 -- in the order the sidebar does. Roles that reach no admin screen at all —
 -- client, developer, demo_viewer — are left alone: their empty menu is the
 -- point of them, not an omission.
 --
 -- Written to be safe to run twice, and to leave alone any menu an owner has
 -- since edited by hand: a role that already names the key is not touched, and a
--- role whose menu no longer carries 'case-studies' has been deliberately
+-- role whose menu no longer carries ’case-studies’ has been deliberately
 -- narrowed and does not silently get a new screen back.
 -- ---------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@ set default_menu = (
 
     union all
 
-    -- Slotted immediately after 'case-studies' by borrowing its position and
+    -- Slotted immediately after ’case-studies’ by borrowing its position and
     -- nudging it, which keeps one ordering rule rather than two.
     select 'testimonials', ordinality + 0.5
     from unnest(default_menu) with ordinality as menu(key, ordinality)

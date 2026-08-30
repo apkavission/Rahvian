@@ -10,6 +10,7 @@ import { getRoles } from "@/lib/queries/roles";
 import { getAccounts, type Account } from "@/lib/queries/users-admin";
 import { cn } from "@/lib/utils";
 import { AccountForm } from "./account-form";
+import { applicationOptions } from "@/lib/queries/applications";
 import { AccountSecurity } from "./account-security";
 import { NewAccountForm } from "./new-account-form";
 import { LeaveTypes } from "./leave-types";
@@ -58,10 +59,11 @@ export default async function UsersScreen({ searchParams }: Props) {
   const tab =
     query.tab === "roles" ? "roles" : query.tab === "leave" ? "leave" : "people";
 
-  const [{ accounts, capped }, roles, leaveTypes] = await Promise.all([
+  const [{ accounts, capped }, roles, leaveTypes, applications] = await Promise.all([
     getAccounts(),
     getRoles(),
     getLeaveTypes(),
+    applicationOptions(),
   ]);
 
   const assignable = assignableRoles(roles, session.role);
@@ -109,6 +111,7 @@ export default async function UsersScreen({ searchParams }: Props) {
           accounts={accounts}
           roles={roles}
           assignable={assignable}
+          applications={applications}
           selectedId={pick(query.account, accounts.map((account) => account.id))}
           selfId={session.userId}
           justSent={query.sent === "1"}
@@ -168,6 +171,7 @@ function People({
   accounts,
   roles,
   assignable,
+  applications,
   selectedId,
   selfId,
   justSent,
@@ -175,6 +179,8 @@ function People({
   accounts: Account[];
   roles: RoleDefinition[];
   assignable: RoleDefinition[];
+  /** From `control.applications`, or the built-in list if that is not there. */
+  applications: readonly { value: string; label: string; hint: string }[];
   selectedId: string | null;
   selfId: string;
   justSent: boolean;
@@ -277,6 +283,7 @@ function People({
                     work_longitude: selected.work_longitude,
                     work_radius_metres: selected.work_radius_metres,
                   }}
+                  applications={applications}
                   roles={roles}
                   assignable={assignable}
                   isSelf={selected.id === selfId}
