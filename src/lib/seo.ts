@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getSeoDefaults } from "@/lib/queries/seo";
 import { SITE_URL } from "@/lib/env";
+import { applyTitleTemplate } from "@/lib/validation/seo";
 
 interface PageSeo {
   /** Page-specific title. Passed through the admin's title template. */
@@ -42,7 +43,7 @@ export async function buildMetadata(page: PageSeo): Promise<Metadata> {
   const title = page.title
     ? page.templated === false
       ? page.title
-      : applyTemplate(defaults?.title_template, page.title)
+      : applyTitleTemplate(defaults?.title_template, page.title)
     : (defaults?.default_title ?? "Apka Vission");
 
   const description = page.description || defaults?.default_description || undefined;
@@ -100,11 +101,9 @@ export async function buildMetadata(page: PageSeo): Promise<Metadata> {
   };
 }
 
-/**
- * `%s` is the placeholder the admin sees. A template missing it would silently
- * discard the page title, so the title is returned unchanged instead.
- */
-function applyTemplate(template: string | null | undefined, title: string) {
-  if (!template || !template.includes("%s")) return title;
-  return template.replace("%s", title);
-}
+/*
+  The template itself is applied by `applyTitleTemplate` in
+  `lib/validation/seo.ts`, beside the rule that requires the `%s` in it. The
+  admin's search-result preview calls the same function, so what the owner is
+  shown and what is rendered cannot drift apart.
+*/

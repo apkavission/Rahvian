@@ -3,11 +3,7 @@ import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { BrandLogo } from "@/components/site/brand-logo";
 import { getNavigation } from "@/lib/queries/navigation";
 import { getSiteSettings } from "@/lib/queries/site-settings";
-
-function whatsappHref(number: string) {
-  // wa.me expects digits only, country code included, no plus or spaces.
-  return `https://wa.me/${number.replace(/\D/g, "")}`;
-}
+import { whatsappLink, whatsappTemplateOf } from "@/lib/whatsapp";
 
 export async function Footer() {
   const [services, company, legal, settings] = await Promise.all([
@@ -18,6 +14,8 @@ export async function Footer() {
   ]);
 
   const year = new Date().getFullYear();
+
+  const whatsapp = whatsappLink(settings?.whatsapp, whatsappTemplateOf(settings));
 
   const address = [
     settings?.address_line1,
@@ -60,10 +58,15 @@ export async function Footer() {
                   {settings.phone}
                 </ContactRow>
               )}
-              {settings?.whatsapp && (
+              {/*
+                The footer is on every page, so it has no one subject to name —
+                the message is the generic opener. A number without its country
+                code produces no link at all rather than a dead one.
+              */}
+              {whatsapp && (
                 <ContactRow
                   icon={<MessageCircle className="size-4" />}
-                  href={whatsappHref(settings.whatsapp)}
+                  href={whatsapp}
                   external
                 >
                   WhatsApp

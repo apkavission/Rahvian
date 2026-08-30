@@ -67,6 +67,26 @@ export const saveAccountSchema = z.object({
   id: z.uuid(),
   full_name: fullName,
   role: roleKey,
+  /*
+    Where this person works, for the task tracker's clock.
+
+    One text box for the pair rather than two number boxes, because that is how
+    a coordinate arrives — copied out of a map in one piece. It is parsed in the
+    action, where a bad paste can be answered with a sentence that names the
+    fix.
+
+    All optional. Most accounts are not employees who clock in, and an owner
+    editing somebody's name should never be made to answer a question about
+    geography.
+  */
+  address: z.string().trim().max(300).optional(),
+  coordinates: z.string().trim().max(120).optional(),
+  work_radius_metres: z.coerce
+    .number()
+    .int()
+    .min(25, "Less than 25 m refuses people who are standing at the door.")
+    .max(50000, "Above 50 km this is not a fence.")
+    .optional(),
   app_access: z
     .array(z.string().refine((value) => APP_VALUES.includes(value)))
     .min(1, "An account with no applications cannot sign in to anything."),

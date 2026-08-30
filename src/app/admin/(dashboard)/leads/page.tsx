@@ -217,7 +217,7 @@ function ViewTab({
       aria-current={active ? "page" : undefined}
       className={
         active
-          ? "-mb-px border-b-2 border-accent px-4 py-2.5 text-sm font-medium text-accent"
+          ? "-mb-px rounded-t-lg border-b-2 border-accent bg-accent-soft px-4 py-2.5 text-sm font-semibold text-accent"
           : "-mb-px border-b-2 border-transparent px-4 py-2.5 text-sm text-text-muted transition-colors hover:text-text"
       }
     >

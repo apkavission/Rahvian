@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { ButtonLink } from "@/components/ui/button";
@@ -18,25 +25,66 @@ interface Props {
   ctaHref: string;
 }
 
-export function HeaderNav({ items, companyName, logo, ctaLabel, ctaHref }: Props) {
+/**
+ * Is the page scrolled past the point where the header should go frosted?
+ *
+ * A module-level pair rather than functions built in the component, because
+ * `useSyncExternalStore` compares snapshots by identity: a `subscribe` that
+ * changed on every render would resubscribe on every render.
+ */
+function subscribeToScroll(onChange: () => void) {
+  window.addEventListener("scroll", onChange, { passive: true });
+  return () => window.removeEventListener("scroll", onChange);
+}
+
+function isScrolled() {
+  return window.scrollY > 8;
+}
+
+export function HeaderNav({
+  items,
+  companyName,
+  logo,
+  ctaLabel,
+  ctaHref,
+}: Props) {
   const pathname = usePathname();
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Frosted background appears only once content is behind the header.
-  // Sitting flush at the top with no border reads as part of the hero.
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  /*
+    The panel's state is the path it was opened on, not a boolean.
 
-  // Close the mobile panel on navigation, otherwise it stays open over the
-  // page the visitor just asked for.
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
+    A panel left open across a navigation covers the page the visitor just
+    asked for, so it has to close when the path changes — including on the back
+    button, where no handler of ours runs. Storing the path makes that fall out
+    of a comparison instead of needing an effect that sets state on every
+    navigation, which is both a wasted render and a rule the React Compiler is
+    right to flag.
+
+    The same idiom the admin shell uses for its drawer, and now for the same
+    stated reason in both places.
+  */
+  const [openedAt, setOpenedAt] = useState<string | null>(null);
+  const mobileOpen = openedAt === pathname;
+
+  /*
+    Frosted background appears only once content is behind the header. Sitting
+    flush at the top with no border reads as part of the hero.
+
+    `useSyncExternalStore` rather than a listener that calls `setState`: this is
+    a browser value being subscribed to, which is exactly what the hook is for.
+    The earlier version also had to call its own handler once on mount to catch
+    a page loaded already scrolled, and that call — `setState` in an effect
+    body — is a cascading render the React Compiler is right to flag. Reading a
+    snapshot has no such problem: the first render already has the answer.
+
+    The server snapshot is `false`, because a document that has not been sent
+    yet cannot be scrolled.
+  */
+  const scrolled = useSyncExternalStore(
+    subscribeToScroll,
+    isScrolled,
+    () => false,
+  );
 
   // Lock the page behind the full-screen panel.
   useEffect(() => {
@@ -49,58 +97,92 @@ export function HeaderNav({ items, companyName, logo, ctaLabel, ctaHref }: Props
   }, [mobileOpen]);
 
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-50 transition-[background-color,border-color,backdrop-filter]",
-        "duration-[--duration-base] ease-[--ease-out]",
-        scrolled
-          ? "border-b border-border bg-bg/80 backdrop-blur-xl"
-          : "border-b border-transparent bg-transparent",
-      )}
-    >
-      <div className="container-page flex h-16 items-center gap-6 md:h-18">
-        {/* Mark and name together. The mark alone is not yet known enough to
+    <>
+      <header
+        className={cn(
+          "sticky top-0 z-50 transition-[background-color,border-color,backdrop-filter]",
+          "duration-[--duration-base] ease-[--ease-out]",
+          scrolled
+            ? "border-b border-border bg-bg/80 backdrop-blur-xl"
+            : "border-b border-transparent bg-transparent",
+        )}
+      >
+        <div className="container-page flex h-16 items-center gap-6 md:h-18">
+          {/* Mark and name together. The mark alone is not yet known enough to
             identify the company, and the name alone wastes the mark. */}
-        <Link
-          href="/"
-          aria-label={`${companyName} — home`}
-          className="flex items-center gap-2.5 font-display text-base font-semibold tracking-tight"
-        >
-          {logo}
-          <span>{companyName}</span>
-        </Link>
-
-        <nav aria-label="Main" className="ml-auto hidden items-center gap-1 lg:flex">
-          {items.map((item) =>
-            item.children.length > 0 ? (
-              <NavDropdown key={item.id} item={item} pathname={pathname} />
-            ) : (
-              <NavLink key={item.id} item={item} pathname={pathname} />
-            ),
-          )}
-        </nav>
-
-        <div className="ml-auto flex items-center gap-3 lg:ml-0">
-          <ThemeToggle />
-          <ButtonLink href={ctaHref} size="sm" className="hidden sm:inline-flex">
-            {ctaLabel}
-          </ButtonLink>
-          <button
-            type="button"
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileOpen}
-            onClick={() => setMobileOpen((open) => !open)}
-            className="grid size-9 place-items-center rounded-lg text-text-muted transition-colors hover:bg-surface-2 hover:text-text lg:hidden"
+          <Link
+            href="/"
+            aria-label={`${companyName} — home`}
+            className="flex items-center gap-2.5 font-display text-base font-semibold tracking-tight"
           >
-            {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
-          </button>
-        </div>
-      </div>
+            {logo}
+            <span>{companyName}</span>
+          </Link>
 
+          <nav
+            aria-label="Main"
+            className="ml-auto hidden items-center gap-1 lg:flex"
+          >
+            {items.map((item) =>
+              item.children.length > 0 ? (
+                <NavDropdown key={item.id} item={item} pathname={pathname} />
+              ) : (
+                <NavLink key={item.id} item={item} pathname={pathname} />
+              ),
+            )}
+          </nav>
+
+          <div className="ml-auto flex items-center gap-3 lg:ml-0">
+            <ThemeToggle />
+            <ButtonLink
+              href={ctaHref}
+              size="sm"
+              className="hidden sm:inline-flex"
+            >
+              {ctaLabel}
+            </ButtonLink>
+            <button
+              type="button"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
+              onClick={() => setOpenedAt(mobileOpen ? null : pathname)}
+              className="grid size-9 place-items-center rounded-lg text-text-muted transition-colors hover:bg-surface-2 hover:text-text lg:hidden"
+            >
+              {mobileOpen ? (
+                <X className="size-5" />
+              ) : (
+                <Menu className="size-5" />
+              )}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/*
+        The panel is a sibling of the header, not a child of it — and that is
+        load-bearing rather than tidiness.
+
+        The header carries `backdrop-blur` once the page is scrolled, and an
+        element with a `backdrop-filter` becomes the **containing block for
+        every `position: fixed` descendant**. Inside the header, this panel's
+        `top-16 bottom-0` was therefore measured against a 64px-tall header
+        instead of the viewport, and resolved to a height of zero: the menu
+        opened, the button turned into an X, and nothing appeared.
+
+        It only happened once the visitor had scrolled past 8px, because that
+        is when the blur is applied — so the menu worked on a freshly loaded
+        page and stopped working the moment anybody scrolled. Found by a
+        browser test on 2026-08-28, after the panel's own link turned out to be
+        un-clickable.
+
+        Out here the containing block is the viewport again. `z-40` against the
+        header's `z-50` keeps the header and its close button above the panel,
+        which is the behaviour that was always intended.
+      */}
       {mobileOpen && (
-        <MobilePanel items={items} ctaLabel={ctaLabel} ctaHref={ctaHref} onClose={() => setMobileOpen(false)} />
+        <MobilePanel items={items} ctaLabel={ctaLabel} ctaHref={ctaHref} />
       )}
-    </header>
+    </>
   );
 }
 
@@ -207,16 +289,22 @@ function NavDropdown({ item, pathname }: { item: NavNode; pathname: string }) {
   );
 }
 
+/**
+ * The full-screen panel behind the menu button.
+ *
+ * It takes no close handler, and that is not an oversight: the header's own
+ * toggle switches to an X and stays visible above the panel, and the panel
+ * closes itself on navigation. A second control in a different position would
+ * be two ways to do one thing.
+ */
 function MobilePanel({
   items,
   ctaLabel,
   ctaHref,
-  onClose,
 }: {
   items: NavNode[];
   ctaLabel: string;
   ctaHref: string;
-  onClose: () => void;
 }) {
   return (
     <div className="fixed inset-0 top-16 z-40 overflow-y-auto bg-bg lg:hidden md:top-18">

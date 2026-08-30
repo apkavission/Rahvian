@@ -1,4 +1,5 @@
 import type { Fieldset } from "@/lib/records/definition";
+import { renamedFilename } from "@/lib/media/filename";
 import { recordSchema } from "@/lib/records/definition";
 import type { Tables, TablesUpdate } from "@/types/database";
 
@@ -12,7 +13,7 @@ export type MediaRow = Tables<"media">;
  * folders that look like one — which is how a library of two hundred files
  * stops being navigable.
  */
-const FOLDER_PATTERN = {
+export const FOLDER_PATTERN = {
   re: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
   message: "Lowercase letters, numbers and single hyphens — one word, no slashes.",
 } as const;
@@ -124,12 +125,19 @@ export function mediaToValues(row: MediaRow): Record<string, unknown> {
  * the name for the benefit of anyone reading the link. Only the id in front of
  * it resolves, so a rename is cosmetic and nothing that already points at the
  * asset breaks.
+ *
+ * The name goes through `renamedFilename` first. Until 2026-08-28 it did not,
+ * and a click-through found the form accepting `../evil.png`, `a/b/c.png` and
+ * `no-extension` — the sanitiser existed and was applied on upload only.
  */
 export function valuesToRow(
   id: string,
+  current: string,
   values: Record<string, unknown>,
 ): TablesUpdate<"media"> {
-  const filename = text(values.filename) ?? "";
+  // Sanitised, and the extension carried over from the stored name — a rename
+  // may change what a file is called, never what it claims to be.
+  const filename = renamedFilename(text(values.filename) ?? "", current);
 
   return {
     alt_text: text(values.alt_text) ?? "",

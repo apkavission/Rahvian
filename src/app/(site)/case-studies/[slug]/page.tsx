@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { CaseStudyDetail, readGallery } from "@/components/case-studies/case-study-detail";
+import { CaseStudyDetail } from "@/components/case-studies/case-study-detail";
+import { readGallery } from "@/lib/media/gallery";
 import { JsonLd } from "@/components/seo/json-ld";
 import { getCaseStudies, getCaseStudy } from "@/lib/queries/case-studies";
 import { getMediaByIds } from "@/lib/queries/projects";

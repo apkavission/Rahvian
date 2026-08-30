@@ -21,10 +21,10 @@ export const metadata: Metadata = {
  * `/admin/login` deliberately sits outside this route group — a login screen
  * inside a layout that requires a session would redirect to itself.
  *
- * The session is established here rather than in each page. The middleware
- * already turned anonymous requests away, but it cannot read a profile, so it
- * does not know a role: this is the first point at which "who is asking" is
- * actually known, and the menu is resolved from it.
+ * The session is established here rather than in each page. The proxy already
+ * turned anonymous requests away, but it cannot read a profile, so it does not
+ * know a role: this is the first point at which "who is asking" is actually
+ * known, and the menu is resolved from it.
  */
 export default async function AdminLayout({
   children,

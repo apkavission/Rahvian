@@ -33,7 +33,7 @@ export async function createClient() {
             }
           } catch {
             // Server Components cannot set cookies. Session refresh is handled
-            // by middleware instead, so this is safe to ignore here rather
+            // by the proxy instead, so this is safe to ignore here rather
             // than being an error worth surfacing.
           }
         },

@@ -22,6 +22,19 @@ import { z } from "zod";
 
 const clientSchema = z.object({
   NEXT_PUBLIC_SITE_URL: z.string().url(),
+
+  /*
+    Where the client portal is served from.
+
+    A separate application in a separate repository, deliberately — a change
+    there must not be able to break this one. So this admin knows nothing about
+    it except its address, which is exactly the amount of coupling that was
+    wanted: a link, and no shared code.
+
+    Optional, with a local default, so this site runs on a machine where the
+    portal has not been set up.
+  */
+  NEXT_PUBLIC_PORTAL_URL: z.string().url().default("http://localhost:3100"),
   NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().optional(),
@@ -57,6 +70,7 @@ function omitEmpty<T extends Record<string, unknown>>(input: T): T {
 const parsedClientEnv = clientSchema.safeParse(
   omitEmpty({
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+    NEXT_PUBLIC_PORTAL_URL: process.env.NEXT_PUBLIC_PORTAL_URL,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,

@@ -1,7 +1,10 @@
 import "server-only";
 
 import type { MediaOption } from "@/lib/media/image-fields";
+import { buildUsageMap, MEDIA_REFERENCES, type MediaUsage } from "@/lib/media/usage";
 import { createClient } from "@/lib/supabase/server";
+
+export type { MediaUsage } from "@/lib/media/usage";
 import type { Tables } from "@/types/database";
 
 export type MediaRow = Tables<"media">;
@@ -160,51 +163,25 @@ export async function darkVariantOptions(
   }));
 }
 
-/** What an asset is being used as, so a delete can say what it will blank. */
-export interface MediaUsage {
-  total: number;
-  /** Human phrases, already counted: "2 × a case study's header image". */
-  places: string[];
-}
-
 /**
- * Every reference to `media` in the schema.
- *
- * Listed by hand rather than read from the catalogue on purpose. A generated
- * list would silently start counting a reference nobody had thought about, and
- * the wording matters as much as the count — the delete dialog has to say what
- * the asset *is* somewhere, not which column holds it.
- */
-const MEDIA_REFERENCES = [
-  { table: "services", column: "og_image_id", label: "a service's social image" },
-  { table: "projects", column: "thumbnail_id", label: "a portfolio thumbnail" },
-  { table: "projects", column: "og_image_id", label: "a portfolio social image" },
-  { table: "case_studies", column: "og_image_id", label: "a case study's header image" },
-  { table: "blog_posts", column: "featured_image_id", label: "a post's featured image" },
-  { table: "blog_posts", column: "og_image_id", label: "a post's social image" },
-  { table: "team_members", column: "photo_id", label: "a team photo" },
-  { table: "site_settings", column: "logo_light_id", label: "the light logo" },
-  { table: "site_settings", column: "logo_dark_id", label: "the dark logo" },
-  { table: "media", column: "dark_variant_id", label: "another asset's dark counterpart" },
-] as const;
-
-/**
- * Where every asset is used, in ten queries rather than ten per asset.
+ * Where every asset is used, in one query per referencing column rather than
+ * per asset.
  *
  * The whole map at once, because the delete confirmation lives on a list row —
  * the dialog opens without a round trip, so the counts have to be on screen
- * already. Counting per asset would be ten queries times however many files
- * are in the library.
+ * already. Counting per asset would be seventeen queries times however many
+ * files are in the library.
  *
  * It exists so that dialog can say "this is the header image on two case
  * studies" rather than "are you sure". Every one of these columns is
  * `on delete set null`, so deleting never fails — it silently blanks an image
  * somewhere, which is exactly the kind of damage a confirmation is for.
+ *
+ * The list and the counting live in `lib/media/usage.ts`, where a test can
+ * reach them. That move found seven references missing from the list.
  */
 export async function mediaUsageMap(): Promise<Map<string, MediaUsage>> {
   const supabase = await createClient();
-
-  const usage = new Map<string, MediaUsage>();
 
   const results = await Promise.all(
     MEDIA_REFERENCES.map(async (reference) => {
@@ -232,19 +209,5 @@ export async function mediaUsageMap(): Promise<Map<string, MediaUsage>> {
     }),
   );
 
-  for (const result of results) {
-    if (!result) continue;
-
-    const counts = new Map<string, number>();
-    for (const id of result.ids) counts.set(id, (counts.get(id) ?? 0) + 1);
-
-    for (const [id, count] of counts) {
-      const entry = usage.get(id) ?? { total: 0, places: [] };
-      entry.total += count;
-      entry.places.push(count === 1 ? result.label : `${count} × ${result.label}`);
-      usage.set(id, entry);
-    }
-  }
-
-  return usage;
+  return buildUsageMap(results);
 }

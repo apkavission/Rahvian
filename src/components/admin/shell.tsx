@@ -2,8 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { clientEnv } from "@/lib/env";
 import { usePathname } from "next/navigation";
 import { ExternalLink, LogOut, Menu, UserCog, X } from "lucide-react";
+import { CommandPalette } from "@/components/admin/command-palette";
 import { AdminNav } from "@/components/admin/sidebar";
 import type { AdminNavGroup } from "@/components/admin/nav";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
@@ -100,6 +102,15 @@ export function AdminShell({
             <Menu className="size-5" aria-hidden />
           </button>
 
+          {/*
+            The palette lives in the header rather than being invisible behind
+            its shortcut. It is the same menu the rail shows, resolved on the
+            server and already in this component, so it costs nothing to pass
+            down — and a search box a person can see is how they find out the
+            shortcut exists at all.
+          */}
+          <CommandPalette groups={groups} />
+
           <div className="ml-auto flex items-center gap-1">
             <Link
               href="/"
@@ -108,6 +119,25 @@ export function AdminShell({
               className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-text-muted transition-colors hover:bg-surface-2 hover:text-text sm:inline-flex"
             >
               View site
+              <ExternalLink className="size-3.5" aria-hidden />
+            </Link>
+
+            {/*
+              The client portal, which is a different application.
+
+              This admin is the control plane for the estate, so the way into
+              each of the other applications belongs here. What is shared with
+              the portal is this address and nothing else — no import, no
+              package, no table — because a change over there must never be able
+              to break this panel.
+            */}
+            <Link
+              href={clientEnv.NEXT_PUBLIC_PORTAL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-text-muted transition-colors hover:bg-surface-2 hover:text-text lg:inline-flex"
+            >
+              Client portal
               <ExternalLink className="size-3.5" aria-hidden />
             </Link>
             <ThemeToggle />

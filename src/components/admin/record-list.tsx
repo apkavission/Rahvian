@@ -20,6 +20,17 @@ export interface RecordListItem {
   dimmed?: boolean;
   /** Optional glyph at the start of the row. */
   icon?: React.ReactNode;
+  /**
+   * The rows this row's arrows move it among. Defaults to the whole list.
+   *
+   * Only the navigation menu needs it, because it is the only list here that
+   * is a tree: a link inside a dropdown must not swap places with the
+   * top-level link printed after it, so each dropdown is its own group and the
+   * arrows stop at the ends of it rather than at the ends of the screen.
+   */
+  group?: string;
+  /** One level of indent, for a row nested under the one above it. */
+  depth?: number;
 }
 
 type RecordAction = (
@@ -82,17 +93,37 @@ export function RecordList({
     confirmLabel: string;
   };
 }) {
+  /*
+    Which rows each row may be swapped with.
+
+    Built once for the whole list rather than searched per row, and keyed on
+    the empty string when nothing declares a group — which is every screen but
+    navigation, so those lists behave exactly as they did before groups
+    existed: one group, arrows disabled at the first and last row.
+  */
+  const groups = new Map<string, string[]>();
+  for (const item of items) {
+    const key = item.group ?? "";
+    const members = groups.get(key);
+    if (members) members.push(item.id);
+    else groups.set(key, [item.id]);
+  }
+
   return (
     <ul className="space-y-2">
-      {items.map((item, index) => {
+      {items.map((item) => {
         const selected = item.id === selectedId;
+        const siblings = groups.get(item.group ?? "") ?? [];
+        const at = siblings.indexOf(item.id);
 
         return (
-          <li key={item.id}>
+          <li key={item.id} className={cn(item.depth ? "ml-5" : undefined)}>
             <div
               className={cn(
                 "rounded-xl border p-3 transition-colors",
-                selected ? "border-accent bg-accent-soft/40" : "border-border bg-surface",
+                selected
+                  ? "border-accent bg-accent-soft/60 shadow-[inset_3px_0_0_var(--accent)]"
+                  : "border-border bg-surface",
                 item.dimmed && "opacity-70",
               )}
             >
@@ -119,13 +150,13 @@ export function RecordList({
                       action={actions.move}
                       id={item.id}
                       direction="up"
-                      disabled={index === 0}
+                      disabled={at <= 0}
                     />
                     <MoveButton
                       action={actions.move}
                       id={item.id}
                       direction="down"
-                      disabled={index === items.length - 1}
+                      disabled={at === siblings.length - 1}
                     />
                   </div>
                 ) : null}

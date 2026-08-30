@@ -14,6 +14,7 @@ export type MenuKey =
   | "services"
   | "portfolio"
   | "case-studies"
+  | "testimonials"
   | "blog"
   | "pricing"
   | "faqs"
@@ -79,10 +80,11 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     label: "Content",
     items: [
       { key: "pages", label: "Pages", href: "/admin/pages", icon: "file-text" },
-      { key: "navigation", label: "Navigation", href: "/admin/navigation", icon: "menu", planned: true },
+      { key: "navigation", label: "Navigation", href: "/admin/navigation", icon: "menu" },
       { key: "services", label: "Services", href: "/admin/services", icon: "boxes" },
       { key: "portfolio", label: "Portfolio", href: "/admin/portfolio", icon: "image" },
       { key: "case-studies", label: "Case studies", href: "/admin/case-studies", icon: "notebook" },
+      { key: "testimonials", label: "Testimonials", href: "/admin/testimonials", icon: "quote" },
       { key: "blog", label: "Blog", href: "/admin/blog", icon: "pen-tool" },
       { key: "pricing", label: "Pricing", href: "/admin/pricing", icon: "tag" },
       { key: "faqs", label: "FAQs", href: "/admin/faqs", icon: "help-circle" },
@@ -94,7 +96,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     label: "Configuration",
     items: [
       { key: "settings", label: "Settings", href: "/admin/settings", icon: "settings-2" },
-      { key: "seo", label: "SEO", href: "/admin/seo", icon: "search", planned: true },
+      { key: "seo", label: "SEO", href: "/admin/seo", icon: "search" },
       {
         key: "users",
         label: "Users",

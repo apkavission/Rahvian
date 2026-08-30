@@ -34,6 +34,14 @@ export interface Account {
   app_access: string[];
   menu_extra: string[];
   menu_denied: string[];
+
+  /* Where this person works, for the task tracker's clock-in check. Null until
+     somebody sets it, which means the clock is recorded but not checked. */
+  address: string | null;
+  work_latitude: number | null;
+  work_longitude: number | null;
+  work_radius_metres: number;
+
   last_login_at: string | null;
   created_at: string;
 }
@@ -83,7 +91,7 @@ export async function getAccounts(): Promise<{ accounts: Account[]; capped: bool
     supabase
       .from("profiles")
       .select(
-        "id, full_name, role, is_active, app_access, menu_extra, menu_denied, last_login_at, created_at",
+"id, full_name, role, is_active, app_access, menu_extra, menu_denied, address, work_latitude, work_longitude, work_radius_metres, last_login_at, created_at",
       ),
     readAddresses(),
   ]);
@@ -105,6 +113,15 @@ export async function getAccounts(): Promise<{ accounts: Account[]; capped: bool
     // find out why.
     menu_extra: row.menu_extra ?? [],
     menu_denied: row.menu_denied ?? [],
+
+    // Absent until the workplace migration has been run. Defaulted rather than
+    // thrown on, for the same reason as the menu columns above: an account list
+    // that fails on a missing column is a panel nobody can get into to fix it.
+    address: row.address ?? null,
+    work_latitude: row.work_latitude ?? null,
+    work_longitude: row.work_longitude ?? null,
+    work_radius_metres: row.work_radius_metres ?? 200,
+
     last_login_at: row.last_login_at,
     created_at: row.created_at,
   }));

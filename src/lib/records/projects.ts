@@ -1,3 +1,4 @@
+import { galleryToJson, readGallery } from "@/lib/media/gallery";
 import type { MediaOption } from "@/lib/media/image-fields";
 import type { Fieldset } from "@/lib/records/definition";
 import { recordSchema } from "@/lib/records/definition";
@@ -30,8 +31,10 @@ export const PROJECT_TYPE_OPTIONS = [
  * a rename-free copy and there is no second place where a field's identity is
  * decided.
  *
- * `gallery` is still absent. It is a list of images rather than one, so it needs
- * a repeater of image fields — the picker handles a single choice today.
+ * `gallery` is a repeater of image fields — the one column on this table that
+ * holds a list of pictures rather than one. It needed no new machinery: the
+ * repeater and the picker already composed, and the row it produces,
+ * `{ media_id, caption }`, is the shape the column already stored.
  */
 export function projectFieldsets(
   technologies: { id: string; name: string }[],
@@ -230,6 +233,32 @@ export function projectFieldsets(
       ],
     },
     {
+      legend: "Gallery",
+      hint: "The “A look inside” grid, two pictures to a row, in the order set here. Leave it empty and the whole section is left out of the page rather than shown as an empty grid. A picture whose file is later deleted from the library drops out on its own.",
+      fields: [
+        {
+          kind: "repeater",
+          name: "gallery",
+          label: "Pictures",
+          itemLabel: "picture",
+          max: 12,
+          fields: [
+            // Required, because a row with a caption and no picture is a row
+            // the page cannot draw — and the page's own reader would drop it,
+            // leaving a caption that was saved and never appeared.
+            imageField("media_id", "project.gallery", assets, { required: true }),
+            {
+              kind: "text",
+              name: "caption",
+              label: "Caption",
+              max: 200,
+              hint: "Optional. One line under the picture — what the screen is, not what it looks like.",
+            },
+          ],
+        },
+      ],
+    },
+    {
       legend: "Publication",
       fields: [
         {
@@ -372,6 +401,14 @@ export function projectToValues(row: ProjectRow): Record<string, unknown> {
     thumbnail_id: row.thumbnail_id ?? "",
     og_image_id: row.og_image_id ?? "",
 
+    // Read through the same function the public page reads it with, so the
+    // form shows exactly the rows that would render — a malformed entry is
+    // dropped in both places rather than in one of them.
+    gallery: readGallery(row.gallery).map((item) => ({
+      media_id: item.media_id,
+      caption: item.caption ?? "",
+    })),
+
     problem: row.problem ?? "",
     solution: row.solution ?? "",
 
@@ -429,6 +466,7 @@ export function valuesToRow(values: Record<string, unknown>): TablesUpdate<"proj
 
     thumbnail_id: text(values.thumbnail_id),
     og_image_id: text(values.og_image_id),
+    gallery: galleryToJson(values.gallery),
     is_featured: values.is_featured === true,
 
     problem: text(values.problem),

@@ -3,6 +3,7 @@ import "server-only";
 import {
   DeleteObjectCommand,
   GetObjectCommand,
+  ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
@@ -161,4 +162,47 @@ export async function deleteObject(key: string): Promise<void> {
   } catch (error) {
     console.error(`[r2] delete failed for ${key}:`, (error as Error).message);
   }
+}
+
+/**
+ * Every object under a prefix.
+ *
+ * Added for the nightly backup, which is the only thing in this estate that
+ * needs to see what is already in the bucket — a media file is always reached
+ * by the key stored on its row, never by looking around.
+ *
+ * Paged, because a listing returns at most a thousand keys and a bucket that
+ * has been running for a while has more than that. A backup pruner that
+ * silently stopped at the first page would leave everything past it forever,
+ * which is the failure this exists to prevent.
+ */
+export async function listObjects(
+  prefix: string,
+): Promise<{ key: string; size: number; modified: Date | undefined }[]> {
+  const found: { key: string; size: number; modified: Date | undefined }[] = [];
+  let token: string | undefined;
+
+  do {
+    const page = await s3().send(
+      new ListObjectsV2Command({
+        Bucket: bucket(),
+        Prefix: prefix,
+        ContinuationToken: token,
+      }),
+    );
+
+    for (const object of page.Contents ?? []) {
+      if (object.Key) {
+        found.push({
+          key: object.Key,
+          size: object.Size ?? 0,
+          modified: object.LastModified,
+        });
+      }
+    }
+
+    token = page.IsTruncated ? page.NextContinuationToken : undefined;
+  } while (token);
+
+  return found;
 }

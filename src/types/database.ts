@@ -909,6 +909,45 @@ export type Database = {
         }
         Relationships: []
       }
+      leave_types: {
+        Row: {
+          key: string
+          label: string
+          description: string
+          is_paid: boolean
+          needs_balance: boolean
+          is_system: boolean
+          is_active: boolean
+          sort_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          key: string
+          label: string
+          description?: string
+          is_paid?: boolean
+          needs_balance?: boolean
+          is_system?: boolean
+          is_active?: boolean
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          key?: string
+          label?: string
+          description?: string
+          is_paid?: boolean
+          needs_balance?: boolean
+          is_system?: boolean
+          is_active?: boolean
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           id: string
@@ -923,6 +962,10 @@ export type Database = {
           updated_at: string
           menu_extra: string[]
           menu_denied: string[]
+          address: string | null
+          work_latitude: number | null
+          work_longitude: number | null
+          work_radius_metres: number
         }
         Insert: {
           id: string
@@ -937,6 +980,10 @@ export type Database = {
           updated_at?: string
           menu_extra: string[]
           menu_denied: string[]
+          address?: string | null
+          work_latitude?: number | null
+          work_longitude?: number | null
+          work_radius_metres?: number
         }
         Update: {
           id?: string
@@ -951,6 +998,10 @@ export type Database = {
           updated_at?: string
           menu_extra?: string[]
           menu_denied?: string[]
+          address?: string | null
+          work_latitude?: number | null
+          work_longitude?: number | null
+          work_radius_metres?: number
         }
         Relationships: [
           {

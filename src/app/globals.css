@@ -21,10 +21,10 @@
   color-scheme: light;
 
   /* -- Surface ----------------------------------------------------------- */
-  --bg: #fcfcfd;
+  --bg: #f4f6f8;
   --surface: #ffffff;
-  --surface-2: #f4f5f7;
-  --surface-3: #eaecf0;
+  --surface-2: #eef1f4;
+  --surface-3: #e3e8ed;
   --overlay: rgb(11 18 32 / 0.45);
 
   /* -- Skeleton ----------------------------------------------------------
@@ -34,18 +34,18 @@
      a higher number is darker; in dark, lighter. A skeleton built out of
      `surface-2` and `surface-3` would sweep a highlight in one theme and a
      shadow in the other.                                                  */
-  --skeleton: #eaecf0;
+  --skeleton: #e3e8ed;
   --skeleton-sheen: rgb(255 255 255 / 0.75);
 
   /* -- Border ------------------------------------------------------------ */
-  --border: #e4e7ec;
-  --border-strong: #d0d5dd;
+  --border: #dde2e9;
+  --border-strong: #c3cad4;
   --ring: #0c6f6e;
 
   /* -- Text -------------------------------------------------------------- */
   --text: #0b1220;
   --text-muted: #475467;
-  --text-subtle: #5d6675;
+  --text-subtle: #54607a;
   --text-inverse: #ffffff;
 
   /* -- Accent ------------------------------------------------------------ */
@@ -71,8 +71,8 @@
   /* -- Depth -------------------------------------------------------------
      Light mode builds elevation with real shadows.
      --highlight is transparent here; it only does work in dark mode.        */
-  --shadow-1: 0 1px 2px rgb(16 24 40 / 0.05);
-  --shadow-2: 0 4px 8px -2px rgb(16 24 40 / 0.08), 0 2px 4px -2px rgb(16 24 40 / 0.05);
+  --shadow-1: 0 1px 2px rgb(16 24 40 / 0.06), 0 1px 1px rgb(16 24 40 / 0.04);
+  --shadow-2: 0 6px 12px -3px rgb(16 24 40 / 0.10), 0 2px 5px -2px rgb(16 24 40 / 0.06);
   --shadow-3: 0 20px 24px -4px rgb(16 24 40 / 0.08), 0 8px 8px -4px rgb(16 24 40 / 0.03);
   --glow: none;
   --highlight: transparent;

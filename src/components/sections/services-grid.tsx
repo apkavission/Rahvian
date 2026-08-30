@@ -42,7 +42,7 @@ export async function ServicesGrid({ content }: { content: ServicesGridContent }
           the admin makes a summary. Without it the grid tracks content and the
           row looks ragged the moment one description runs longer. */}
       <div className="reveal-group mt-14 grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {services.map((service, index) => {
+        {services.map((service) => {
           const price = priceLabel(service);
 
           return (

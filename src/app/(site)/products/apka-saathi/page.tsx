@@ -62,7 +62,13 @@ export default async function ApkaSaathiPage() {
           { name: page.title, path: PATH },
         ])}
       />
-      <SectionRenderer sections={result.sections} />
+      {/*
+        The one page whose title is genuinely the subject of a conversation:
+        "I'd like to talk about Apka Saathi" reads correctly, where "about
+        About" or "about Privacy policy" would not. Every other page leaves the
+        opener generic unless a section sets its own wording.
+      */}
+      <SectionRenderer sections={result.sections} context={result.page.title} />
     </>
   );
 }

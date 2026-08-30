@@ -62,7 +62,20 @@ export function PostDetail({
                 <span className="mx-2 text-text-subtle" aria-hidden>
                   /
                 </span>
-                <span className="text-accent">{post.category.name}</span>
+                {/*
+                  A link since 2026-08-28, when the category archive was built.
+                  This is the one place a reader is already thinking about the
+                  subject rather than the post, which makes it the right way in
+                  — and it is why the archive was worth building before there is
+                  anything in it: the link appears with the first post, not the
+                  week after.
+                */}
+                <Link
+                  href={`/blog/category/${post.category.slug}`}
+                  className="text-accent transition-colors hover:text-accent-hover"
+                >
+                  {post.category.name}
+                </Link>
               </>
             )}
           </nav>

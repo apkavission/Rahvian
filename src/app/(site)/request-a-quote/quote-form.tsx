@@ -1,12 +1,13 @@
 "use client";
 
-import { useActionState, useId } from "react";
+import { useActionState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
 import { BrandSpinner } from "@/components/brand/brand-loader";
 import { useBusyWhile } from "@/components/forms/use-busy-while";
 import { Button } from "@/components/ui/button";
 import { useFormToast } from "@/components/forms/use-form-toast";
+import { Field, FIELD } from "@/components/ui/field";
 import { cn } from "@/lib/utils";
 import {
   BUDGET_RANGES,
@@ -31,14 +32,6 @@ const UTM_KEYS = [
   "utm_content",
 ] as const;
 
-const FIELD = cn(
-  "w-full rounded-md border border-border bg-surface",
-  "px-3.5 py-2.5 text-sm text-text transition-colors",
-  "placeholder:text-text-subtle",
-  "focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20",
-);
-
-const LABEL = "block text-sm font-medium text-text";
 
 export function QuoteForm({ services }: { services: ServiceOption[] }) {
   const [state, formAction, pending] = useActionState(
@@ -117,7 +110,7 @@ export function QuoteForm({ services }: { services: ServiceOption[] }) {
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2">
-        <Field label="Your name" name="name" required error={state.fieldErrors?.name}>
+        <Field label="Your name" required error={state.fieldErrors?.name}>
           {(id, describedBy) => (
             <input
               id={id}
@@ -131,7 +124,7 @@ export function QuoteForm({ services }: { services: ServiceOption[] }) {
           )}
         </Field>
 
-        <Field label="Company" name="company_name" error={state.fieldErrors?.company_name}>
+        <Field label="Company" error={state.fieldErrors?.company_name}>
           {(id, describedBy) => (
             <input
               id={id}
@@ -144,7 +137,7 @@ export function QuoteForm({ services }: { services: ServiceOption[] }) {
           )}
         </Field>
 
-        <Field label="Email" name="email" required error={state.fieldErrors?.email}>
+        <Field label="Email" required error={state.fieldErrors?.email}>
           {(id, describedBy) => (
             <input
               id={id}
@@ -158,7 +151,7 @@ export function QuoteForm({ services }: { services: ServiceOption[] }) {
           )}
         </Field>
 
-        <Field label="Phone" name="phone" error={state.fieldErrors?.phone}>
+        <Field label="Phone" error={state.fieldErrors?.phone}>
           {(id, describedBy) => (
             <input
               id={id}
@@ -171,7 +164,7 @@ export function QuoteForm({ services }: { services: ServiceOption[] }) {
           )}
         </Field>
 
-        <Field label="WhatsApp" name="whatsapp" hint="If different from your phone">
+        <Field label="WhatsApp" hint="If different from your phone">
           {(id, describedBy) => (
             <input
               id={id}
@@ -183,7 +176,7 @@ export function QuoteForm({ services }: { services: ServiceOption[] }) {
           )}
         </Field>
 
-        <Field label="Existing website" name="existing_website">
+        <Field label="Existing website">
           {(id, describedBy) => (
             <input
               id={id}
@@ -197,7 +190,7 @@ export function QuoteForm({ services }: { services: ServiceOption[] }) {
           )}
         </Field>
 
-        <Field label="What do you need?" name="service_id">
+        <Field label="What do you need?">
           {(id, describedBy) => (
             <select
               id={id}
@@ -216,7 +209,7 @@ export function QuoteForm({ services }: { services: ServiceOption[] }) {
           )}
         </Field>
 
-        <Field label="Preferred way to reach you" name="preferred_contact">
+        <Field label="Preferred way to reach you">
           {(id, describedBy) => (
             <select
               id={id}
@@ -234,7 +227,7 @@ export function QuoteForm({ services }: { services: ServiceOption[] }) {
           )}
         </Field>
 
-        <Field label="Budget" name="budget_range">
+        <Field label="Budget">
           {(id, describedBy) => (
             <select id={id} name="budget_range" aria-describedby={describedBy} className={FIELD}>
               <option value="">Prefer not to say</option>
@@ -247,7 +240,7 @@ export function QuoteForm({ services }: { services: ServiceOption[] }) {
           )}
         </Field>
 
-        <Field label="Timeline" name="timeline">
+        <Field label="Timeline">
           {(id, describedBy) => (
             <select id={id} name="timeline" aria-describedby={describedBy} className={FIELD}>
               <option value="">Not decided</option>
@@ -263,7 +256,6 @@ export function QuoteForm({ services }: { services: ServiceOption[] }) {
 
       <Field
         label="Tell us about the project"
-        name="description"
         required
         hint="What you are building, who it is for, and anything already decided."
         error={state.fieldErrors?.description}
@@ -284,7 +276,6 @@ export function QuoteForm({ services }: { services: ServiceOption[] }) {
         <label className="flex items-start gap-3 text-sm text-text-muted">
           <input
             type="checkbox"
-            name="consent_given"
             required
             className="mt-0.5 size-4 shrink-0 rounded-sm border-border-strong text-accent focus:ring-2 focus:ring-accent/20"
           />
@@ -324,57 +315,3 @@ export function QuoteForm({ services }: { services: ServiceOption[] }) {
   );
 }
 
-/**
- * Label, control and message as one unit.
- *
- * Takes the control as a render prop so the generated id and the
- * `aria-describedby` chain are wired up in one place. Doing it per field by
- * hand is where accessible forms usually go wrong.
- */
-function Field({
-  label,
-  name,
-  required,
-  hint,
-  error,
-  children,
-}: {
-  label: string;
-  name: string;
-  required?: boolean;
-  hint?: string;
-  error?: string;
-  children: (id: string, describedBy: string | undefined) => React.ReactNode;
-}) {
-  const id = useId();
-  const hintId = hint ? `${id}-hint` : undefined;
-  const errorId = error ? `${id}-error` : undefined;
-  const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
-
-  return (
-    <div className={name === "description" ? undefined : "min-w-0"}>
-      <label htmlFor={id} className={LABEL}>
-        {label}
-        {required ? (
-          <span className="ml-0.5 text-accent" aria-hidden>
-            *
-          </span>
-        ) : null}
-      </label>
-
-      <div className="mt-2">{children(id, describedBy)}</div>
-
-      {hint ? (
-        <p id={hintId} className="mt-1.5 text-xs text-text-subtle">
-          {hint}
-        </p>
-      ) : null}
-
-      {error ? (
-        <p id={errorId} className="mt-1.5 text-sm text-danger">
-          {error}
-        </p>
-      ) : null}
-    </div>
-  );
-}

@@ -11,8 +11,22 @@ import type { PageWithSections } from "@/lib/queries/page";
  */
 export function SectionRenderer({
   sections,
+  context,
 }: {
   sections: PageWithSections["sections"];
+  /**
+   * What this page is about, in the page's own words.
+   *
+   * Merged into every section's content as `whatsappContext`, which is what
+   * lets a WhatsApp button open a chat that already names the subject instead
+   * of an empty one. Passed as the page's title rather than a string typed
+   * here, so it follows what the owner renamed the page to.
+   *
+   * Merged rather than passed as a second prop for the same reason
+   * `background` is: one prop keeps every section's signature identical, which
+   * is what lets the registry type them all the same way.
+   */
+  context?: string;
 }) {
   return (
     <>
@@ -44,7 +58,13 @@ export function SectionRenderer({
             key={section.id}
             content={
               section.content && typeof section.content === "object" && !Array.isArray(section.content)
-                ? { ...section.content, background: section.background }
+                ? {
+                    // A context written into the section itself wins: somebody
+                    // who set one meant that wording, not the page title.
+                    whatsappContext: context,
+                    ...section.content,
+                    background: section.background,
+                  }
                 : section.content
             }
           />

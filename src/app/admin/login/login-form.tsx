@@ -28,7 +28,7 @@ export function LoginForm() {
 
   return (
     <form action={formAction} className="space-y-5" noValidate>
-      {/* Where the middleware was sending them before it turned them away.
+      {/* Where the proxy was sending them before it turned them away.
           Validated server-side — anyone can put anything in a query string. */}
       <input type="hidden" name="next" value={searchParams.get("next") ?? ""} />
 

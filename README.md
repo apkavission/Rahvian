@@ -1,37 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Apka Vission — company website
 
-## Getting Started
+The services site, admin panel and client portal for **Apka Saathi Private
+Limited**, trading as Apka Vission.
 
-First, run the development server:
+Everything on the public site is database-driven and editable from the admin
+panel — the copy, the images, the menus, the pricing, the SEO and the switch
+that opens the site to search engines. Nothing on it is hardcoded in a
+component.
+
+---
+
+## Where to start
+
+**Read [`docs/README.md`](docs/README.md) first.** It names the standing rules
+that bind every screen in this project, and they are not optional — images,
+responsiveness, loading, privacy, and what may and may not be committed.
+
+Then [`docs/PROGRESS.md`](docs/PROGRESS.md), which is the living state of the
+work: what is built, what is next, and every decision with the reason it was
+made.
+
+| | |
+|---|---|
+| **What the owner has to do** | [`docs/owner-checklist.md`](docs/owner-checklist.md) |
+| **Before this goes live** | [`docs/pre-production-cleanup.md`](docs/pre-production-cleanup.md) |
+| **What is tested and what is not** | [`docs/testing.md`](docs/testing.md) |
+
+---
+
+## Running it
 
 ```bash
+npm ci
+cp .env.example .env.local     # then fill it in — see the notes in that file
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The public site is on `/`, the admin on `/admin`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Command | What it does |
+|---|---|
+| `npm run dev` | Development server |
+| `npm run build` | Production build; prerenders every page against the live database |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run lint` | ESLint |
+| `npm test` | Unit tests (Vitest) |
+| `npm run test:e2e` | Browser tests (Playwright) — see [`e2e/README.md`](e2e/README.md) |
+| `npm run db:types` | Regenerate `src/types/database.ts` from the live schema |
+| `npm run db:seed` | Seed initial content. **Destructive** — never run against production |
+| `npm run db:backup` | Take a backup by hand. The nightly one is `/api/cron/backup` |
+| `npm run admin:create` | Create the first admin account on a fresh database |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## How it is put together
 
-To learn more about Next.js, take a look at the following resources:
+| | |
+|---|---|
+| **Framework** | Next.js, App Router, TypeScript |
+| **Database** | Supabase — one project, seven schemas, row-level security on every table |
+| **Storage** | Cloudflare R2, private. Files are served through the app, never straight from the bucket |
+| **Email** | SMTP, sent from the server |
+| **Styling** | Tailwind, with the design tokens in `src/app/globals.css` |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Content is cached indefinitely under tags and cleared explicitly on save.**
+That is what lets every page be static and every word of it still be editable
+without a deploy. A write that forgets to invalidate serves stale content
+forever with nothing failing to say so, which is why `src/lib/cache/tags.ts`
+is the only place a tag may be named.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Three layers decide who sees what**, and the weakest of them is the one you
+can see: the proxy turns anonymous requests away from `/admin`, `requireMenu()`
+answers 404 for a screen not in that person's menu, and row-level security
+refuses the rows underneath both.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-"# services" 
+Private repository. All rights reserved.

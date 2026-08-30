@@ -81,8 +81,8 @@ export async function getStaffSession(): Promise<StaffSession | null> {
 /**
  * The session, or a redirect to the login screen.
  *
- * Every admin page calls this. The middleware already turns anonymous requests
- * away, but a middleware check is a routing convenience, not an authorisation
+ * Every admin page calls this. The proxy already turns anonymous requests
+ * away, but that check is a routing convenience, not an authorisation
  * boundary: it cannot see the profile, and it is skipped for requests that
  * never pass through it. The page has to establish for itself who is asking.
  */
@@ -104,7 +104,7 @@ export async function requireStaff(): Promise<StaffSession> {
  * confirms the screen is there and that someone else can reach it, which is a
  * fact an account that may not use it has no business learning.
  *
- * This is the routing layer of three. The middleware turned anonymous requests
+ * This is the routing layer of three. The proxy turned anonymous requests
  * away, and RLS refuses the rows underneath whatever this decides.
  */
 export async function requireMenu(key: MenuKey): Promise<StaffSession> {

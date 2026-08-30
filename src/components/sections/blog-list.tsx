@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { PostCard, postMeta } from "@/components/blog/post-card";
 import { FramedImage } from "@/components/media/image";
 import { Reveal } from "@/components/motion/reveal";
 import { Section, SectionHeading } from "@/components/sections/section";
@@ -7,7 +8,6 @@ import type { BackgroundVariant } from "@/components/sections/section";
 import { ButtonLink } from "@/components/ui/button";
 import { getBlogPosts } from "@/lib/queries/blog";
 import type { BlogPostCard } from "@/lib/queries/blog";
-import { formatDate } from "@/lib/utils";
 
 export interface BlogListContent {
   eyebrow?: string;
@@ -104,17 +104,6 @@ export async function BlogList({ content }: { content: BlogListContent }) {
   );
 }
 
-/** Meta line shared by both cards: date, reading time, category. */
-function meta(post: BlogPostCard): string {
-  return [
-    formatDate(post.published_at),
-    post.reading_minutes ? `${post.reading_minutes} min read` : null,
-    post.category?.name,
-  ]
-    .filter(Boolean)
-    .join(" · ");
-}
-
 function FeaturedCard({ post }: { post: BlogPostCard }) {
   return (
     <Reveal className="mt-14">
@@ -130,7 +119,7 @@ function FeaturedCard({ post }: { post: BlogPostCard }) {
           {post.excerpt && (
             <p className="measure mt-4 leading-relaxed text-text-muted">{post.excerpt}</p>
           )}
-          <p className="mt-7 font-mono text-xs text-text-subtle">{meta(post)}</p>
+          <p className="mt-7 font-mono text-xs text-text-subtle">{postMeta(post)}</p>
         </div>
 
         {post.image ? (
@@ -145,44 +134,6 @@ function FeaturedCard({ post }: { post: BlogPostCard }) {
             className="order-first aspect-[16/10] border-b border-border bg-surface-2 opacity-40 [background:repeating-linear-gradient(135deg,var(--border)_0_1px,transparent_1px_10px)] lg:order-last lg:aspect-auto lg:border-b-0 lg:border-l"
           />
         )}
-      </Link>
-    </Reveal>
-  );
-}
-
-function PostCard({ post }: { post: BlogPostCard }) {
-  return (
-    <Reveal as="li" className="h-full">
-      <Link
-        href={`/blog/${post.slug}`}
-        className="surface-raised group flex h-full flex-col overflow-hidden rounded-2xl border border-border transition-[transform,border-color] duration-[--duration-base] ease-[--ease-out] hover:-translate-y-1 hover:border-border-strong"
-      >
-        {post.image ? (
-          <FramedImage
-            image={post.image}
-            className="aspect-[16/10] border-b border-border"
-          />
-        ) : (
-          <div
-            aria-hidden
-            className="aspect-[16/10] border-b border-border bg-surface-2 opacity-40 [background:repeating-linear-gradient(135deg,var(--border)_0_1px,transparent_1px_10px)]"
-          />
-        )}
-
-        <div className="flex flex-1 flex-col p-6">
-          {post.category && (
-            <p className="font-mono text-xs uppercase tracking-[0.16em] text-accent">
-              {post.category.name}
-            </p>
-          )}
-          <h3 className="mt-3 font-display text-lg font-semibold leading-snug">{post.title}</h3>
-          {post.excerpt && (
-            <p className="mt-3 flex-1 text-sm leading-relaxed text-text-muted">{post.excerpt}</p>
-          )}
-          <p className="mt-5 border-t border-border pt-4 font-mono text-xs text-text-subtle">
-            {meta(post)}
-          </p>
-        </div>
       </Link>
     </Reveal>
   );

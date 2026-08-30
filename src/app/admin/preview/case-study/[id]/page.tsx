@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { CaseStudyDetail, readGallery } from "@/components/case-studies/case-study-detail";
+import { CaseStudyDetail } from "@/components/case-studies/case-study-detail";
+import { readGallery } from "@/lib/media/gallery";
 import { requireMenu } from "@/lib/auth/session";
 import { getAdminCaseStudy } from "@/lib/queries/case-studies-admin";
 import { getCaseStudies } from "@/lib/queries/case-studies";

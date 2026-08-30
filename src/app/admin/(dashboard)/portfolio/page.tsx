@@ -116,15 +116,6 @@ export default async function PortfolioScreen({ searchParams }: Props) {
                   assets={assets}
                 />
               </div>
-
-              {/*
-                Said once, on the screen, rather than left as a gap someone has
-                to work out.
-              */}
-              <p className="mt-6 rounded-lg bg-surface-2 p-3 text-xs leading-relaxed text-text-subtle">
-                The gallery is not here yet. It is a list of images rather than
-                one, so the picker needs to become a repeater first.
-              </p>
             </>
           ) : (
             <div className="rounded-2xl border border-dashed border-border bg-surface-2/40 p-8">

@@ -27,7 +27,7 @@ export const CACHE_TAGS = {
   /** Title template, default description, verification codes. */
   seoDefaults: "seo-defaults",
 
-  /** Path redirect table, read by middleware. */
+  /** Path redirect table. Nothing reads it yet — see pre-production-cleanup.md §5. */
   redirects: "redirects",
 
   /** Any page or page section. */

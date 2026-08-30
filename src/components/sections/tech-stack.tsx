@@ -57,7 +57,7 @@ export async function TechStack({ content }: { content: TechStackContent }) {
       />
 
       <div className="reveal-group mt-14 space-y-px">
-        {grouped.map((group, index) => (
+        {grouped.map((group) => (
           <Reveal key={group.category}>
             <div className="grid gap-4 border-t border-border py-6 sm:grid-cols-[9rem_1fr] sm:gap-8">
               <h3 className="font-mono text-xs uppercase tracking-[0.16em] text-text-subtle">

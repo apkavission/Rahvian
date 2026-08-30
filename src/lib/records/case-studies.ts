@@ -1,3 +1,4 @@
+import { galleryToJson, readGallery } from "@/lib/media/gallery";
 import type { MediaOption } from "@/lib/media/image-fields";
 import type { Fieldset } from "@/lib/records/definition";
 import { recordSchema } from "@/lib/records/definition";
@@ -19,8 +20,10 @@ export interface PickerOption {
  * a rename-free copy and there is no second place where a field's identity is
  * decided.
  *
- * `screenshots` is still absent. It is a list of images rather than one, so it
- * needs a repeater of image fields — the picker handles a single choice today.
+ * `screenshots` is a repeater of image fields — the one column on this table
+ * that holds a list of pictures rather than one. It is the same descriptor the
+ * portfolio gallery uses, against a different declared size, and it produces
+ * the same `{ media_id, caption }` row the column already stored.
  */
 export function caseStudyFieldsets(
   technologies: PickerOption[],
@@ -117,6 +120,32 @@ export function caseStudyFieldsets(
       legend: "Header image",
       hint: "Optional. The write-up reads perfectly well without one, and a placeholder photograph of nothing in particular reads worse than no photograph.",
       fields: [imageField("og_image_id", "caseStudy.header", assets)],
+    },
+    {
+      legend: "Screenshots",
+      hint: "The “A look inside” grid, two screens to a row, in the order set here. Leave it empty and the whole section is left out of the write-up rather than shown as an empty grid. A screen whose file is later deleted from the library drops out on its own.",
+      fields: [
+        {
+          kind: "repeater",
+          name: "screenshots",
+          label: "Screens",
+          itemLabel: "screen",
+          max: 12,
+          fields: [
+            // Required, because a row with a caption and no picture is a row
+            // the page cannot draw — and the page's own reader would drop it,
+            // leaving a caption that was saved and never appeared.
+            imageField("media_id", "caseStudy.screenshot", assets, { required: true }),
+            {
+              kind: "text",
+              name: "caption",
+              label: "Caption",
+              max: 200,
+              hint: "Optional. One line under the screen — what it does, not what it looks like.",
+            },
+          ],
+        },
+      ],
     },
     {
       legend: "Connections",
@@ -217,6 +246,13 @@ export function caseStudyToValues(row: CaseStudyRow): Record<string, unknown> {
 
     og_image_id: row.og_image_id ?? "",
 
+    // Read through the same function the public page reads it with, so the
+    // form shows exactly the rows that would render.
+    screenshots: readGallery(row.screenshots).map((item) => ({
+      media_id: item.media_id,
+      caption: item.caption ?? "",
+    })),
+
     project_id: row.project_id ?? "",
     testimonial_id: row.testimonial_id ?? "",
     technology_ids: row.technology_ids,
@@ -256,6 +292,7 @@ export function valuesToRow(values: Record<string, unknown>): TablesUpdate<"case
     duration: text(values.duration),
 
     og_image_id: text(values.og_image_id),
+    screenshots: galleryToJson(values.screenshots),
 
     problem: text(values.problem),
     solution: text(values.solution),

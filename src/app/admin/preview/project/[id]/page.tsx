@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { ProjectDetail, readGallery } from "@/components/portfolio/project-detail";
+import { ProjectDetail } from "@/components/portfolio/project-detail";
+import { readGallery } from "@/lib/media/gallery";
 import { requireMenu } from "@/lib/auth/session";
 import { getAdminProject } from "@/lib/queries/projects-admin";
 import { getMediaByIds, getProjects } from "@/lib/queries/projects";

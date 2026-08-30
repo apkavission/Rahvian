@@ -62,12 +62,23 @@ export function SectionHeading({
   description,
   align = "left",
   className,
+  as: Heading = "h2",
 }: {
   eyebrow?: string;
   title: string;
   description?: string;
   align?: "left" | "center";
   className?: string;
+  /**
+   * The heading level. `h2` everywhere except a page whose main heading this
+   * is — the category archive is the only one today.
+   *
+   * A level rather than a second component, because the styling is the same
+   * and the difference is structural: a page needs exactly one `h1`, and a
+   * section on a page that already has one must not add a second. Getting that
+   * wrong is invisible on screen and total to somebody navigating by heading.
+   */
+  as?: "h1" | "h2";
 }) {
   return (
     <Reveal
@@ -82,14 +93,14 @@ export function SectionHeading({
           {eyebrow}
         </p>
       )}
-      <h2
+      <Heading
         className={cn(
           "font-display text-3xl font-semibold sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]",
           eyebrow && "mt-4",
         )}
       >
         {title}
-      </h2>
+      </Heading>
       {description && (
         <p className="mt-5 text-lg leading-relaxed text-text-muted">{description}</p>
       )}

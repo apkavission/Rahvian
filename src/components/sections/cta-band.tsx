@@ -4,6 +4,7 @@ import { SceneMount } from "@/components/three/scene-mount";
 import { ButtonLink } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getSiteSettings } from "@/lib/queries/site-settings";
+import { whatsappLink, whatsappTemplateOf } from "@/lib/whatsapp";
 
 export interface CtaBandContent {
   eyebrow?: string;
@@ -13,11 +14,15 @@ export interface CtaBandContent {
   /** Shown only when a WhatsApp number is configured in settings. */
   showWhatsapp?: boolean;
   whatsappLabel?: string;
+  /** The page's subject, merged in by the renderer. See `lib/whatsapp.ts`. */
+  whatsappContext?: string;
 }
 
 export async function CtaBand({ content }: { content: CtaBandContent }) {
   const settings = await getSiteSettings();
-  const whatsapp = content.showWhatsapp ? settings?.whatsapp : null;
+  const whatsapp = content.showWhatsapp
+    ? whatsappLink(settings?.whatsapp, whatsappTemplateOf(settings), content.whatsappContext)
+    : null;
 
   return (
     /*
@@ -84,7 +89,7 @@ export async function CtaBand({ content }: { content: CtaBandContent }) {
 
             {whatsapp && (
               <a
-                href={`https://wa.me/${whatsapp.replace(/\D/g, "")}`}
+                href={whatsapp}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex h-13 items-center gap-2 rounded-lg border border-[#232b36] px-7 text-base font-medium text-[#e8edf4] transition-colors duration-[--duration-fast] hover:border-[#323c4a] hover:bg-[#0e1218]"

@@ -66,6 +66,14 @@ export default async function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
+      /* Tells Next that the smooth scrolling in `globals.css` is deliberate, so
+         it suppresses it for the duration of a route change. Without it, Next
+         waits on an animated scroll to the top on every navigation — which it
+         warns about on every build, and which is long enough that a click on a
+         menu link appears not to have worked. Within a page, an anchor link
+         still scrolls smoothly; that is what the CSS rule was added for and it
+         is untouched. */
+      data-scroll-behavior="smooth"
       className={`${sora.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
       <head>

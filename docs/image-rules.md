@@ -155,7 +155,7 @@ distrust the warnings that are real.
 One list, in code, read by the media picker and by the docs. Two lists drift,
 and the one that drifts is the one the owner is reading.
 
-That list is `src/lib/media/image-fields.ts`. As of 2026-08-27 it holds nine
+That list is `src/lib/media/image-fields.ts`. As of 2026-08-28 it holds eleven
 entries, and a field cannot be declared without one:
 
 | Field | Size | Shape | Where it is seen |
@@ -163,7 +163,9 @@ entries, and a field cannot be declared without one:
 | Service — social image | 1200 × 630 | 40:21 | Sharing a service page |
 | Portfolio — card image | 1600 × 1000 | 16:10 | The portfolio grid, and the top of the project page |
 | Portfolio — social image | 1200 × 630 | 40:21 | Sharing a project |
+| Portfolio — gallery picture | 1200 wide or more | **any** | The "A look inside" grid on the project page |
 | Case study — header image | 1600 × 1000 | 16:10 | The case studies grid and the top of the write-up |
+| Case study — screenshot | 1200 wide or more | **any** | The "A look inside" grid on the write-up |
 | Post — featured image | 1600 × 1000 | 16:10 | The blog list and across the top of the post |
 | Post — social image | 1200 × 630 | 40:21 | Sharing a post |
 | Team — photo | 400 × 400 | 1:1 | The About page portraits |
@@ -175,9 +177,22 @@ in, at twice its CSS size so it stays sharp on a dense screen, and at exactly
 that box's aspect ratio. The last part is what makes "never cropped" keepable
 rather than aspirational: a file at the box's own ratio has nothing to crop.
 
-**Still missing:** `projects.gallery` and `case_studies.screenshots`. Both are
-lists of images rather than one, so they need a repeater of image fields. The
-picker handles a single choice today.
+**The two "any shape" fields are a real exception, added 2026-08-28.** Every
+other field draws its picture inside a frame of a fixed shape, which is what
+makes the declared ratio a requirement. The two galleries render through
+`NaturalImage`, which flows a picture at its own size — nothing is cropped and
+nothing letterboxes — so a tall phone screen beside a wide dashboard is correct
+there rather than a mistake. Warning about the shape would be warning about the
+feature, and a warning that fires on correct input is one people learn to
+ignore, which then costs them the nine fields where the shape does matter.
+
+The exception is carried as `shapeFree` on the spec and is deliberately narrow.
+**Only the shape half of the rule is turned off.** A file narrower than the
+declared width still warns, in the same words, because `NaturalImage` never
+enlarges either: too small is still too small, and it will be drawn at its own
+size with space beside it. The hint prints
+`1200 × 750 px or wider — any shape` rather than a ratio, so what is being asked
+for is what is actually required.
 
 ### `contain`, never `cover` — and no hover zoom
 
@@ -229,7 +244,7 @@ The precise commitment is:
 | Dimensions are known, and known truthfully | **Done.** `src/lib/media/image-file.ts` reads them from the file's own header, never from what the browser reported. Tested against all five formats. |
 | Never cropped, covered, distorted or upscaled — in the library | **Done.** The preview column at `/admin/media` shows every file whole, at its own ratio, never above its natural width, on white and on near-black. |
 | The uploader is told its file's real size | **Done.** The upload form reads and shows it before the file is sent, and warns on anything under 400px wide. |
-| Every image field states the exact size it wants | **Done.** All nine are wired and each prints its size before a file is chosen. |
+| Every image field states the exact size it wants | **Done.** All eleven are wired and each prints its size before a file is chosen — the two gallery fields print a minimum width and "any shape", which is what is actually required of them. |
 | A mismatch warns, naming both numbers | **Done.** `describeFit()`, with unit tests asserting both numbers appear in every message. |
 | One table of every field's declared size | **Done.** `src/lib/media/image-fields.ts`, reproduced above. |
 | Never cropped, on the public site | **Done.** Every `object-cover` on a photograph became `object-contain`, and the hover zoom that enlarged and clipped card images was removed. |

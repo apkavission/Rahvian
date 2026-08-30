@@ -48,6 +48,7 @@ const CONTENT_MENU: MenuKey[] = [
   "services",
   "portfolio",
   "case-studies",
+  "testimonials",
   "blog",
   "pricing",
   "faqs",

@@ -256,7 +256,7 @@ function FolderPill({
         className={cn(
           "inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-sm transition-colors",
           active
-            ? "border-accent bg-accent-soft text-text"
+            ? "border-accent bg-accent-soft font-semibold text-accent"
             : "border-border bg-surface text-text-muted hover:border-border-strong hover:text-text",
         )}
       >

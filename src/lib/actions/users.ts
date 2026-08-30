@@ -22,6 +22,7 @@ import {
   type AccountActionState,
 } from "@/lib/validation/users";
 import { fieldErrors, type RecordActionState } from "@/lib/validation/records";
+import { parseCoordinates } from "@/lib/coordinates";
 
 /**
  * Account mutations.
@@ -272,6 +273,9 @@ export async function saveAccount(
     role: formData.get("role"),
     app_access: formData.getAll("app_access"),
     menu: formData.getAll("menu"),
+    address: formData.get("address") || undefined,
+    coordinates: formData.get("coordinates") || undefined,
+    work_radius_metres: formData.get("work_radius_metres") || undefined,
   });
 
   if (!parsed.success) {
@@ -342,6 +346,24 @@ export async function saveAccount(
     }
   }
 
+  /*
+    The work point, read from what was pasted.
+
+    Refused with a sentence rather than saved wrongly: a mistyped pair does not
+    fail here, it fails at nine in the morning when somebody cannot clock in and
+    has no idea why. Empty is a real answer meaning "no fence", which is how one
+    is removed.
+  */
+  const point = parseCoordinates(parsed.data.coordinates);
+
+  if (!point.ok) {
+    return {
+      status: "error",
+      message: point.message,
+      fieldErrors: { coordinates: point.message },
+    };
+  }
+
   const { menu_extra, menu_denied } = menuOverrides(role, parsed.data.menu);
 
   const { error } = await supabase
@@ -352,6 +374,14 @@ export async function saveAccount(
       app_access: parsed.data.app_access,
       menu_extra,
       menu_denied,
+
+      /* The workplace, for the tracker's clock-in check. Nulls are meaningful:
+         clearing the box removes the fence, and the tracker then records a
+         clock-in as unchecked rather than refusing it. */
+      address: parsed.data.address ?? null,
+      work_latitude: point.point?.latitude ?? null,
+      work_longitude: point.point?.longitude ?? null,
+      work_radius_metres: parsed.data.work_radius_metres ?? 200,
     })
     .eq("id", parsed.data.id);
 

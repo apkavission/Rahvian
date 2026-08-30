@@ -5,12 +5,14 @@ import { ADMIN_NAV_ITEMS, navItem } from "@/components/admin/nav";
 import { GRANTABLE_ITEMS, resolveMenu } from "@/lib/auth/menu";
 import { assignableRoles, roleByKey, type RoleDefinition } from "@/lib/auth/roles";
 import { requireMenu } from "@/lib/auth/session";
+import { getLeaveTypes } from "@/lib/queries/leave-types";
 import { getRoles } from "@/lib/queries/roles";
 import { getAccounts, type Account } from "@/lib/queries/users-admin";
 import { cn } from "@/lib/utils";
 import { AccountForm } from "./account-form";
 import { AccountSecurity } from "./account-security";
 import { NewAccountForm } from "./new-account-form";
+import { LeaveTypes } from "./leave-types";
 import { NewRoleForm } from "./new-role-form";
 import { RoleForm } from "./role-form";
 
@@ -46,9 +48,21 @@ export default async function UsersScreen({ searchParams }: Props) {
   const session = await requireMenu("users");
 
   const query = await searchParams;
-  const tab = query.tab === "roles" ? "roles" : "people";
 
-  const [{ accounts, capped }, roles] = await Promise.all([getAccounts(), getRoles()]);
+  /*
+    Three tabs, one subject: who somebody is, what their role means, and what
+    they can ask time off for. All three are answers to "what may this person
+    do", and moving between them is a normal minute's work — a separate menu
+    entry for each would turn that into a decision about where to click.
+  */
+  const tab =
+    query.tab === "roles" ? "roles" : query.tab === "leave" ? "leave" : "people";
+
+  const [{ accounts, capped }, roles, leaveTypes] = await Promise.all([
+    getAccounts(),
+    getRoles(),
+    getLeaveTypes(),
+  ]);
 
   const assignable = assignableRoles(roles, session.role);
 
@@ -73,6 +87,12 @@ export default async function UsersScreen({ searchParams }: Props) {
           active={tab === "roles"}
           count={roles.length}
         />
+        <Tab
+          href="/admin/users?tab=leave"
+          label="Leave types"
+          active={tab === "leave"}
+          count={leaveTypes.length}
+        />
       </nav>
 
       {capped && (
@@ -82,7 +102,9 @@ export default async function UsersScreen({ searchParams }: Props) {
         </p>
       )}
 
-      {tab === "people" ? (
+      {tab === "leave" ? (
+        <LeaveTypes types={leaveTypes} />
+      ) : tab === "people" ? (
         <People
           accounts={accounts}
           roles={roles}
@@ -128,7 +150,7 @@ function Tab({
       className={cn(
         "-mb-px border-b-2 px-4 py-2.5 text-sm font-medium transition-colors",
         active
-          ? "border-accent text-text"
+          ? "rounded-t-lg border-accent bg-accent-soft font-semibold text-accent"
           : "border-transparent text-text-muted hover:text-text",
       )}
     >
@@ -179,7 +201,7 @@ function People({
                   className={cn(
                     "flex items-start gap-2.5 rounded-xl border p-3 transition-colors",
                     active
-                      ? "border-accent bg-accent-soft/40"
+                      ? "border-accent bg-accent-soft/60 shadow-[inset_3px_0_0_var(--accent)]"
                       : "border-border bg-surface hover:bg-surface-2",
                     !account.is_active && "opacity-70",
                   )}
@@ -250,6 +272,10 @@ function People({
                     app_access: selected.app_access,
                     menu_extra: selected.menu_extra,
                     menu_denied: selected.menu_denied,
+                    address: selected.address,
+                    work_latitude: selected.work_latitude,
+                    work_longitude: selected.work_longitude,
+                    work_radius_metres: selected.work_radius_metres,
                   }}
                   roles={roles}
                   assignable={assignable}

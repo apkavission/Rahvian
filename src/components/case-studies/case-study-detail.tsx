@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRight, Check } from "lucide-react";
 import { NaturalImage } from "@/components/media/image";
+import { readGallery } from "@/lib/media/gallery";
 import { Reveal } from "@/components/motion/reveal";
 import { Section, SectionHeading } from "@/components/sections/section";
 import type { CaseStudyCard, CaseStudyImage } from "@/lib/queries/case-studies";
@@ -305,22 +306,6 @@ function Meta({ term, value }: { term: string; value: string }) {
 function stringList(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   return value.filter((item): item is string => typeof item === "string" && item.trim() !== "");
-}
-
-export function readGallery(value: unknown): { media_id: string; caption: string | null }[] {
-  if (!Array.isArray(value)) return [];
-
-  return value.flatMap((entry) => {
-    if (!entry || typeof entry !== "object") return [];
-    const row = entry as Record<string, unknown>;
-    if (typeof row.media_id !== "string") return [];
-    return [
-      {
-        media_id: row.media_id,
-        caption: typeof row.caption === "string" && row.caption.trim() ? row.caption : null,
-      },
-    ];
-  });
 }
 
 /**

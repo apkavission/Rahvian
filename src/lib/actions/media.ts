@@ -10,6 +10,7 @@ import { readImageFacts } from "@/lib/media/image-file";
 import { darkVariantOptions } from "@/lib/queries/media-admin";
 import { mediaPath, mediaSchema, valuesToRow } from "@/lib/records/media";
 import { deleteObject, putObject, storageConfigured } from "@/lib/storage/r2";
+import { extensionFor, safeFilename } from "@/lib/media/filename";
 import { createClient } from "@/lib/supabase/server";
 import {
   fieldErrors,
@@ -230,9 +231,29 @@ export async function saveMedia(
 
   const supabase = await createClient();
 
+  /*
+    The stored name is read back before the new one is built.
+
+    A rename may change what a file is called and must never change what it
+    claims to be: the extension records what the bytes are, and that was
+    established once, when the file arrived. So the extension comes from the
+    row rather than from what was typed.
+  */
+  const { data: existing } = await supabase
+    .from("media")
+    .select("filename")
+    .eq("id", parsed.data.id)
+    .maybeSingle();
+
+  if (!existing) {
+    return { status: "error", message: "That file no longer exists." };
+  }
+
   const { error } = await supabase
     .from("media")
-    .update(valuesToRow(parsed.data.id, values.data as Record<string, unknown>))
+    .update(
+      valuesToRow(parsed.data.id, existing.filename, values.data as Record<string, unknown>),
+    )
     .eq("id", parsed.data.id);
 
   if (error) {
@@ -296,42 +317,6 @@ export async function deleteMedia(
 }
 
 // ---------------------------------------------------------------------------
-
-const EXTENSIONS = {
-  png: "png",
-  jpeg: "jpg",
-  gif: "gif",
-  webp: "webp",
-  svg: "svg",
-} as const;
-
-function extensionFor(format: keyof typeof EXTENSIONS): string {
-  return EXTENSIONS[format];
-}
-
-/**
- * The name the file is filed and served under.
- *
- * The uploader's name, reduced to something safe for a URL and a bucket key,
- * with the extension forced to match what the bytes actually are — a JPEG
- * named `.png` is stored as `.jpg`, because the extension is the last thing
- * anyone checks and the first thing that misleads them.
- */
-function safeFilename(original: string, format: keyof typeof EXTENSIONS): string {
-  const withoutExtension = original.replace(/\.[^.]+$/, "");
-
-  const stem =
-    withoutExtension
-      .toLowerCase()
-      .normalize("NFKD")
-      // Anything that is not a letter, a number or a hyphen becomes a hyphen,
-      // then runs collapse. A filename is part of a URL here.
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 80) || "image";
-
-  return `${stem}.${extensionFor(format)}`;
-}
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;

@@ -32,7 +32,7 @@ export function WhatWeBuild({ content }: { content: WhatWeBuildContent }) {
       />
 
       <div className="reveal-group mt-14 grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {content.items.map((item, index) => (
+        {content.items.map((item) => (
           <Reveal key={item.title} className="h-full">
             <article className="surface-raised group flex h-full flex-col rounded-2xl border border-border p-7 transition-[transform,border-color] duration-[--duration-base] ease-[--ease-out] hover:-translate-y-1 hover:border-border-strong">
               <span className="grid size-11 place-items-center rounded-xl bg-accent-soft text-accent transition-transform duration-[--duration-base] ease-[--ease-out] group-hover:scale-105">

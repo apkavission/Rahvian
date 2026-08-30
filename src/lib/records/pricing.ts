@@ -27,7 +27,7 @@ export const CURRENCY_OPTIONS = [
  * into an `href`, and the one shape that must never reach it is a bare word
  * that silently resolves against whatever page the card happens to be on.
  */
-const HREF_PATTERN = {
+export const CTA_HREF_PATTERN = {
   re: /^(?:\/|https?:\/\/|mailto:|tel:)/,
   message:
     "Start with / for a page on this site, or with https://, mailto: or tel: for anywhere else.",
@@ -136,7 +136,7 @@ export function pricingFieldsets(): Fieldset[] {
           label: "Button goes to",
           required: true,
           max: 500,
-          pattern: HREF_PATTERN,
+          pattern: CTA_HREF_PATTERN,
         },
       ],
     },

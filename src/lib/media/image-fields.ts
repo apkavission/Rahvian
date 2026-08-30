@@ -29,6 +29,21 @@ export interface ImageFieldSpec {
    * fallback for a raster one. Logos, above all.
    */
   vectorPreferred?: boolean;
+  /**
+   * Where the picture flows at its own shape instead of filling a frame.
+   *
+   * The two gallery fields are the only ones. They render through
+   * `NaturalImage`, which takes the width it is given, up to the file's own,
+   * and lets the height follow — nothing is cropped and nothing letterboxes.
+   * A portrait screenshot beside a landscape one is correct there rather than
+   * a mistake, so warning about the shape would be warning about the feature.
+   *
+   * The declared size still means something for these. It is the width the
+   * picture is drawn at, so a file narrower than it is shown smaller than its
+   * space — never enlarged. That half of the rule still applies and is still
+   * checked.
+   */
+  shapeFree?: boolean;
 }
 
 export const IMAGE_FIELDS = {
@@ -51,12 +66,26 @@ export const IMAGE_FIELDS = {
     height: 630,
     use: "Shown when this project is shared. Left empty, the card image is used instead.",
   },
+  "project.gallery": {
+    label: "Picture",
+    width: 1200,
+    height: 750,
+    shapeFree: true,
+    use: "One picture in the “A look inside” grid on the project's page, two to a row. Any shape — a tall phone screen and a wide dashboard sit beside each other correctly — but at least this wide, or it will be drawn smaller than its space.",
+  },
 
   "caseStudy.header": {
     label: "Header image",
     width: 1600,
     height: 1000,
     use: "The picture on the case studies grid and at the top of the write-up. It doubles as the social preview, where the platform will show it wider than this — that crop is theirs, not ours.",
+  },
+  "caseStudy.screenshot": {
+    label: "Screenshot",
+    width: 1200,
+    height: 750,
+    shapeFree: true,
+    use: "One screen in the “A look inside” grid on the write-up, two to a row. Any shape — a phone screen and a desktop one sit beside each other correctly — but at least this wide, or it will be drawn smaller than its space.",
   },
 
   "post.featured": {
@@ -70,6 +99,13 @@ export const IMAGE_FIELDS = {
     width: 1200,
     height: 630,
     use: "Shown when this post is shared. Left empty, the featured image is used instead.",
+  },
+
+  "testimonial.avatar": {
+    label: "Their photo",
+    width: 400,
+    height: 400,
+    use: "The small portrait beside the quote. Square — the frame is a circle. Only use a photograph the person has agreed you may publish; the same consent that covers their words does not automatically cover their face.",
   },
 
   "team.photo": {
@@ -155,6 +191,26 @@ export function describeFit(spec: ImageFieldSpec, asset: MediaOption): Fit {
     return { level: "ok", message: `${given} — exactly what this field wants.` };
   }
 
+  /*
+    A field whose picture flows at its own shape is asked only one question:
+    is it wide enough. There is no frame for a shape to be wrong against, and
+    telling somebody that their portrait screenshot is "a different shape" from
+    a gallery that has no shape would be a warning about the feature.
+  */
+  if (spec.shapeFree) {
+    if (asset.width < spec.width) {
+      return {
+        level: "warn",
+        message: `${given} is narrower than the ${spec.width}px this field draws at. It will never be enlarged, so it will be shown at its own size and leave space beside it.`,
+      };
+    }
+
+    return {
+      level: "ok",
+      message: `${given} — wide enough. Its shape is fine as it is; pictures here are shown whole, whatever shape they are.`,
+    };
+  }
+
   // Compared as a cross-product rather than as two divisions, so 1600 × 1000
   // and 1200 × 750 are recognised as the same shape without a rounding
   // tolerance to argue about.
@@ -180,8 +236,19 @@ export function describeFit(spec: ImageFieldSpec, asset: MediaOption): Fit {
   };
 }
 
-/** "1200 × 630 (40:21)" — what a field prints before anyone picks a file. */
+/**
+ * "1200 × 630 px (40:21)" — what a field prints before anyone picks a file.
+ *
+ * A shape-free field prints the same numbers with the ratio replaced by the
+ * rule that actually applies to it. Printing "1200 × 750 px (8:5)" for a
+ * gallery would be stating a requirement that is not one, and every picture
+ * that ignored it would look like a mistake.
+ */
 export function specLabel(spec: ImageFieldSpec): string {
+  if (spec.shapeFree) {
+    return `${spec.width} × ${spec.height} px or wider — any shape`;
+  }
+
   return `${spec.width} × ${spec.height} px (${ratioLabel(spec.width, spec.height)})`;
 }
 
@@ -200,6 +267,22 @@ export function ratioLabel(width: number, height: number): string {
 
   if (w <= 40 && h <= 40) return `${w}:${h}`;
   return `${(width / height).toFixed(2)}:1`;
+}
+
+/**
+ * A stored file's shape, or a sentence when it has none.
+ *
+ * The same reduction as `ratioLabel`, which is the point: this lived in
+ * `asset-preview.tsx` as a second implementation with a different cap — 32
+ * rather than 40 — so the same file could be described two ways in two places
+ * of the same admin. Moved here on 2026-08-28 and made to delegate.
+ *
+ * What it adds is the null case. A vector has no pixel size, and "Scales to
+ * fit" is the true answer rather than a dash.
+ */
+export function aspectLabel(width: number | null, height: number | null): string {
+  if (!width || !height) return "Scales to fit";
+  return ratioLabel(width, height);
 }
 
 function gcd(a: number, b: number): number {

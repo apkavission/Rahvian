@@ -1,5 +1,5 @@
 import { QualityNote } from "@/components/admin/quality-note";
-import { assessQuality } from "@/lib/media/image-fields";
+import { aspectLabel, assessQuality } from "@/lib/media/image-fields";
 import { cn } from "@/lib/utils";
 
 export interface AssetFacts {
@@ -152,29 +152,6 @@ function Fact({ term, value }: { term: string; value: string }) {
       <dd className="mt-1 text-text">{value}</dd>
     </div>
   );
-}
-
-/**
- * The file's shape, as a ratio someone can compare against a field's.
- *
- * Reduced by the greatest common divisor, then only kept if the result is
- * small enough to read: 1200 × 800 is "3:2", and 1201 × 800 is "1.50:1", which
- * is the honest way to say "nearly, but not one of the standard shapes".
- */
-export function aspectLabel(width: number | null, height: number | null): string {
-  if (!width || !height) return "Scales to fit";
-
-  const divisor = gcd(width, height);
-  const w = width / divisor;
-  const h = height / divisor;
-
-  if (w <= 32 && h <= 32) return `${w}:${h}`;
-
-  return `${(width / height).toFixed(2)}:1`;
-}
-
-function gcd(a: number, b: number): number {
-  return b === 0 ? a : gcd(b, a % b);
 }
 
 export function formatSize(bytes: number): string {

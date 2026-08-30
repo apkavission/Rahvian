@@ -15,7 +15,7 @@ export type TeamMemberRow = Tables<"team_members">;
  * on, so the link would silently go somewhere wrong rather than nowhere — which
  * on a personal profile is worse than a broken link.
  */
-const URL_PATTERN = {
+export const PROFILE_URL_PATTERN = {
   re: /^https?:\/\/\S+$/,
   message: "Paste the whole address, starting with https://",
 } as const;
@@ -83,14 +83,14 @@ export function teamFieldsets(assets: MediaOption[]): Fieldset[] {
           name: "linkedin_url",
           label: "LinkedIn",
           max: 500,
-          pattern: URL_PATTERN,
+          pattern: PROFILE_URL_PATTERN,
         },
         {
           kind: "text",
           name: "github_url",
           label: "GitHub",
           max: 500,
-          pattern: URL_PATTERN,
+          pattern: PROFILE_URL_PATTERN,
         },
       ],
     },

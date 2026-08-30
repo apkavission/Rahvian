@@ -118,11 +118,6 @@ export default async function CaseStudiesScreen({ searchParams }: Props) {
                   assets={assets}
                 />
               </div>
-
-              <p className="mt-6 rounded-lg bg-surface-2 p-3 text-xs leading-relaxed text-text-subtle">
-                The screenshots are not here yet. They are a list of images
-                rather than one, so the picker needs to become a repeater first.
-              </p>
             </>
           ) : (
             <div className="rounded-2xl border border-dashed border-border bg-surface-2/40 p-8">

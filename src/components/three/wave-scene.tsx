@@ -1,5 +1,23 @@
 "use client";
 
+/*
+  This file is exempt from `react-hooks/immutability`, and only this file.
+
+  The frame loop below does the one thing that rule exists to prevent: it
+  writes into a `Float32Array` and sets `needsUpdate` on a `BufferGeometry`,
+  sixty times a second, from inside `useFrame`. That is not a bug being
+  excused — it is how react-three-fiber works. The buffer is GPU memory, and
+  the entire point is to mutate it in place rather than allocate a new one on
+  every frame; a scene written the way the rule wants would allocate several
+  megabytes a second and drop the mobile performance budget in ground rule 4.
+
+  The React Compiler cannot see that distinction, and its own `"use no memo"`
+  directive does not silence this rule. So the exemption is stated here, once,
+  with its reason, rather than as three unexplained inline disables.
+*/
+/* eslint-disable react-hooks/immutability -- see the note above */
+
+
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Points } from "three";

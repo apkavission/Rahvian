@@ -70,7 +70,7 @@ export function AdminNav({
                     className={cn(
                       "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors duration-[--duration-fast]",
                       active
-                        ? "bg-accent-soft font-medium text-accent"
+                        ? "bg-accent-soft font-semibold text-accent shadow-[inset_3px_0_0_var(--accent)]"
                         : "text-text-muted hover:bg-surface-2 hover:text-text",
                     )}
                   >

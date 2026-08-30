@@ -10,7 +10,9 @@ import { GRANTABLE_ITEMS, resolveMenu } from "@/lib/auth/menu";
 import { roleByKey, type RoleDefinition } from "@/lib/auth/roles";
 import { saveAccount } from "@/lib/actions/users";
 import { APP_ACCESS_OPTIONS, initialAccountState } from "@/lib/validation/users";
+import { formatCoordinates } from "@/lib/coordinates";
 import { MenuChecklist } from "./menu-checklist";
+import { WorkplaceFields } from "./workplace-fields";
 
 export interface AccountFormValues {
   id: string;
@@ -19,6 +21,10 @@ export interface AccountFormValues {
   app_access: string[];
   menu_extra: string[];
   menu_denied: string[];
+  address: string | null;
+  work_latitude: number | null;
+  work_longitude: number | null;
+  work_radius_metres: number;
 }
 
 /**
@@ -171,6 +177,13 @@ export function AccountForm({
           <p className="mt-2 text-sm text-danger">{state.fieldErrors.app_access}</p>
         )}
       </fieldset>
+
+      <WorkplaceFields
+        address={values.address}
+        coordinates={formatCoordinates(values.work_latitude, values.work_longitude)}
+        radiusMetres={values.work_radius_metres}
+        error={state.fieldErrors?.coordinates}
+      />
 
       <div className="border-t border-border pt-6">
         <MenuChecklist

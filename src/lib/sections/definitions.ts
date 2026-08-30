@@ -375,6 +375,13 @@ export const SECTION_DEFINITIONS: Record<string, SectionDefinition> = {
       { kind: "text", name: "channelsHeading", label: "Channels heading", max: 120 },
       { kind: "text", name: "hoursHeading", label: "Working hours heading", max: 120 },
       {
+        kind: "text",
+        name: "whatsappContext",
+        label: "What the WhatsApp message should say this is about",
+        max: 80,
+        hint: 'Fills the blank in the message set in Settings. Left empty the opener is generic.',
+      },
+      {
         kind: "group",
         name: "quoteLink",
         label: "Pointer to the quote form",
@@ -425,6 +432,13 @@ export const SECTION_DEFINITIONS: Record<string, SectionDefinition> = {
         hint: "Appears only when a WhatsApp number is set in Settings.",
       },
       { kind: "text", name: "whatsappLabel", label: "WhatsApp button text", max: 60 },
+      {
+        kind: "text",
+        name: "whatsappContext",
+        label: "What the message should say this is about",
+        max: 80,
+        hint: 'Fills the blank in the message set in Settings — "SEO", "the clinic demo", "a new website". Left empty the opener is generic. This is what the visitor sees already typed when WhatsApp opens, so write it the way they would say it.',
+      },
     ],
   },
 };

@@ -6,6 +6,7 @@ import { Section, SectionHeading } from "@/components/sections/section";
 import type { BackgroundVariant } from "@/components/sections/section";
 import { getServices } from "@/lib/queries/services";
 import { getSiteSettings } from "@/lib/queries/site-settings";
+import { whatsappLink, whatsappTemplateOf } from "@/lib/whatsapp";
 
 export interface ContactChannelsContent {
   eyebrow?: string;
@@ -21,6 +22,13 @@ export interface ContactChannelsContent {
   /** Shown in place of the channel list while no contact details are set. */
   channelsFallback?: string;
   privacyNote?: string;
+  /**
+   * What the WhatsApp message should say this page is about.
+   *
+   * Merged in by the section renderer from the page's own subject, so a service
+   * page opens a chat naming that service. Absent, the message is generic.
+   */
+  whatsappContext?: string;
   background?: BackgroundVariant;
 }
 
@@ -72,7 +80,18 @@ export async function ContactChannels({ content }: { content: ContactChannelsCon
     : "";
 
   const hours = readHours(settings?.working_hours);
-  const hasChannel = Boolean(settings?.email || settings?.phone || settings?.whatsapp || address);
+  /*
+    Pre-filled from the section's own subject when the page builder gives it
+    one, so the contact block on a service page opens a chat that already names
+    that service. Left unset it is the generic opener.
+  */
+  const whatsapp = whatsappLink(
+    settings?.whatsapp,
+    whatsappTemplateOf(settings),
+    content.whatsappContext,
+  );
+
+  const hasChannel = Boolean(settings?.email || settings?.phone || whatsapp || address);
 
   return (
     <Section background={content.background ?? "default"}>
@@ -125,10 +144,10 @@ export async function ContactChannels({ content }: { content: ContactChannelsCon
                     label={settings.phone}
                   />
                 )}
-                {settings?.whatsapp && (
+                {whatsapp && (
                   <Channel
                     icon={<MessageCircle className="size-4" aria-hidden />}
-                    href={`https://wa.me/${settings.whatsapp.replace(/\D/g, "")}`}
+                    href={whatsapp}
                     label="WhatsApp"
                     external
                   />
