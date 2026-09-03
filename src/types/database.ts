@@ -570,6 +570,45 @@ export type Database = {
           }
         ]
       }
+      leave_types: {
+        Row: {
+          key: string
+          label: string
+          description: string
+          is_paid: boolean
+          needs_balance: boolean
+          is_system: boolean
+          is_active: boolean
+          sort_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          key: string
+          label: string
+          description?: string
+          is_paid?: boolean
+          needs_balance?: boolean
+          is_system?: boolean
+          is_active?: boolean
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          key?: string
+          label?: string
+          description?: string
+          is_paid?: boolean
+          needs_balance?: boolean
+          is_system?: boolean
+          is_active?: boolean
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       media: {
         Row: {
           id: string
@@ -909,45 +948,6 @@ export type Database = {
         }
         Relationships: []
       }
-      leave_types: {
-        Row: {
-          key: string
-          label: string
-          description: string
-          is_paid: boolean
-          needs_balance: boolean
-          is_system: boolean
-          is_active: boolean
-          sort_order: number
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          key: string
-          label: string
-          description?: string
-          is_paid?: boolean
-          needs_balance?: boolean
-          is_system?: boolean
-          is_active?: boolean
-          sort_order?: number
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          key?: string
-          label?: string
-          description?: string
-          is_paid?: boolean
-          needs_balance?: boolean
-          is_system?: boolean
-          is_active?: boolean
-          sort_order?: number
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           id: string
@@ -1184,6 +1184,7 @@ export type Database = {
           sort_order: number
           created_at: string
           updated_at: string
+          portal_menu: string[]
         }
         Insert: {
           key: string
@@ -1199,6 +1200,7 @@ export type Database = {
           sort_order?: number
           created_at?: string
           updated_at?: string
+          portal_menu: string[]
         }
         Update: {
           key?: string
@@ -1214,6 +1216,7 @@ export type Database = {
           sort_order?: number
           created_at?: string
           updated_at?: string
+          portal_menu?: string[]
         }
         Relationships: []
       }
@@ -1404,6 +1407,7 @@ export type Database = {
           announcement_bar: Json
           created_at: string
           updated_at: string
+          whatsapp_template: string
         }
         Insert: {
           id?: number
@@ -1437,6 +1441,7 @@ export type Database = {
           announcement_bar: Json
           created_at?: string
           updated_at?: string
+          whatsapp_template?: string
         }
         Update: {
           id?: number
@@ -1470,6 +1475,7 @@ export type Database = {
           announcement_bar?: Json
           created_at?: string
           updated_at?: string
+          whatsapp_template?: string
         }
         Relationships: [
           {

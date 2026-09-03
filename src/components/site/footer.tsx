@@ -33,7 +33,7 @@ export async function Footer() {
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div className="space-y-4">
             <p className="flex items-center gap-3 font-display text-lg font-semibold tracking-tight">
-              <BrandLogo height={36} />
+              <BrandLogo height={72} />
               <span>{settings?.company_name ?? "Apka Saathi"}</span>
             </p>
             <p className="max-w-xs text-sm leading-relaxed text-text-muted">

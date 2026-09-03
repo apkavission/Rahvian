@@ -107,7 +107,7 @@ export function HeaderNav({
             : "border-b border-transparent bg-transparent",
         )}
       >
-        <div className="container-page flex h-16 items-center gap-6 md:h-18">
+        <div className="container-page flex h-24 items-center gap-6 md:h-26">
           {/* Mark and name together. The mark alone is not yet known enough to
             identify the company, and the name alone wastes the mark. */}
           <Link

@@ -24,7 +24,6 @@ import {
  * writing a key into a column.
  */
 
-const owner = roleByKey(FALLBACK_ROLES, "owner")!;
 const admin = roleByKey(FALLBACK_ROLES, "admin")!;
 const editor = roleByKey(FALLBACK_ROLES, "editor")!;
 const client = roleByKey(FALLBACK_ROLES, "client")!;
@@ -32,8 +31,8 @@ const client = roleByKey(FALLBACK_ROLES, "client")!;
 const nobody = { menu_extra: [], menu_denied: [] };
 
 describe("defaultMenuFor", () => {
-  it("gives an owner every screen the panel has", () => {
-    expect(defaultMenuFor(owner).sort()).toEqual(
+  it("gives an admin every screen the panel has", () => {
+    expect(defaultMenuFor(admin).sort()).toEqual(
       ADMIN_NAV_ITEMS.map((item) => item.key).sort(),
     );
   });
@@ -43,9 +42,16 @@ describe("defaultMenuFor", () => {
     expect(defaultMenuFor(admin)).toContain("leads");
   });
 
-  it("keeps the accounts screen away from anyone who is not an owner", () => {
-    expect(defaultMenuFor(admin)).not.toContain("users");
+  /*
+    Admin reaches the accounts screen as of 2026-08-31, because Admin is what
+    Owner became. What this guards is the line underneath: carrying `is_owner`
+    is the only way to reach it, and a role that does not carry the flag does
+    not get there however senior it looks.
+  */
+  it("keeps the accounts screen away from every role without is_owner", () => {
+    expect(defaultMenuFor(admin)).toContain("users");
     expect(defaultMenuFor(editor)).not.toContain("users");
+    expect(defaultMenuFor(client)).not.toContain("users");
   });
 
   it("gives nothing to a role that reaches nothing here", () => {
@@ -66,9 +72,11 @@ describe("defaultMenuFor", () => {
   });
 
   it("refuses an owner-only screen to a role that does not carry is_owner", () => {
+    // Built on editor, not admin: admin now carries the flag, so a pretender
+    // based on it would be testing nothing.
     const pretender: RoleDefinition = {
-      ...admin,
-      default_menu: [...admin.default_menu, "users"],
+      ...editor,
+      default_menu: [...editor.default_menu, "users"],
     };
     expect(defaultMenuFor(pretender)).not.toContain("users");
   });
@@ -91,7 +99,9 @@ describe("resolveMenu", () => {
   });
 
   it("never grants the accounts screen, whatever the column says", () => {
-    const menu = resolveMenu({ menu_extra: ["users"], menu_denied: [] }, admin);
+    // Editor, not admin: admin reaches `users` by default now, so asking
+    // whether admin can be *granted* it would pass without testing anything.
+    const menu = resolveMenu({ menu_extra: ["users"], menu_denied: [] }, editor);
     expect(menu.has("users")).toBe(false);
   });
 
@@ -161,12 +171,30 @@ describe("menuOverrides", () => {
 
   it("recomputes against the role being saved, not the one before it", () => {
     // Somebody promoted from editor to admin, with the same ticks on screen.
-    // `leads` is an admin default, so it must stop being stored as an extra.
     const wanted = [...defaultMenuFor(editor), "leads"];
     const { menu_extra, menu_denied } = menuOverrides(admin, wanted);
 
+    // `leads` is an admin default, so it stops being stored as an extra.
     expect(menu_extra).toEqual([]);
-    expect(menu_denied).toEqual([]);
+
+    /*
+      And the screens admin reaches that were not ticked are stored as
+      removals — which is the half that proves the subtraction ran against
+      admin and not against editor. Before Admin absorbed Owner both arrays
+      were empty here, because the two roles differed by one screen; now admin
+      reaches the whole panel, so leaving the editor's ticks in place is a
+      deliberate set of removals rather than a no-op.
+
+      This list is written out rather than derived, and it is meant to fail
+      when a screen is added that an editor does not get — `studio` landed on
+      2026-09-03 and this is where that showed up. The failure is the point: it
+      makes somebody confirm the new screen really is owner-default, rather than
+      the test quietly agreeing with whatever the code now does.
+
+      `users` and `estate` are absent because they are owner-only rather than
+      grantable, and nothing that cannot be granted is ever stored.
+    */
+    expect([...menu_denied].sort()).toEqual(["seo", "settings", "studio"]);
   });
 
   it("never writes a screen that cannot be granted", () => {
@@ -186,10 +214,10 @@ describe("menuOverrides", () => {
 });
 
 describe("assignableRoles", () => {
-  it("stops an owner minting a super admin", () => {
-    const keys = assignableRoles(FALLBACK_ROLES, owner).map((role) => role.key);
+  it("stops an admin minting a super admin", () => {
+    const keys = assignableRoles(FALLBACK_ROLES, admin).map((role) => role.key);
     expect(keys).not.toContain("super_admin");
-    expect(keys).toContain("owner");
+    expect(keys).toContain("admin");
     expect(keys).toContain("editor");
   });
 
@@ -205,9 +233,9 @@ describe("assignableRoles", () => {
 
   it("never offers a role that has been switched off", () => {
     const roles = FALLBACK_ROLES.map((role) =>
-      role.key === "admin" ? { ...role, is_active: false } : role,
+      role.key === "editor" ? { ...role, is_active: false } : role,
     );
-    const keys = assignableRoles(roles, owner).map((role) => role.key);
-    expect(keys).not.toContain("admin");
+    const keys = assignableRoles(roles, admin).map((role) => role.key);
+    expect(keys).not.toContain("editor");
   });
 });

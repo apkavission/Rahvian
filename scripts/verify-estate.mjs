@@ -30,36 +30,19 @@
  */
 import pg from "pg";
 import { readFileSync, readdirSync, existsSync } from "node:fs";
+import { loadConfig, dbClient, presentProjects, absentProjects } from "./estate.mjs";
 
-const PROJECTS = [
-  { name: "services", dir: "c:/Users/kumar/services" },
-  { name: "portal", dir: "c:/Users/kumar/portal" },
-  { name: "demo-clinic", dir: "c:/Users/kumar/demo-clinic" },
-  { name: "demo-restaurant", dir: "c:/Users/kumar/demo-restaurant" },
-  { name: "demo-school", dir: "c:/Users/kumar/demo-school" },
-  { name: "demo-realestate", dir: "c:/Users/kumar/demo-realestate" },
-  { name: "demo-crm", dir: "c:/Users/kumar/demo-crm" },
-  { name: "demo-ecommerce", dir: "c:/Users/kumar/demo-ecommerce" },
-];
+const PROJECTS = presentProjects();
 
-const config = Object.fromEntries(
-  readFileSync("c:/Users/kumar/portal/.env.local", "utf8")
-    .split(/\r?\n/)
-    .map((line) => /^([A-Z_]+)=(.*)$/.exec(line.trim()))
-    .filter(Boolean)
-    .map((m) => [m[1], m[2].replace(/^"|"$/g, "")]),
-);
+const config = loadConfig();
 
-const ref = new URL(config.NEXT_PUBLIC_SUPABASE_URL).hostname.split(".")[0];
+const client = dbClient(pg, config);
 
-const client = new pg.Client({
-  host: `aws-0-${config.SUPABASE_REGION ?? "ap-south-1"}.pooler.supabase.com`,
-  port: 5432,
-  user: `postgres.${ref}`,
-  password: config.SUPABASE_DB_PASSWORD,
-  database: "postgres",
-  ssl: { rejectUnauthorized: false },
-});
+const missing = absentProjects();
+if (missing.length) {
+  console.log(`Not on this machine, so not examined: ${missing.join(", ")}
+`);
+}
 
 await client.connect();
 

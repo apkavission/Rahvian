@@ -1,4 +1,5 @@
 import "server-only";
+import { resolve, type Paged, type PageRequest } from "@/lib/pagination";
 
 import type { MediaOption } from "@/lib/media/image-fields";
 import { buildUsageMap, MEDIA_REFERENCES, type MediaUsage } from "@/lib/media/usage";
@@ -39,20 +40,37 @@ const SUMMARY_COLUMNS =
  * anonymous read would return. It stays a separate query anyway, because the
  * day a private folder exists is the day these two must already be apart.
  */
-export async function getAdminMedia(): Promise<MediaSummaryRow[]> {
+export async function getAdminMedia(
+  request: PageRequest,
+  folder?: string | null,
+): Promise<Paged<MediaSummaryRow>> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  /*
+    The folder is filtered here rather than in the screen.
+
+    It used to fetch every asset and filter the array. That works until the
+    library has a few thousand rows, and it makes the count wrong the moment
+    there is a page: "1–25 of 812" while looking at a folder holding nine.
+    The database has to do the narrowing for the number under the list to
+    mean anything.
+  */
+  let query = supabase
     .from("media")
-    .select(SUMMARY_COLUMNS)
-    .order("created_at", { ascending: false });
+    .select(SUMMARY_COLUMNS, { count: "exact" })
+    .order("created_at", { ascending: false })
+    .range(request.from, request.to);
+
+  if (folder) query = query.eq("folder", folder);
+
+  const { data, error, count } = await query;
 
   if (error) {
     console.error("[media] admin list failed:", error.message);
-    return [];
+    return resolve<MediaSummaryRow>([], 0, request);
   }
 
-  return data ?? [];
+  return resolve(data ?? [], count, request);
 }
 
 /**

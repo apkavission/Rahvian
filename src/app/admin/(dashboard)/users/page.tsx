@@ -1,4 +1,9 @@
 import type { Metadata } from "next";
+import type {
+  DesignationRow,
+  StaffDocumentKind,
+  StaffDocumentRow,
+} from "@/types/control";
 import Link from "next/link";
 import { CircleSlash, Shield, UserRound } from "lucide-react";
 import { ADMIN_NAV_ITEMS, navItem } from "@/components/admin/nav";
@@ -8,6 +13,8 @@ import { requireMenu } from "@/lib/auth/session";
 import { getLeaveTypes } from "@/lib/queries/leave-types";
 import { getRoles } from "@/lib/queries/roles";
 import { getAccounts, type Account } from "@/lib/queries/users-admin";
+import { Pagination } from "@/components/admin/pagination";
+import { PAGE_SIZE, hrefFor, requestedPage, resolve, type Paged, type Query } from "@/lib/pagination";
 import { cn } from "@/lib/utils";
 import { AccountForm } from "./account-form";
 import { applicationOptions } from "@/lib/queries/applications";
@@ -16,6 +23,15 @@ import { NewAccountForm } from "./new-account-form";
 import { LeaveTypes } from "./leave-types";
 import { NewRoleForm } from "./new-role-form";
 import { RoleForm } from "./role-form";
+import { PortalAccess } from "./portal-access";
+import { StaffDocuments } from "./staff-documents";
+import {
+  getDesignations,
+  getPortalStaff,
+  getStaffDocumentKinds,
+  getStaffDocuments,
+} from "@/lib/queries/portal-staff";
+import type { PortalStaffRow } from "@/types/control";
 
 export const metadata: Metadata = {
   title: "Users",
@@ -59,12 +75,69 @@ export default async function UsersScreen({ searchParams }: Props) {
   const tab =
     query.tab === "roles" ? "roles" : query.tab === "leave" ? "leave" : "people";
 
-  const [{ accounts, capped }, roles, leaveTypes, applications] = await Promise.all([
-    getAccounts(),
-    getRoles(),
-    getLeaveTypes(),
-    applicationOptions(),
-  ]);
+  const [{ accounts, capped }, roles, leaveTypes, applications, portalStaff, designations] =
+    await Promise.all([
+      getAccounts(),
+      getRoles(),
+      getLeaveTypes(),
+      applicationOptions(),
+      /* The portal and tracker's own staff list, so one account can be seen
+         whole. Fetched with the rest rather than per selection: it is one call
+         that returns everybody, and the alternative is a round trip each time
+         somebody clicks a different name. */
+      getPortalStaff(),
+      /* The titles that can be given. One call for a list of sixteen words,
+         beside the staff list it belongs to. */
+      getDesignations(),
+    ]);
+
+  /*
+    The selected person, and their papers, read here rather than in `People`.
+
+    `People` is a plain function, not an async component, so it cannot fetch.
+    Working out who is selected is a comparison across two lists — a website
+    account's id *is* the portal staff row's `auth_user_id` — and doing it
+    twice would be two answers that can disagree, so it is done once, here.
+  */
+  const selectedAccountId = pick(
+    query.account,
+    accounts.map((account) => account.id),
+  );
+
+  /*
+    Ten names at a time.
+
+    The whole list is still read — it is what `pick` above resolves the selected
+    account against, and what the roles screen counts people with — so this is a
+    slice rather than a second query. The person selected stays on screen even
+    when the list has moved past them, which is the behaviour somebody expects
+    after clicking a name and then paging on.
+  */
+  const accountsRequest = requestedPage(query, PAGE_SIZE);
+  const pagedAccounts = resolve(
+    accounts.slice(accountsRequest.from, accountsRequest.to + 1),
+    accounts.length,
+    accountsRequest,
+  );
+
+  const selectedStaff =
+    portalStaff.find((person) => person.auth_user_id === selectedAccountId) ?? null;
+
+  /*
+    Neither is fetched unless somebody is selected.
+
+    The documents panel only renders for a person, so asking for the kinds on
+    a screen where nothing is selected is a round trip whose answer is thrown
+    away. Two of them made this screen flaky under parallel load — it passed
+    alone every time and failed occasionally beside other tests, which is what
+    a screen doing more work than it needs looks like.
+  */
+  const [documentKinds, staffDocuments] = selectedStaff
+    ? await Promise.all([
+        getStaffDocumentKinds(),
+        getStaffDocuments(selectedStaff.id),
+      ])
+    : [[], []];
 
   const assignable = assignableRoles(roles, session.role);
 
@@ -109,10 +182,16 @@ export default async function UsersScreen({ searchParams }: Props) {
       ) : tab === "people" ? (
         <People
           accounts={accounts}
+          paged={pagedAccounts}
+          query={query}
+          portalStaff={portalStaff}
           roles={roles}
+          designations={designations}
+          documentKinds={documentKinds}
+          staffDocuments={staffDocuments}
           assignable={assignable}
           applications={applications}
-          selectedId={pick(query.account, accounts.map((account) => account.id))}
+          selectedId={selectedAccountId}
           selfId={session.userId}
           justSent={query.sent === "1"}
         />
@@ -169,7 +248,13 @@ function Tab({
 
 function People({
   accounts,
+  paged,
+  query,
+  portalStaff,
   roles,
+  designations,
+  documentKinds,
+  staffDocuments,
   assignable,
   applications,
   selectedId,
@@ -177,32 +262,65 @@ function People({
   justSent,
 }: {
   accounts: Account[];
+  /**
+   * The slice of them this page shows.
+   *
+   * `accounts` stays whole because the panel on the right renders whoever is
+   * selected — and somebody selected from page one must not vanish when the
+   * list moves to page two.
+   */
+  paged: Paged<Account>;
+  /** Everything in the address, so the pager and the name links keep each other. */
+  query: Query;
   roles: RoleDefinition[];
+  /** The titles that can be given, for the portal access panel. */
+  designations: DesignationRow[];
+  /** What can be issued, and what already has been to the selected person. */
+  documentKinds: StaffDocumentKind[];
+  staffDocuments: StaffDocumentRow[];
   assignable: RoleDefinition[];
   /** From `control.applications`, or the built-in list if that is not there. */
   applications: readonly { value: string; label: string; hint: string }[];
   selectedId: string | null;
   selfId: string;
   justSent: boolean;
+  portalStaff: PortalStaffRow[];
 }) {
   const selected = accounts.find((account) => account.id === selectedId) ?? null;
+
+  /* `company.profiles.id` is the auth user's id — the same id the portal's
+     staff row points at — so this is a join across two applications done with
+     one comparison and no second query. */
+  const selectedPortalStaff = selected
+    ? (portalStaff.find((person) => person.auth_user_id === selected.id) ?? null)
+    : null;
   const selectedRole = selected ? roleByKey(roles, selected.role) : undefined;
 
   return (
     <div className="mt-10 grid gap-8 xl:grid-cols-[17rem_minmax(0,1fr)_minmax(0,1fr)]">
-      <div className="xl:sticky xl:top-24 xl:self-start">
+      <div className="min-w-0 xl:sticky xl:top-24 xl:self-start">
         <h2 className="font-mono text-[0.65rem] uppercase tracking-[0.16em] text-text-subtle">
           Accounts
         </h2>
 
         <ul className="mt-3 space-y-2">
-          {accounts.map((account) => {
+          {paged.rows.map((account) => {
             const active = account.id === selectedId;
+
+            /*
+              The page travels with the name.
+
+              `hrefFor` rebuilds the address from everything already in it, so
+              clicking somebody on page three keeps page three — without it the
+              list jumps back to the top and the person you just opened is no
+              longer in it.
+            */
+            const href = `${hrefFor("/admin/users", { ...query, account: account.id }, paged.page)}`;
 
             return (
               <li key={account.id}>
                 <Link
-                  href={`/admin/users?account=${account.id}`}
+                  href={href}
                   aria-current={active ? "true" : undefined}
                   className={cn(
                     "flex items-start gap-2.5 rounded-xl border p-3 transition-colors",
@@ -245,6 +363,15 @@ function People({
             </li>
           )}
         </ul>
+
+        {accounts.length > 0 && (
+          <Pagination
+            paged={paged}
+            pathname="/admin/users"
+            query={query}
+            className="mt-4"
+          />
+        )}
 
         <NewAccountForm assignable={assignable} />
       </div>
@@ -299,6 +426,38 @@ function People({
               isActive={selected.is_active}
               isSelf={selected.id === selfId}
             />
+
+            {/*
+              The same person's access to the other two applications.
+
+              Here rather than on a screen of its own, because "who is this
+              person and what may they open" is one question and it was being
+              answered in two places — this panel for the website, the portal's
+              own Team screen for the portal and the tracker. Two lists of
+              people kept in step by remembering to, which is what the comment
+              on `portal.staff` has warned about since the day it was written.
+            */}
+            <PortalAccess
+              key={`portal-${selected.id}`}
+              person={selectedPortalStaff}
+              roles={roles}
+              designations={designations}
+            />
+
+            {/*
+              Their papers, beside the person they belong to.
+
+              Only for somebody who is actually on the portal staff list — a
+              website-only account has no tracker to see them in.
+            */}
+            {selectedPortalStaff && (
+              <StaffDocuments
+                staffId={selectedPortalStaff.id}
+                name={selectedPortalStaff.full_name}
+                kinds={documentKinds}
+                issued={staffDocuments}
+              />
+            )}
           </>
         ) : (
           <div className="rounded-2xl border border-dashed border-border bg-surface-2/40 p-8">
@@ -468,7 +627,7 @@ function Roles({
 
   return (
     <div className="mt-10 grid gap-8 xl:grid-cols-[17rem_minmax(0,1fr)_minmax(0,1fr)]">
-      <div className="xl:sticky xl:top-24 xl:self-start">
+      <div className="min-w-0 xl:sticky xl:top-24 xl:self-start">
         <h2 className="font-mono text-[0.65rem] uppercase tracking-[0.16em] text-text-subtle">
           In order of authority
         </h2>

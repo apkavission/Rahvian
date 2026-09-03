@@ -26,7 +26,7 @@ export async function Header() {
       // The logo is resolved here rather than inside the client shell: it needs
       // a database read, and passing the rendered element keeps `header-nav`
       // free of any data dependency.
-      logo={<BrandLogo height={30} />}
+      logo={<BrandLogo height={56} />}
       ctaLabel="Start Your Project"
       ctaHref="/request-a-quote"
     />

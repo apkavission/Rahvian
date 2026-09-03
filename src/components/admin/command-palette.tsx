@@ -149,7 +149,18 @@ export function CommandPalette({ groups }: { groups: AdminNavGroup[] }) {
   // point of the shortcut is that it works from anywhere on the screen.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key.toLowerCase() !== "k" || !(event.metaKey || event.ctrlKey)) return;
+      /*
+        `key` is read defensively because it is not always there.
+
+        A `keydown` carries one in every case the specification cares about, and
+        not in several the browser produces anyway: a value committed by a
+        password manager or an autofill, and some IME composition events, all
+        dispatch a KeyboardEvent with `key` undefined. `event.key.toLowerCase()`
+        then throws inside a window listener that is live on every admin screen,
+        which is how this turned up in the log as an uncaught TypeError with no
+        obvious action behind it.
+      */
+      if (event.key?.toLowerCase() !== "k" || !(event.metaKey || event.ctrlKey)) return;
       event.preventDefault();
       setOpen((current) => !current);
     };

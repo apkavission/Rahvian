@@ -120,6 +120,12 @@ export default async function EstatePage() {
           One inbox for everything
         </Link>
         <Link
+          href="/admin/estate/demos"
+          className="rounded-lg border border-border px-4 py-2 text-sm transition-colors hover:bg-surface-2"
+        >
+          Who may open a demo
+        </Link>
+        <Link
           href="/admin/estate/audit"
           className="rounded-lg border border-border px-4 py-2 text-sm transition-colors hover:bg-surface-2"
         >

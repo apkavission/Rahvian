@@ -47,7 +47,14 @@ test("the sidebar lists every screen the owner may reach", async ({ page }) => {
     // it is the one screen no owner can take away from anybody.
     if (screen.path === "/admin/account") continue;
 
-    const label = typeof screen.heading === "string" ? screen.heading : "Dashboard";
+    /* A screen reached from inside another one, rather than from the menu.
+       `nav: null` says so in the list itself, so this loop is not carrying a
+       second opinion about which screens have their own link. */
+    if (screen.nav === null) continue;
+
+    const label =
+      screen.nav ??
+      (typeof screen.heading === "string" ? screen.heading : "Dashboard");
 
     await expect(
       nav.getByRole("link", { name: label, exact: true }),

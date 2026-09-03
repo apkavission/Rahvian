@@ -64,7 +64,18 @@ export function AdminShell({
       {/* Desktop rail. */}
       <aside className="hidden border-r border-border bg-surface lg:flex lg:h-dvh lg:flex-col lg:sticky lg:top-0">
         <Brand />
-        <div className="flex-1 overflow-y-auto px-3 py-6">
+        {/*
+          `min-h-0`, and it is load-bearing.
+
+          A flex item's default `min-height: auto` refuses to shrink below its
+          content, so `flex-1` alone does not make this scroll — it makes the
+          column taller than the screen and the account panel below it ends up
+          drawn over the last menu item. It was invisible until the menu reached
+          eighteen entries on 2026-09-03, at which point "Logo & banners" sat
+          underneath the account card on any 900-pixel-tall laptop: present in
+          the markup, reachable by keyboard, and unclickable.
+        */}
+        <div className="min-h-0 flex-1 overflow-y-auto px-3 py-6">
           <AdminNav groups={groups} />
         </div>
         <UserPanel user={user} signOutAction={signOutAction} />
@@ -82,7 +93,8 @@ export function AdminShell({
           />
           <div className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col border-r border-border bg-surface">
             <Brand onClose={close} />
-            <div className="flex-1 overflow-y-auto px-3 py-6">
+            {/* `min-h-0` for the same reason as the rail above. */}
+            <div className="min-h-0 flex-1 overflow-y-auto px-3 py-6">
               <AdminNav groups={groups} onNavigate={close} />
             </div>
             <UserPanel user={user} signOutAction={signOutAction} />
@@ -140,6 +152,25 @@ export function AdminShell({
               Client portal
               <ExternalLink className="size-3.5" aria-hidden />
             </Link>
+
+            {/*
+              The role, in the header.
+
+              It was already in the sidebar under the person's name, which is
+              the right place for "this is your account" and the wrong place
+              for "this is why the menu looks like this" — the rail is hidden
+              on a phone and closed on a tablet, so on the two devices where a
+              missing screen is most confusing the answer was not on screen at
+              all. The tracker states it in its header for the same reason and
+              this matches it.
+
+              The label the role carries, never a word invented here, so a role
+              renamed in the accounts screen is renamed everywhere at once.
+            */}
+            <span className="hidden items-center rounded-full bg-surface-2 px-2.5 py-1 font-mono text-[0.65rem] uppercase tracking-[0.12em] text-text-subtle sm:inline-flex">
+              {user.role}
+            </span>
+
             <ThemeToggle />
           </div>
         </header>

@@ -1,10 +1,13 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { ArrowUpRight, ExternalLink } from "lucide-react";
+import { Pagination } from "@/components/admin/pagination";
 import { requireMenu } from "@/lib/auth/session";
+import { PAGE_SIZE, requestedPage, resolve, type Query } from "@/lib/pagination";
 import { getAdminPages } from "@/lib/queries/pages-admin";
 import { formatDate } from "@/lib/utils";
 import { NewPageForm } from "./new-page-form";
+import { publicPathFor } from "@/lib/content/slugs";
 
 export const metadata: Metadata = {
   title: "Pages",
@@ -18,9 +21,26 @@ export const metadata: Metadata = {
  * page marked "system" has a route in the code that reads it by slug, which is
  * why the database refuses to delete one and the builder refuses to rename it.
  */
-export default async function PagesIndex() {
+export default async function PagesIndex({
+  searchParams,
+}: {
+  searchParams: Promise<Query>;
+}) {
   await requireMenu("pages");
-  const pages = await getAdminPages();
+
+  const query = await searchParams;
+  const all = await getAdminPages();
+
+  /*
+    Paged after the read, not in it.
+
+    A site has tens of pages, not thousands, and they are already loaded to be
+    counted. Asking the database twice — once for a page and once for a total —
+    would be two round trips to say what one array already says.
+  */
+  const request = requestedPage(query, PAGE_SIZE);
+  const paged = resolve(all.slice(request.from, request.to + 1), all.length, request);
+  const pages = paged.rows;
 
   return (
     <div className="mx-auto w-full max-w-5xl">
@@ -74,7 +94,7 @@ export default async function PagesIndex() {
                 <div className="flex shrink-0 items-center gap-1">
                   {page.status === "published" && (
                     <a
-                      href={page.slug === "home" ? "/" : `/${page.slug}`}
+                      href={publicPathFor(page)}
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`Open ${page.title} on the site`}
@@ -105,6 +125,10 @@ export default async function PagesIndex() {
             this is a fresh database.
           </p>
         </div>
+      )}
+
+      {all.length > 0 && (
+        <Pagination paged={paged} pathname="/admin/pages" query={query} className="mt-6" />
       )}
     </div>
   );

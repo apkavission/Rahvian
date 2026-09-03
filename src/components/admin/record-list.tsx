@@ -2,6 +2,9 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
+import { Pagination } from "@/components/admin/pagination";
+import { PAGE_SIZE, requestedPage, resolve } from "@/lib/pagination";
 import { ChevronDown, ChevronUp, Copy, Trash2 } from "lucide-react";
 import { requestPreviewRefresh } from "@/components/admin/preview-pane";
 import { useBusyWhile } from "@/components/forms/use-busy-while";
@@ -63,9 +66,15 @@ export function RecordList({
   actions,
   emptyLabel,
   deleteCopy,
+  pageSize = PAGE_SIZE,
 }: {
   items: RecordListItem[];
   selectedId: string | null;
+  /**
+   * How many rows before a second page. Raise it for a list whose order is the
+   * point — a navigation menu paged in the middle is a menu nobody can reorder.
+   */
+  pageSize?: number;
   /** The screen this list is on, e.g. `/admin/services`. */
   basePath: string;
   /** The query parameter that selects a record, e.g. `service`. */
@@ -101,6 +110,42 @@ export function RecordList({
     navigation, so those lists behave exactly as they did before groups
     existed: one group, arrows disabled at the first and last row.
   */
+  /*
+    Which page of this list is showing.
+
+    ---------------------------------------------------------------------------
+    **Read from the address, in the browser.** Every screen using this list is a
+    server component that has already fetched its records, and threading a page
+    parameter through eleven of them would be eleven chances to get it wrong.
+    `useSearchParams` is the same source of truth those screens read, so a link
+    to page two works whichever side reads it.
+
+    **The rows are already here, and that is the honest trade.** This pages what
+    the screen fetched rather than fetching a page — so it fixes the reading
+    problem (four hundred rows in one column) and not the query. For these lists
+    that is the right balance: they are content a person maintains, not a log,
+    and the whole set is wanted for the reorder arrows to mean anything. The two
+    lists that genuinely grow without bound — leads, media — page in their
+    queries instead.
+
+    **Reordering still works across the boundary.** `groups` below is built from
+    every item, not from the page, so the arrow on the last row of page one
+    still knows about the first row of page two.
+  */
+  const search = useSearchParams();
+  const pathname = usePathname();
+
+  const query = Object.fromEntries(search.entries());
+  const request = requestedPage(query, pageSize);
+  const paged = resolve(items.slice(request.from, request.to + 1), items.length, request);
+
+  /* Clamped, so a stale link to page seven of a two-page list shows page two
+     rather than an empty column that reads as "nothing found". */
+  const shown =
+    paged.page === request.page
+      ? items.slice(request.from, request.to + 1)
+      : items.slice((paged.page - 1) * pageSize, paged.page * pageSize);
+
   const groups = new Map<string, string[]>();
   for (const item of items) {
     const key = item.group ?? "";
@@ -110,8 +155,9 @@ export function RecordList({
   }
 
   return (
+    <>
     <ul className="space-y-2">
-      {items.map((item) => {
+      {shown.map((item) => {
         const selected = item.id === selectedId;
         const siblings = groups.get(item.group ?? "") ?? [];
         const at = siblings.indexOf(item.id);
@@ -179,6 +225,11 @@ export function RecordList({
         </li>
       )}
     </ul>
+
+    {/* Under the list, where a pager belongs. It draws nothing but the count
+        when everything fits on one page. */}
+    <Pagination paged={paged} pathname={pathname} query={query} className="mt-3" />
+    </>
   );
 }
 

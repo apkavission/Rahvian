@@ -140,7 +140,20 @@ export const STORAGE_STATE = "e2e/.auth/owner.json";
  * answers 200 with an empty shell is the failure worth catching, and it is
  * invisible to a status check.
  */
-export const ADMIN_SCREENS: { path: string; heading: string | RegExp }[] = [
+export const ADMIN_SCREENS: {
+  path: string;
+  heading: string | RegExp;
+  /**
+   * The sidebar link that leads here, when there is one.
+   *
+   * Most screens are their own menu item and their heading is its label, so
+   * this is left out. The estate is one item with three pages under it — its
+   * sub-pages are reached from the estate screen itself, and looking for a
+   * sidebar link named after each of their headings is looking for something
+   * that was never meant to exist.
+   */
+  nav?: string | null;
+}[] = [
   // The dashboard greets the person by name and falls back to "Dashboard" only
   // for an account with none, so this is the one heading that is not fixed.
   { path: "/admin", heading: /^(Dashboard|Hello,)/ },
@@ -160,4 +173,20 @@ export const ADMIN_SCREENS: { path: string; heading: string | RegExp }[] = [
   { path: "/admin/seo", heading: "SEO" },
   { path: "/admin/users", heading: "Users" },
   { path: "/admin/account", heading: "Your account" },
+
+  /*
+    The estate screens, which are one menu key with three pages under it.
+
+    They were left off this list until 2026-09-03, so the suite reported every
+    admin screen opening while three of the most powerful ones were never
+    requested. A list of screens that quietly omits some is worse than a shorter
+    honest one, because the number at the end of a run is believed.
+  */
+  { path: "/admin/estate", heading: "The estate", nav: "Estate" },
+  { path: "/admin/estate/inbox", heading: "One inbox", nav: null },
+  { path: "/admin/estate/audit", heading: "What was done", nav: null },
+  { path: "/admin/estate/demos", heading: "Who may open a demo", nav: null },
+
+  /* Its own menu key, granted per person — see 20260903000029. */
+  { path: "/admin/studio", heading: "Logo & banners", nav: "Logo & banners" },
 ];

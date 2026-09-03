@@ -234,6 +234,23 @@ export const SECTION_DEFINITIONS: Record<string, SectionDefinition> = {
     fields: HEADING_FIELDS,
   },
 
+  testimonials: {
+    label: "Testimonials",
+    description:
+      "Published testimonials, read live. Renders nothing while the table is empty.",
+    fields: [
+      ...HEADING_FIELDS,
+      {
+        kind: "number",
+        name: "limit",
+        label: "Maximum shown",
+        hint: "Blank shows all of them, in the order set on the Testimonials screen.",
+        min: 1,
+        max: 60,
+      },
+    ],
+  },
+
   portfolio_grid: {
     label: "Portfolio grid",
     description: "Published projects, read live, optionally filtered by type.",

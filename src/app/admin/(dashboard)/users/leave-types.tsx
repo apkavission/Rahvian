@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, useRef } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { BrandSpinner } from "@/components/brand/brand-loader";
 import { useFormToast } from "@/components/forms/use-form-toast";
@@ -14,6 +14,7 @@ import {
 import type { LeaveTypeDefinition } from "@/lib/queries/leave-types";
 import { initialRecordState } from "@/lib/validation/records";
 import { cn } from "@/lib/utils";
+import { useConfirm } from "@/components/ui/confirm-dialog";
 
 /**
  * The kinds of leave the company offers.
@@ -189,13 +190,32 @@ function Tick({
 
 function RemoveLeaveType({ typeKey, label }: { typeKey: string; label: string }) {
   const [state, action, pending] = useActionState(deleteLeaveType, initialRecordState);
+  const form = useRef<HTMLFormElement>(null);
+  const confirm = useConfirm();
+
   useFormToast(state, { successTitle: "Leave type removed", errorTitle: "Not removed" });
 
   return (
-    <form action={action}>
+    <form action={action} ref={form}>
       <input type="hidden" name="key" value={typeKey} />
+      {/*
+        Asked before it happens.
+
+        This is master data: every leave request already booked against this
+        kind is reading a row that would stop existing, and the tracker's leave
+        screen builds its options from this list.
+      */}
       <button
-        type="submit"
+        type="button"
+        onClick={async () => {
+          const yes = await confirm({
+            title: `Remove ${label}?`,
+            body: "Nobody will be able to ask for this kind of leave. Requests already booked against it keep their own record.",
+            confirmLabel: "Remove it",
+            tone: "danger",
+          });
+          if (yes) form.current?.requestSubmit();
+        }}
         disabled={pending}
         aria-label={`Remove ${label}`}
         className="rounded-lg p-2 text-text-subtle transition-colors hover:bg-surface-2 hover:text-danger disabled:opacity-50"

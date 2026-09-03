@@ -44,6 +44,25 @@ const BASE_URL = process.env.E2E_BASE_URL ?? "http://localhost:3000";
 /** Kept in step with `e2e/routes.ts`, which the specs import it from. */
 const STORAGE_STATE = "e2e/.auth/owner.json";
 
+/**
+ * The specs that need a session, named once.
+ *
+ * ---------------------------------------------------------------------------
+ * **This was two lists, and they drifted the day they were written.**
+ *
+ * The `admin` project matched these by name and the `public` project listed the
+ * same files to ignore. Nothing made the second list follow the first, so every
+ * spec added to `admin` also ran signed out — where it opened the login screen,
+ * found none of the things it was looking for, and failed. Three specs were in
+ * that state (`pagination`, `staff-designation` and, the day it landed,
+ * `demo-access`): seven red tests that said nothing about the application and
+ * everything about this file.
+ *
+ * One expression, used by both, so adding a signed-in spec is one edit.
+ */
+const SIGNED_IN =
+  /(admin-screens|staff-designation|pagination|demo-access|studio|responsive-admin)\.spec\.ts/;
+
 export default defineConfig({
   testDir: "./e2e",
 
@@ -107,7 +126,9 @@ export default defineConfig({
     {
       name: "public",
       use: { ...devices["Desktop Chrome"] },
-      testIgnore: ["**/admin-screens.spec.ts", "**/auth.setup.ts"],
+      /* The same expression the admin project matches, so the two cannot
+         disagree. See SIGNED_IN above. */
+      testIgnore: [SIGNED_IN, "**/auth.setup.ts"],
     },
     {
       name: "setup",
@@ -117,7 +138,7 @@ export default defineConfig({
     {
       name: "admin",
       use: { ...devices["Desktop Chrome"], storageState: STORAGE_STATE },
-      testMatch: "**/admin-screens.spec.ts",
+      testMatch: SIGNED_IN,
       dependencies: ["setup"],
     },
   ],

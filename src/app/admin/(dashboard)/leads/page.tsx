@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ArrowUpRight, Download } from "lucide-react";
+import { ArrowUpRight, Download, TrendingUp } from "lucide-react";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { requireMenu } from "@/lib/auth/session";
 import {
@@ -11,6 +11,8 @@ import {
 } from "@/lib/queries/leads";
 import { isLeadStatus, type LeadFilters } from "@/lib/validation/leads";
 import { formatDate } from "@/lib/utils";
+import { Pagination } from "@/components/admin/pagination";
+import { resolve } from "@/lib/pagination";
 import { LeadFilterBar } from "./filter-bar";
 
 export const metadata: Metadata = {
@@ -18,7 +20,9 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, nocache: true },
 };
 
-type Search = { searchParams: Promise<Record<string, string | string[] | undefined>> };
+type Search = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
 
 /**
  * The enquiry list.
@@ -55,7 +59,19 @@ export default async function LeadsPage({ searchParams }: Search) {
           </p>
         </div>
 
-        {result.total > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Where they come from, from the enquiries themselves — see
+              `/admin/leads/sources`. Beside the export because both are things
+              somebody does *with* the list rather than to it. */}
+          <Link
+            href="/admin/leads/sources"
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2.5 text-sm transition-colors hover:bg-surface-2"
+          >
+            <TrendingUp className="size-4" aria-hidden />
+            Where they come from
+          </Link>
+
+          {result.total > 0 && (
           <Link
             href={`/admin/leads/export?${new URLSearchParams(
               Object.entries({
@@ -71,12 +87,21 @@ export default async function LeadsPage({ searchParams }: Search) {
             <Download className="size-4" aria-hidden />
             Export CSV
           </Link>
-        )}
+          )}
+        </div>
       </header>
 
-      <nav aria-label="Views" className="mt-8 flex flex-wrap gap-1 border-b border-border">
+      <nav
+        aria-label="Views"
+        className="mt-8 flex flex-wrap gap-1 border-b border-border"
+      >
         <ViewTab current={view} value="open" label="Open" count={counts.open} />
-        <ViewTab current={view} value="archived" label="Archived" count={counts.archived} />
+        <ViewTab
+          current={view}
+          value="archived"
+          label="Archived"
+          count={counts.archived}
+        />
         <ViewTab current={view} value="spam" label="Spam" count={counts.spam} />
       </nav>
 
@@ -94,17 +119,23 @@ export default async function LeadsPage({ searchParams }: Search) {
                   className="surface-raised block rounded-xl border border-border p-4 transition-colors hover:border-border-strong"
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <p className="min-w-0 flex-1 truncate font-medium">{lead.name}</p>
+                    <p className="min-w-0 flex-1 truncate font-medium">
+                      {lead.name}
+                    </p>
                     <StatusBadge status={lead.status} />
                   </div>
                   <p className="mt-1 truncate text-sm text-text-muted">
-                    {[lead.company_name, lead.email].filter(Boolean).join(" · ")}
+                    {[lead.company_name, lead.email]
+                      .filter(Boolean)
+                      .join(" · ")}
                   </p>
                   <p className="mt-3 font-mono text-xs text-text-subtle">
                     {[
                       formatDate(lead.created_at),
                       lead.service?.name,
-                      lead.assigned_to ? staffById.get(lead.assigned_to) : "Unassigned",
+                      lead.assigned_to
+                        ? staffById.get(lead.assigned_to)
+                        : "Unassigned",
                     ]
                       .filter(Boolean)
                       .join(" · ")}
@@ -130,7 +161,10 @@ export default async function LeadsPage({ searchParams }: Search) {
               </thead>
               <tbody className="divide-y divide-border">
                 {result.rows.map((lead) => (
-                  <tr key={lead.id} className="group transition-colors hover:bg-surface-2/50">
+                  <tr
+                    key={lead.id}
+                    className="group transition-colors hover:bg-surface-2/50"
+                  >
                     <td className="px-4 py-3">
                       <Link
                         href={`/admin/leads/${lead.id}`}
@@ -139,13 +173,17 @@ export default async function LeadsPage({ searchParams }: Search) {
                         {lead.name}
                       </Link>
                       {lead.company_name && (
-                        <p className="text-xs text-text-subtle">{lead.company_name}</p>
+                        <p className="text-xs text-text-subtle">
+                          {lead.company_name}
+                        </p>
                       )}
                     </td>
                     <td className="px-4 py-3 text-text-muted">
                       <p className="truncate">{lead.email}</p>
                       {lead.service?.name && (
-                        <p className="text-xs text-text-subtle">{lead.service.name}</p>
+                        <p className="text-xs text-text-subtle">
+                          {lead.service.name}
+                        </p>
                       )}
                     </td>
                     <td className="px-4 py-3">
@@ -174,11 +212,23 @@ export default async function LeadsPage({ searchParams }: Search) {
             </table>
           </div>
 
-          <Pagination result={result} params={params} />
+          <Pagination
+            paged={resolve(result.rows, result.total, {
+              page: result.page,
+              size: LEADS_PER_PAGE,
+              from: 0,
+              to: 0,
+            })}
+            pathname="/admin/leads"
+            query={params}
+            className="mt-6"
+          />
         </>
       ) : (
         <div className="mt-8 rounded-2xl border border-dashed border-border bg-surface-2/40 p-8 md:p-12">
-          <h2 className="font-display text-lg font-semibold">{emptyHeading(view, filters)}</h2>
+          <h2 className="font-display text-lg font-semibold">
+            {emptyHeading(view, filters)}
+          </h2>
           <p className="measure mt-3 text-sm leading-relaxed text-text-muted">
             {emptyBody(view, filters)}
           </p>
@@ -227,59 +277,6 @@ function ViewTab({
   );
 }
 
-function Pagination({
-  result,
-  params,
-}: {
-  result: { page: number; pageCount: number; total: number };
-  params: Record<string, string | string[] | undefined>;
-}) {
-  if (result.pageCount <= 1) return null;
-
-  const link = (page: number) => {
-    const next = new URLSearchParams();
-    for (const [key, value] of Object.entries(params)) {
-      if (typeof value === "string" && value && key !== "page") next.set(key, value);
-    }
-    if (page > 1) next.set("page", String(page));
-    const query = next.toString();
-    return query ? `/admin/leads?${query}` : "/admin/leads";
-  };
-
-  const first = (result.page - 1) * LEADS_PER_PAGE + 1;
-  const last = Math.min(result.page * LEADS_PER_PAGE, result.total);
-
-  return (
-    <nav
-      aria-label="Pagination"
-      className="mt-6 flex items-center justify-between gap-4 text-sm"
-    >
-      <p className="text-text-subtle">
-        {first}–{last} of {result.total}
-      </p>
-
-      <div className="flex gap-2">
-        {result.page > 1 && (
-          <Link
-            href={link(result.page - 1)}
-            className="rounded-lg border border-border px-3 py-2 transition-colors hover:bg-surface-2"
-          >
-            Previous
-          </Link>
-        )}
-        {result.page < result.pageCount && (
-          <Link
-            href={link(result.page + 1)}
-            className="rounded-lg border border-border px-3 py-2 transition-colors hover:bg-surface-2"
-          >
-            Next
-          </Link>
-        )}
-      </div>
-    </nav>
-  );
-}
-
 /**
  * The query string, narrowed to what the list understands.
  *
@@ -287,7 +284,9 @@ function Pagination({
  * is not in the enum would make PostgREST reject the whole query, turning a
  * mistyped URL into an empty screen with no explanation.
  */
-function readFilters(params: Record<string, string | string[] | undefined>): LeadFilters {
+function readFilters(
+  params: Record<string, string | string[] | undefined>,
+): LeadFilters {
   const one = (key: string) => {
     const value = params[key];
     return typeof value === "string" ? value : undefined;
@@ -307,7 +306,8 @@ function readFilters(params: Record<string, string | string[] | undefined>): Lea
 }
 
 function emptyHeading(view: string, filters: LeadFilters): string {
-  if (filters.q || filters.status || filters.assigned) return "Nothing matches those filters";
+  if (filters.q || filters.status || filters.assigned)
+    return "Nothing matches those filters";
   if (view === "archived") return "The archive is empty";
   if (view === "spam") return "Nothing marked as spam";
   return "No enquiries yet";

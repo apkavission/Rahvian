@@ -30,7 +30,7 @@ export const getRoles = unstable_cache(
     const { data, error } = await supabase
       .from("roles")
       .select(
-        "key, label, description, rank, is_staff, can_manage_leads, is_owner, default_menu, is_system, is_active, sort_order",
+        "key, label, description, rank, is_staff, can_manage_leads, is_owner, default_menu, portal_menu, is_system, is_active, sort_order",
       )
       .order("sort_order", { ascending: true });
 
@@ -54,6 +54,7 @@ export const getRoles = unstable_cache(
       can_manage_leads: row.can_manage_leads,
       is_owner: row.is_owner,
       default_menu: row.default_menu ?? [],
+      portal_menu: row.portal_menu ?? [],
       is_system: row.is_system,
       is_active: row.is_active,
       sort_order: row.sort_order,

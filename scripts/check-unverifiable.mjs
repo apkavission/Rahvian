@@ -11,26 +11,11 @@
  * nobody can read and a screen that renders empty for everybody.
  */
 import pg from "pg";
-import { readFileSync } from "node:fs";
+import { loadConfig, dbClient } from "./estate.mjs";
 
-const config = Object.fromEntries(
-  readFileSync("c:/Users/kumar/portal/.env.local", "utf8")
-    .split(/\r?\n/)
-    .map((line) => /^([A-Z_]+)=(.*)$/.exec(line.trim()))
-    .filter(Boolean)
-    .map((m) => [m[1], m[2].replace(/^"|"$/g, "")]),
-);
+const config = loadConfig();
 
-const ref = new URL(config.NEXT_PUBLIC_SUPABASE_URL).hostname.split(".")[0];
-
-const db = new pg.Client({
-  host: `aws-0-${config.SUPABASE_REGION ?? "ap-south-1"}.pooler.supabase.com`,
-  port: 5432,
-  user: `postgres.${ref}`,
-  password: config.SUPABASE_DB_PASSWORD,
-  database: "postgres",
-  ssl: { rejectUnauthorized: false },
-});
+const db = dbClient(pg, config);
 
 await db.connect();
 

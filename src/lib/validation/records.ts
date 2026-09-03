@@ -23,6 +23,36 @@ export const initialRecordState: RecordActionState = {
 };
 
 /**
+ * The state a demo share form ends in.
+ *
+ * `RecordActionState` carries a message and nothing else, and that form has one
+ * more thing to say: the link itself, which is the whole point of submitting
+ * it. The extra fields are optional, so `useFormToast` keeps working unchanged.
+ *
+ * ---------------------------------------------------------------------------
+ * **Why this lives here and not beside the action that returns it.**
+ *
+ * `lib/actions/demo-access.ts` begins with `"use server"`, and that directive
+ * marks *every export of the file* as a server function — not only the ones
+ * that look like actions. A plain object exported from there becomes a
+ * reference to a function that does not exist, and `useActionState` starts life
+ * holding it: the screen drew a red "That link was not made" the moment it
+ * loaded, before anybody had touched the form.
+ *
+ * Types are erased and may be declared anywhere. Values may not.
+ */
+export type ShareActionState = RecordActionState & {
+  /** The full address to send, present only on the submit that made it. */
+  url?: string;
+  label?: string;
+};
+
+export const initialShareState: ShareActionState = {
+  status: "idle",
+  message: "",
+};
+
+/**
  * The slug rule, in one place.
  *
  * It is the same expression the database enforces with a check constraint on

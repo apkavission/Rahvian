@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Pagination } from "@/components/admin/pagination";
+import { requestedPage, resolve } from "@/lib/pagination";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { requireMenu } from "@/lib/auth/session";
@@ -31,20 +33,36 @@ export const metadata: Metadata = { title: "What was done" };
  * those calls. An empty log means nothing has been recorded — not that nothing
  * has happened — and this screen says so rather than implying otherwise.
  */
-export default async function AuditPage() {
+type Props = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function AuditPage({ searchParams }: Props) {
   await requireMenu("estate");
 
   const supabase = await createControlClient();
 
-  const { data, error } = await supabase
+  /*
+    Paged rather than capped at two hundred.
+
+    A cap is a silent lie on a log: the two hundred and first thing that
+    happened simply is not there, and nothing on the screen says so. This is
+    the one list in the estate that grows for ever, so it is the one that most
+    needs a way to reach the rest of it.
+  */
+  const query = await searchParams;
+  const request = requestedPage(query);
+
+  const { data, error, count } = await supabase
     .from("audit_log")
-    .select("*")
+    .select("*", { count: "exact" })
     .order("at", { ascending: false })
-    .limit(200);
+    .range(request.from, request.to);
 
   if (error) return <Unavailable message={error.message} />;
 
   const rows = data ?? [];
+  const paged = resolve(rows, count ?? null, request);
 
   return (
     <div className="space-y-8">
@@ -94,14 +112,24 @@ export default async function AuditPage() {
                 }).format(new Date(row.at))}
               </time>
 
-              <span className="min-w-0 flex-1">
+              {/*
+                `break-words`, because these two are not prose.
+
+                An action is `demo.opened_to_public` and a subject is whatever
+                was acted on — a slug, a label, sometimes an address. None of
+                them contain a space to break at, so on a phone one long token
+                pushed the whole document sideways. Nothing else on the screen
+                was wide; this was.
+              */}
+              <span className="min-w-0 flex-1 break-words">
                 <span className="block font-medium">{row.action}</span>
                 {row.subject && (
                   <span className="block text-text-muted">{row.subject}</span>
                 )}
               </span>
 
-              <span className="w-48 shrink-0 text-right text-xs text-text-subtle">
+              {/* An email address has no space in it either. */}
+              <span className="w-48 max-w-full shrink-0 break-words text-right text-xs text-text-subtle">
                 {row.actor_email ?? "unknown"}
                 {row.app_key && <span className="block">{row.app_key}</span>}
               </span>
@@ -109,6 +137,12 @@ export default async function AuditPage() {
           ))}
         </ul>
       )}
+
+      <Pagination
+        paged={paged}
+        pathname="/admin/estate/audit"
+        query={query}
+      />
     </div>
   );
 }

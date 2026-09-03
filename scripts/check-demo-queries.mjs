@@ -20,14 +20,9 @@
  */
 import { createClient } from "@supabase/supabase-js";
 import { readFileSync } from "node:fs";
+import { loadConfig, projectDir } from "./estate.mjs";
 
-const config = Object.fromEntries(
-  readFileSync("c:/Users/kumar/portal/.env.local", "utf8")
-    .split(/\r?\n/)
-    .map((line) => /^([A-Z_]+)=(.*)$/.exec(line.trim()))
-    .filter(Boolean)
-    .map((m) => [m[1], m[2].replace(/^"|"$/g, "")]),
-);
+const config = loadConfig();
 
 const DEMOS = [
   { dir: "demo-clinic", schema: "demo_clinic", enquiry: "appointments" },
@@ -40,7 +35,13 @@ const DEMOS = [
 let bad = 0;
 
 for (const demo of DEMOS) {
-  const source = readFileSync(`c:/Users/kumar/${demo.dir}/src/app/admin/page.tsx`, "utf8");
+  const dir = projectDir(demo.dir);
+  if (!dir) {
+    console.log(`?  ${demo.dir} is not on this machine — its dashboard was not read`);
+    continue;
+  }
+
+  const source = readFileSync(`${dir}/src/app/admin/page.tsx`, "utf8");
 
   /* Every `.select("...")` in the dashboard, exactly as written. */
   const selects = [...source.matchAll(/\.select\(\s*"([^"]+)"/g)].map((m) => m[1]);

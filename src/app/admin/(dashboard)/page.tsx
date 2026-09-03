@@ -76,10 +76,27 @@ export default async function AdminDashboard() {
         </dl>
       </section>
 
-      <div className="mt-10 grid gap-6 lg:grid-cols-2">
+      {/*
+        `grid-cols-1`, and it is not redundant.
+
+        A grid with no declared columns puts its items in one *implicit* column
+        sized `auto`, which will not shrink below its content — so a card
+        holding a long blog title stayed 582px wide inside a 360px phone and
+        took the whole document sideways with it. `min-w-0` on the card cannot
+        fix that: the constraint is the track, not the item.
+
+        Two things together, and both are needed. `grid-cols-1` declares the
+        single column explicitly, and `min-w-0` on each card removes its
+        automatic minimum — a grid item's `min-width: auto` is what pushes an
+        `auto` track wide, so leaving it in place lets the card win the argument
+        whatever the track says.
+
+        The admin had never been measured at 360px until 2026-09-03.
+      */}
+      <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
         {leads && (
           <section
-            className="surface-raised rounded-2xl border border-border p-6"
+            className="surface-raised min-w-0 rounded-2xl border border-border p-6"
             aria-labelledby="recent-heading"
           >
             <h2 id="recent-heading" className="font-display text-base font-semibold">
@@ -117,7 +134,7 @@ export default async function AdminDashboard() {
         )}
 
         <section
-          className="surface-raised rounded-2xl border border-border p-6"
+          className="surface-raised min-w-0 rounded-2xl border border-border p-6"
           aria-labelledby="gaps-heading"
         >
           <h2 id="gaps-heading" className="font-display text-base font-semibold">

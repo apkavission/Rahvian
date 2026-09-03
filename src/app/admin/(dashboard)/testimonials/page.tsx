@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PreviewPane } from "@/components/admin/preview-pane";
 import { requireMenu } from "@/lib/auth/session";
 import { getMediaOptions } from "@/lib/queries/media-admin";
 import {
@@ -75,8 +76,8 @@ export default async function TestimonialsScreen({ searchParams }: Props) {
         </p>
       )}
 
-      <div className="mt-10 grid gap-8 xl:grid-cols-[19rem_minmax(0,1fr)]">
-        <div className="xl:sticky xl:top-24 xl:self-start">
+      <div className="mt-10 grid gap-8 xl:grid-cols-[19rem_minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="min-w-0 xl:sticky xl:top-24 xl:self-start">
           <h2 className="font-mono text-[0.65rem] uppercase tracking-[0.16em] text-text-subtle">
             In the order shown
           </h2>
@@ -123,6 +124,25 @@ export default async function TestimonialsScreen({ searchParams }: Props) {
               </p>
             </div>
           )}
+        </div>
+
+        {/*
+          The quotes as a visitor will read them.
+
+          This screen had no preview while nothing on the site could show a
+          testimonial — there were nineteen section types and none of them was
+          this one. Now that a page can carry them, the judgement this screen
+          needs is a visual one: whether a two-word quote under five stars
+          reads as praise or as filler, and whether the attribution sounds like
+          a real person. Neither is answerable from a row in a list.
+        */}
+        <div className="min-w-0 xl:sticky xl:top-24 xl:self-start">
+          <PreviewPane
+            path={`/admin/preview/testimonials${
+              selectedId ? `?testimonial=${selectedId}` : ""
+            }`}
+            note="Every quote, drafts included. Unpublished ones are marked; a visitor sees only the published ones."
+          />
         </div>
       </div>
     </div>

@@ -43,13 +43,35 @@ function isVector(url: string): boolean {
   return /\.svg(\?|#|$)/i.test(url);
 }
 
-/** The natural size as a ceiling — the whole point of this file. */
-function ceiling(image: StoredImage): React.CSSProperties | undefined {
+/**
+ * The natural size as a ceiling — the whole point of this file.
+ *
+ * ---------------------------------------------------------------------------
+ * **`min(100%, Npx)`, and the `100%` half is a bug fix.**
+ *
+ * This used to be `maxWidth: "400px"` on its own, alongside `max-w-full` and
+ * `max-h-full` in the class list. Those two rules do not both apply: an inline
+ * style beats a class, so the natural-size ceiling **replaced** the frame limit
+ * rather than joining it. Every `FramedImage` was therefore free to render at
+ * its own size and overflow its box, hidden only by the box's
+ * `overflow-hidden`.
+ *
+ * It looked fine wherever the picture was smaller than the frame, and wrong
+ * wherever it was bigger — most visibly on a team photograph, where a 400×400
+ * portrait rendered at 400×400 inside an 80px circle and showed the middle of
+ * somebody's face. Reported on 2026-08-31 as an uploaded image not being "set
+ * properly", and measured here: natural 400×400, rendered 400×400, frame 80px.
+ *
+ * `min()` is what expresses both intentions at once — never wider than the
+ * frame, and never enlarged past its own size — in the one declaration that
+ * wins.
+ */
+export function ceiling(image: StoredImage): React.CSSProperties | undefined {
   if (isVector(image.url)) return undefined;
 
   return {
-    maxWidth: image.width ? `${image.width}px` : undefined,
-    maxHeight: image.height ? `${image.height}px` : undefined,
+    maxWidth: image.width ? `min(100%, ${image.width}px)` : undefined,
+    maxHeight: image.height ? `min(100%, ${image.height}px)` : undefined,
   };
 }
 

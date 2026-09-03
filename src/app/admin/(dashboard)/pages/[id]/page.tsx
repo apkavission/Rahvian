@@ -8,6 +8,7 @@ import { PreviewPane } from "@/components/admin/preview-pane";
 import { PageMetaForm } from "./page-meta-form";
 import { SectionEditor } from "./section-editor";
 import { SectionList } from "./section-list";
+import { publicPathFor } from "@/lib/content/slugs";
 
 export const metadata: Metadata = {
   title: "Edit page",
@@ -43,7 +44,7 @@ export default async function PageBuilder({ params, searchParams }: Props) {
   const selected =
     sections.find((section) => section.id === requested) ?? sections[0] ?? null;
 
-  const publicPath = page.slug === "home" ? "/" : `/${page.slug}`;
+  const publicPath = publicPathFor(page);
 
   return (
     <div className="mx-auto w-full max-w-7xl">

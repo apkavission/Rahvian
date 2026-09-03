@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
+import { Pagination } from "@/components/admin/pagination";
 import { requireMenu } from "@/lib/auth/session";
+import { PAGE_SIZE, requestedPage, resolve, type Query } from "@/lib/pagination";
 import { createControlClient } from "@/lib/supabase/control";
 import { Unavailable } from "../page";
 import type { InboxLine } from "@/types/control";
@@ -27,16 +29,35 @@ export const metadata: Metadata = { title: "One inbox" };
  * copy of every business's contact details is exactly what this estate has
  * spent its whole design avoiding.
  */
-export default async function InboxPage() {
+export default async function InboxPage({
+  searchParams,
+}: {
+  searchParams: Promise<Query>;
+}) {
   await requireMenu("estate");
 
+  const query = await searchParams;
   const supabase = await createControlClient();
 
   const { data, error } = await supabase.rpc("estate_inbox", { p_limit: 100 });
 
   if (error) return <Unavailable message={error.message} />;
 
-  const lines = (data ?? []) as InboxLine[];
+  const everything = (data ?? []) as InboxLine[];
+
+  /*
+    A hundred is what the function returns, and it was all rendered at once —
+    a hundred rows on one screen is a wall, and the ones that matter are at the
+    top of it. Ten to a page, from the same shared pager every other list in the
+    estate uses, so the control looks and behaves identically here.
+  */
+  const request = requestedPage(query, PAGE_SIZE);
+  const paged = resolve(
+    everything.slice(request.from, request.to + 1),
+    everything.length,
+    request,
+  );
+  const lines = paged.rows;
 
   return (
     <div className="space-y-8">
@@ -96,6 +117,10 @@ export default async function InboxPage() {
             </li>
           ))}
         </ul>
+      )}
+
+      {everything.length > 0 && (
+        <Pagination paged={paged} pathname="/admin/estate/inbox" query={query} />
       )}
 
       <p className="measure text-xs text-text-subtle">

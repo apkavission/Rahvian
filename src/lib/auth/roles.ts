@@ -33,6 +33,15 @@ export interface RoleDefinition {
   is_owner: boolean;
   /** Screens this role reaches before anything is said about the individual. */
   default_menu: string[];
+  /**
+   * The same, for the client portal.
+   *
+   * Added 2026-08-31, when staff moved from the portal's own Team screen to
+   * this panel. Per-person grants are stored as a difference from the role's
+   * default, so the screen handing them out has to be able to see that default
+   * — and it lived in the portal's TypeScript until it became a column.
+   */
+  portal_menu: string[];
   /** Built in. The key cannot change and the row cannot be deleted. */
   is_system: boolean;
   is_active: boolean;
@@ -67,6 +76,27 @@ const OWNER_MENU: MenuKey[] = [
      `users` is: somebody who can read across all eight applications can read
      every enquiry every business has ever received. */
   "estate",
+
+  /*
+    The logo and banner studio.
+
+    The instruction was that this is a separate menu whoever owns the estate
+    hands out — "ho sakta h ye menu superadmin admin ko bhi na de, kisi manager
+    ya TL ko de" — so the question was whether an owner starts with it or is
+    given it.
+
+    They start with it, and it is taken away per person rather than added per
+    person, for a plain reason: **nobody holds `super_admin`.** Both accounts
+    that own this estate hold `admin`, so a studio kept out of the admin default
+    would be a screen nobody could reach, including the person who has to decide
+    who reaches it.
+
+    What was actually asked for is intact either way: it is its own key in its
+    own group, granted and revoked independently of everything else, so an owner
+    can hand it to a manager without handing over anything else and can take it
+    off an admin with one tick.
+  */
+  "studio",
 ];
 
 /**
@@ -94,35 +124,36 @@ export const FALLBACK_ROLES: RoleDefinition[] = [
     can_manage_leads: true,
     is_owner: true,
     default_menu: OWNER_MENU,
+    portal_menu: ["dashboard", "board", "clients", "projects", "requests"],
     is_system: true,
     is_active: true,
     sort_order: 10,
   },
   {
-    key: "owner",
-    label: "Owner",
+    /*
+      Admin absorbed Owner on 2026-08-31 — see
+      `20260903000019_one_admin_role.sql`. There were three different things
+      called "owner" in this estate: this key, the `is_owner` capability that
+      every policy actually reads, and a separate enum value in the portal.
+      One of them had to stop existing, and the key is the one nobody outside
+      the code was using: the flag keeps its name and now travels with Admin.
+
+      So `is_owner` is true here and the menu is the full one. That is a change
+      in what Admin means, and it was safe to make because the database was
+      asked first: nobody held Admin, so nobody was promoted by it.
+    */
+    key: "admin",
+    label: "Admin",
     description: "The business. Every screen, including accounts and site settings.",
     rank: 20,
     is_staff: true,
     can_manage_leads: true,
     is_owner: true,
     default_menu: OWNER_MENU,
+    portal_menu: ["dashboard", "board", "clients", "projects", "requests"],
     is_system: true,
     is_active: true,
     sort_order: 20,
-  },
-  {
-    key: "admin",
-    label: "Admin",
-    description: "Content and enquiries. Cannot reach accounts or site settings.",
-    rank: 10,
-    is_staff: true,
-    can_manage_leads: true,
-    is_owner: false,
-    default_menu: ["dashboard", "leads", ...CONTENT_MENU],
-    is_system: true,
-    is_active: true,
-    sort_order: 30,
   },
   {
     key: "editor",
@@ -134,6 +165,7 @@ export const FALLBACK_ROLES: RoleDefinition[] = [
     can_manage_leads: false,
     is_owner: false,
     default_menu: ["dashboard", ...CONTENT_MENU],
+    portal_menu: [],
     is_system: true,
     is_active: true,
     sort_order: 40,
@@ -147,6 +179,7 @@ export const FALLBACK_ROLES: RoleDefinition[] = [
     can_manage_leads: false,
     is_owner: false,
     default_menu: [],
+    portal_menu: [],
     is_system: true,
     is_active: true,
     sort_order: 50,
@@ -160,6 +193,7 @@ export const FALLBACK_ROLES: RoleDefinition[] = [
     can_manage_leads: false,
     is_owner: false,
     default_menu: [],
+    portal_menu: ["dashboard", "board", "projects", "requests"],
     is_system: true,
     is_active: true,
     sort_order: 60,
@@ -174,6 +208,7 @@ export const FALLBACK_ROLES: RoleDefinition[] = [
     can_manage_leads: false,
     is_owner: false,
     default_menu: [],
+    portal_menu: [],
     is_system: true,
     is_active: true,
     sort_order: 70,

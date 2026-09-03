@@ -18,10 +18,30 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": resolve(__dirname, "src"),
+
+      /*
+        `server-only` is a guard for the bundler, not a fact about the code.
+
+        The package exports a module that throws the moment a Client Component
+        imports it — which is exactly what it is for, and it makes any file that
+        imports it untestable here: vitest is neither bundler, so it takes the
+        client entry point and the whole suite fails at collection with "This
+        module cannot be imported from a Client Component".
+
+        Stubbed with an empty module. Nothing is weakened: the real check runs
+        in `next build`, where it belongs, and stubbing it is what lets the
+        email layout — server-only, and the most breakable HTML in the estate —
+        have tests at all.
+      */
+      "server-only": resolve(__dirname, "src/test/server-only-stub.ts"),
     },
   },
   test: {
     environment: "node",
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
+
+    /* Public environment variables, so a module that validates them at import
+       time can be loaded. See `src/test/env.ts`. */
+    setupFiles: ["src/test/env.ts"],
   },
 });

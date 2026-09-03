@@ -305,6 +305,32 @@ export default function AssembleScene({
     return () => observer.disconnect();
   }, []);
 
+  /*
+    The words, serialised, because this effect must depend on what they say
+    and not on which array said it.
+
+    `lines` is a fresh array on every render — from the default above when the
+    caller omits it, and from the literal at the call site when it does not.
+    As a dependency it therefore differed every single time: the effect ran,
+    set `sampled` to a new object, that re-rendered, the render built another
+    array, and the effect ran again. Measured on 2026-08-31 as 2,320 renders
+    and 1,160 rasterisations in seven seconds, from mount, with nothing
+    touched.
+
+    Nothing reported it. The scene looked correct, the build was clean and all
+    259 unit tests passed, because none of them can see a component that
+    arrives at the right answer over and over. What it cost was the whole main
+    thread: an input dispatch swallowed roughly once in fifteen — written up in
+    `playwright.config.ts` as a Playwright flake and in `e2e/theme.spec.ts` as
+    an open question, and neither was — and, when a theme change asked that
+    thread for a view transition on top, Chrome's "Page Unresponsive" on the
+    deployed site.
+
+    Keying on the text fixes it at the source rather than at this one call
+    site: any caller may pass a literal and none of them can start this again.
+  */
+  const wordmark = JSON.stringify(lines);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -312,13 +338,15 @@ export default function AssembleScene({
     // fallback, and the letterforms would be visibly wrong.
     document.fonts.ready.then(() => {
       if (cancelled) return;
-      setSampled(sampleText(lines, Math.round(MAX_FRAGMENTS * quality)));
+      setSampled(
+        sampleText(JSON.parse(wordmark) as string[], Math.round(MAX_FRAGMENTS * quality)),
+      );
     });
 
     return () => {
       cancelled = true;
     };
-  }, [lines, quality]);
+  }, [wordmark, quality]);
 
   if (sampled.points.length === 0) return null;
 

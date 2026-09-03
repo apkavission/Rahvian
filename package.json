@@ -2,7 +2,7 @@
   "name": "apkasaathi-services",
   "version": "0.1.0",
   "private": true,
-  "description": "Apka Saathi Private Limited \u2014 company services website, admin panel and client portal.",
+  "description": "Apka Saathi Private Limited — company services website, admin panel and client portal.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -22,7 +22,16 @@
     "check:demos": "node scripts/check-demos.mjs",
     "check:queries": "node scripts/check-demo-queries.mjs",
     "verify:estate": "node scripts/verify-estate.mjs",
-    "check:effects": "node scripts/check-unverifiable.mjs"
+    "check:effects": "node scripts/check-unverifiable.mjs",
+    "check:privileges": "node scripts/check-privileges.mjs",
+    "check:access": "node scripts/check-demo-access.mjs",
+    "check:door": "node scripts/check-demo-door.mjs",
+    "check:leak": "node scripts/check-leak.mjs",
+    "check:panel": "node scripts/check-panel.mjs",
+    "crawl": "node scripts/crawl.mjs",
+    "check:copies": "node scripts/check-copies.mjs",
+    "check:speed": "node scripts/check-speed.mjs",
+    "check:loaders": "node scripts/check-loaders.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.941.0",

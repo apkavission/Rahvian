@@ -11,6 +11,7 @@ import {
   type ImageFieldSpec,
   type MediaOption,
 } from "@/lib/media/image-fields";
+import { uploadMedia } from "@/lib/actions/media";
 import { cn } from "@/lib/utils";
 
 /**
@@ -56,7 +57,20 @@ export function MediaPicker({
 }) {
   const [open, setOpen] = useState(false);
 
-  const chosen = assets.find((asset) => asset.id === value) ?? null;
+  /*
+    Files uploaded from this field, kept beside the ones the server sent.
+
+    The list arrives as a prop, resolved on the server when the screen
+    rendered, so a file added a moment ago is not in it. Rather than reloading
+    the page — which would throw away whatever else is half-typed on this form
+    — the new asset is added here and the page catches up on the next save.
+  */
+  const [added, setAdded] = useState<MediaOption[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const all = [...added, ...assets];
+  const chosen = all.find((asset) => asset.id === value) ?? null;
   const fit = chosen ? describeFit(spec, chosen) : null;
   const quality = chosen ? assessQuality(chosen) : null;
 
@@ -140,15 +154,61 @@ export function MediaPicker({
             different shape simply leaves space along one edge.
           </p>
 
-          {assets.length === 0 ? (
+          <UploadHere
+            spec={spec}
+            uploading={uploading}
+            error={uploadError}
+            onUpload={async (file, alt) => {
+              setUploadError(null);
+              setUploading(true);
+
+              try {
+                const form = new FormData();
+                form.set("file", file);
+                form.set("alt_text", alt);
+                /* One folder for everything added this way. The library's own
+                   screen is where files get sorted; guessing a folder from the
+                   field would put a case study's header under "case-studies"
+                   and the same picture, reused on a page, under something
+                   else. */
+                form.set("folder", "general");
+                // Hand the asset back instead of navigating to the library.
+                form.set("for_field", "1");
+
+                const result = await uploadMedia({ status: "idle", message: "" }, form);
+
+                if (result.status !== "success" || !result.asset) {
+                  setUploadError(result.fieldErrors?.file ?? result.message);
+                  return;
+                }
+
+                const asset: MediaOption = {
+                  id: result.asset.id,
+                  filename: result.asset.filename,
+                  url: result.asset.public_url,
+                  alt: result.asset.alt_text,
+                  width: result.asset.width,
+                  height: result.asset.height,
+                  vector: result.asset.mime_type === "image/svg+xml",
+                };
+
+                setAdded((current) => [asset, ...current]);
+                onChange(asset.id);
+                setOpen(false);
+              } finally {
+                setUploading(false);
+              }
+            }}
+          />
+
+          {all.length === 0 ? (
             <p className="mt-3 rounded-lg border border-dashed border-border p-4 text-sm text-text-muted">
-              The media library is empty. Upload something at{" "}
-              <span className="font-mono text-xs">/admin/media</span> and it will
-              appear here.
+              Nothing in the library yet. Add a file above and it is chosen for
+              this field straight away.
             </p>
           ) : (
             <ul className="mt-3 grid max-h-96 grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3">
-              {assets.map((asset) => {
+              {all.map((asset) => {
                 const assetFit = describeFit(spec, asset);
                 const selected = asset.id === value;
 
@@ -263,5 +323,90 @@ function FitLine({ fit, className }: { fit: Fit; className?: string }) {
       />
       <span>{fit.message}</span>
     </p>
+  );
+}
+
+/**
+ * Add a file without leaving the record being edited.
+ *
+ * ---------------------------------------------------------------------------
+ * **The trip this removes.** Putting a picture on a case study meant leaving
+ * the case study, opening Media, uploading, coming back, finding the field
+ * again and choosing it. On a site whose library holds five logos, every image
+ * field offered a folder of logos and nothing usable — which reads as the
+ * field being broken rather than the library being empty.
+ *
+ * The file still lands in the library and is reusable from every other field.
+ * What changes is that nobody has to go there and come back.
+ *
+ * **Not a `<form>`, and it cannot be one.** This control lives inside the
+ * record's own form, and a nested form is invalid HTML — the browser drops the
+ * inner one, so the upload button would submit the case study instead. The
+ * Server Action is called directly from the click handler, which is also what
+ * keeps the record's unsaved fields untouched.
+ *
+ * **Alt text is asked for here rather than later.** The database refuses a
+ * file without it, and this is the one moment the person is looking at the
+ * picture — afterwards they would be describing it from memory, which is how
+ * alt text ends up saying "image".
+ */
+function UploadHere({
+  spec,
+  uploading,
+  error,
+  onUpload,
+}: {
+  spec: ImageFieldSpec;
+  uploading: boolean;
+  error: string | null;
+  onUpload: (file: File, alt: string) => void | Promise<void>;
+}) {
+  const [file, setFile] = useState<File | null>(null);
+  const [alt, setAlt] = useState("");
+
+  const ready = file !== null && alt.trim().length > 0 && !uploading;
+
+  return (
+    <div className="mt-3 rounded-lg border border-dashed border-border bg-surface p-3">
+      <p className="text-xs font-medium">Add a file</p>
+      <p className="mt-1 text-xs text-text-subtle">
+        It goes into the library and is chosen for this field. {specLabel(spec)} suits
+        it best.
+      </p>
+
+      <input
+        type="file"
+        accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml"
+        disabled={uploading}
+        onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+        className="mt-2.5 block w-full text-xs text-text-muted file:mr-3 file:rounded-lg file:border-0 file:bg-surface-2 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-text hover:file:bg-surface-3"
+      />
+
+      <input
+        type="text"
+        value={alt}
+        disabled={uploading}
+        maxLength={300}
+        onChange={(event) => setAlt(event.target.value)}
+        placeholder="Describe the image, for somebody who cannot see it"
+        className="mt-2 block w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm placeholder:text-text-subtle focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+      />
+
+      <button
+        type="button"
+        disabled={!ready}
+        onClick={() => file && onUpload(file, alt.trim())}
+        className="mt-2 inline-flex items-center gap-2 rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-accent-fg transition-colors hover:bg-accent-hover disabled:pointer-events-none disabled:opacity-60"
+      >
+        {uploading ? "Adding…" : "Add and choose"}
+      </button>
+
+      {error && (
+        <p role="alert" className="mt-2 flex items-start gap-1.5 text-xs text-danger">
+          <TriangleAlert className="mt-0.5 size-3.5 shrink-0" aria-hidden />
+          {error}
+        </p>
+      )}
+    </div>
   );
 }

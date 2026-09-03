@@ -23,7 +23,8 @@ export type MenuKey =
   | "settings"
   | "seo"
   | "users"
-  | "estate";
+  | "estate"
+  | "studio";
 
 export interface AdminNavItem {
   key: MenuKey;
@@ -104,6 +105,30 @@ export const ADMIN_NAV: AdminNavGroup[] = [
         href: "/admin/users",
         icon: "user-cog",
         ownerOnly: true,
+      },
+    ],
+  },
+  {
+    label: "Studio",
+    items: [
+      {
+        /*
+          Its own group, and its own key.
+
+          The owner's instruction was specific: "ye wala menu alag banaya h …
+          ho sakta h ye menu superadmin admin ko bhi na de, kisi manager ya TL
+          ko de." A key is what makes that possible — it can be handed to one
+          person and taken from another without touching anything else. Folded
+          into Media or Settings it would travel with those for ever.
+
+          So it is **grantable**, not `ownerOnly`. Who starts with it is decided
+          in `lib/auth/roles.ts` and in the roles table, not here; the note there
+          explains why an owner starts with it rather than being given it.
+        */
+        key: "studio",
+        label: "Logo & banners",
+        href: "/admin/studio",
+        icon: "palette",
       },
     ],
   },

@@ -15,6 +15,7 @@ import { ProductPromo } from "@/components/sections/product-promo";
 import { ServicesGrid } from "@/components/sections/services-grid";
 import { Story } from "@/components/sections/story";
 import { Team } from "@/components/sections/team";
+import { Testimonials } from "@/components/sections/testimonials";
 import { TechStack } from "@/components/sections/tech-stack";
 import { WhatWeBuild } from "@/components/sections/what-we-build";
 import { WhyChooseUs } from "@/components/sections/why-choose-us";
@@ -55,6 +56,7 @@ export const SECTION_REGISTRY: Record<string, SectionComponent> = {
   tech_stack: TechStack,
   story: Story,
   team: Team,
+  testimonials: Testimonials,
   portfolio_grid: PortfolioGrid,
   case_studies_grid: CaseStudiesGrid,
   blog_list: BlogList,

@@ -37,6 +37,28 @@ import {
  * written with a key this code chose.
  */
 
+/**
+ * One newly stored asset, in the shape an image field's picker wants.
+ *
+ * Deliberately the same fields `MediaOption` carries, so a file that has just
+ * been uploaded can be dropped into the picker's list beside the ones that
+ * came from the server with no mapping in between — a second shape here would
+ * be a second place for "what an image field knows about a file" to drift.
+ */
+export interface UploadedAsset {
+  id: string;
+  filename: string;
+  public_url: string;
+  alt_text: string;
+  width: number | null;
+  height: number | null;
+  mime_type: string;
+  folder: string;
+}
+
+/** The usual action state, plus the asset when a field asked for one. */
+export type UploadState = RecordActionState & { asset?: UploadedAsset };
+
 /** 8MB. Larger than any web image should be, small enough to refuse a video. */
 const MAX_BYTES = 8 * 1024 * 1024;
 
@@ -84,9 +106,9 @@ const uploadSchema = z.object({
  * so they have to be facts.
  */
 export async function uploadMedia(
-  _previous: RecordActionState,
+  _previous: UploadState,
   formData: FormData,
-): Promise<RecordActionState> {
+): Promise<UploadState> {
   const refused = await guard();
   if (refused) return refused;
 
@@ -189,6 +211,37 @@ export async function uploadMedia(
   }
 
   refresh();
+
+  /*
+    Uploaded from an image field rather than from the Media screen.
+
+    The redirect below is right when somebody is standing on that screen adding
+    files; it is exactly wrong here, where it would throw away a half-edited
+    case study to show them a library they did not ask to visit. So the asset
+    is handed back and the field selects it.
+
+    The file still lands in the library, indexed and reusable, exactly as it
+    would have. What changes is that nobody has to go there and come back:
+    before this, putting a picture on a case study meant leaving the case
+    study, uploading, returning, and finding the field again — and on a fresh
+    site the picker offered a folder of logos and nothing usable.
+  */
+  if (formData.get("for_field") === "1") {
+    return {
+      status: "success",
+      message: `${filename} was added to the library and chosen.`,
+      asset: {
+        id,
+        filename,
+        public_url: mediaPath(id, filename),
+        alt_text: parsed.data.alt_text,
+        width: facts.width,
+        height: facts.height,
+        mime_type: facts.mimeType,
+        folder: parsed.data.folder,
+      },
+    };
+  }
 
   redirect(`/admin/media?asset=${id}&folder=${encodeURIComponent(parsed.data.folder)}`);
 }

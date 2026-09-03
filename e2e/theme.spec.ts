@@ -113,3 +113,50 @@ test("the admin sign-in screen carries the theme too", async ({ page }) => {
 
   await expect(page.locator(ROOT)).toHaveAttribute("data-theme", /light|dark/);
 });
+
+/**
+ * The hero samples its wordmark once, not for ever.
+ *
+ * `AssembleScene` rasterises "APKA VISSION" to a 2D canvas and reads the pixels
+ * back to find the points its fragments fly into. That is expensive and it is
+ * meant to happen once, when the font finishes loading.
+ *
+ * It happened continuously. `lines` defaulted to a fresh `["APKA", "VISSION"]`
+ * on every render and was a dependency of the effect that does the sampling;
+ * the effect set state, the state caused a render, the render built a new
+ * array, and the effect ran again. Measured on 2026-08-31: **2,320 renders and
+ * 1,160 rasterisations in the seven seconds after load**, with nothing clicked.
+ *
+ * Nothing failed. The page looked right, every unit test passed, the build was
+ * clean — it simply had no idle main thread left. That is why a synthetic click
+ * on the theme control "dispatched and never resolved" about once in fifteen
+ * (see `choose` above), and why changing theme on the deployed site could stop
+ * the tab dead with Chrome's "Page Unresponsive": the theme change asks a
+ * saturated thread for a view transition and four colour re-reads on top.
+ *
+ * Counting canvases is how this is caught without instrumenting the component:
+ * one `sampleText` is one `createElement("canvas")`. A handful is the scene
+ * setting itself up. Hundreds is the loop.
+ */
+test("the hero does not re-rasterise its wordmark on a loop", async ({ page }) => {
+  await page.addInitScript(() => {
+    let canvases = 0;
+    const create = document.createElement.bind(document);
+    document.createElement = function (tag: string, ...rest: unknown[]) {
+      if (String(tag).toLowerCase() === "canvas") canvases += 1;
+      return create(tag, ...(rest as []));
+    } as typeof document.createElement;
+    (window as unknown as { __canvases: () => number }).__canvases = () => canvases;
+  });
+
+  await page.goto("/");
+  await page.waitForTimeout(5_000);
+
+  const count = await page.evaluate(
+    () => (window as unknown as { __canvases: () => number }).__canvases(),
+  );
+
+  // Comfortably above what a settled page needs and far below a loop, so this
+  // fails on the defect and not on a slow machine.
+  expect(count).toBeLessThan(25);
+});

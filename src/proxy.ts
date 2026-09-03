@@ -122,7 +122,23 @@ export async function proxy(request: NextRequest) {
 
   if (!exists) {
     const url = request.nextUrl.clone();
-    url.pathname = "/__not-found";
+    /*
+      Two segments, and that is the whole point of it.
+
+      This was `/__not-found`, a single segment, chosen because nothing routed
+      there. That stopped being true on 2026-08-31 when `(site)/[slug]` was
+      added so pages made in the admin could be reached: a catch-all over one
+      segment matches `__not-found` as readily as `testimonials`, so the
+      rewrite began *rendering* rather than missing, and every soft 404 this
+      code exists to prevent came back — measured as `/blog/anything-made-up`
+      answering 200 again.
+
+      No route in this application matches two segments at the root, and the
+      leading `__` keeps it out of the way of any page slug somebody might
+      write. If a route is ever added that would match this, the test in
+      `slugs.test.ts` fails rather than the site quietly going soft again.
+    */
+    url.pathname = "/__not-found/__";
     url.search = "";
     return NextResponse.rewrite(url);
   }

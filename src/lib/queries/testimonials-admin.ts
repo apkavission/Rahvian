@@ -2,6 +2,7 @@ import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
 import type { ProjectOption } from "@/lib/records/testimonials";
+import type { Testimonial } from "@/lib/queries/testimonials";
 import type { Tables } from "@/types/database";
 
 export type TestimonialRow = Tables<"testimonials">;
@@ -83,4 +84,59 @@ export async function getProjectOptions(): Promise<ProjectOption[]> {
     id: row.id,
     label: row.status === "published" ? row.title : `${row.title} · ${row.status}`,
   }));
+}
+
+/**
+ * Every quote as a card, drafts included, for the preview.
+ *
+ * The same shape the public `getTestimonials` returns, plus the status — so
+ * the preview can draw the site's own `TestimonialCard` and mark the ones a
+ * visitor would not see. Read uncached through the session client, which is
+ * what makes a draft visible at all.
+ *
+ * A separate function from `getAdminTestimonials` rather than more columns on
+ * it: that one feeds a list where the quote is truncated to a line, and asking
+ * it for avatars and ratings it never draws would make every keystroke in the
+ * editor fetch a join nothing reads.
+ */
+export async function getAdminTestimonialCards(): Promise<
+  (Testimonial & { status: string })[]
+> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("testimonials")
+    .select(
+      `id, quote, author_name, author_role, company_name, rating, status,
+       avatar:media!testimonials_avatar_id_fkey(public_url, alt_text, width, height)`,
+    )
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    console.error("[testimonials] preview list failed:", error.message);
+    return [];
+  }
+
+  return (data ?? []).map((row) => {
+    // PostgREST types an embedded row as an array; it is one row or none.
+    const media = Array.isArray(row.avatar) ? row.avatar[0] : row.avatar;
+
+    return {
+      id: row.id,
+      quote: row.quote,
+      author_name: row.author_name,
+      author_role: row.author_role,
+      company_name: row.company_name,
+      rating: row.rating,
+      status: row.status,
+      avatar: media?.public_url
+        ? {
+            url: media.public_url,
+            alt: media.alt_text ?? "",
+            width: media.width,
+            height: media.height,
+          }
+        : null,
+    };
+  });
 }

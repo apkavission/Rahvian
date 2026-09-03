@@ -77,7 +77,7 @@ export default async function PortfolioScreen({ searchParams }: Props) {
       </header>
 
       <div className="mt-10 grid gap-8 xl:grid-cols-[17rem_minmax(0,1fr)_minmax(0,1fr)]">
-        <div className="xl:sticky xl:top-24 xl:self-start">
+        <div className="min-w-0 xl:sticky xl:top-24 xl:self-start">
           <h2 className="font-mono text-[0.65rem] uppercase tracking-[0.16em] text-text-subtle">
             Portfolio, in order
           </h2>

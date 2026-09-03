@@ -116,6 +116,10 @@ export async function createRole(
     can_manage_leads: false,
     is_owner: false,
     default_menu: [],
+    /* And nothing in the portal either. A new role reaches no screen anywhere
+       until somebody decides it should — the same rule the website's own menu
+       has always followed, now that the portal's is master data too. */
+    portal_menu: [],
     is_system: false,
     is_active: true,
     sort_order: (who.roles.at(-1)?.sort_order ?? 0) + 10,

@@ -27,7 +27,7 @@ interface Props {
  * Returns `null` when no logo is configured. Callers pair it with the company
  * name, so the header still reads correctly on a fresh database.
  */
-export async function BrandLogo({ height = 32, className, decorative = true }: Props) {
+export async function BrandLogo({ height = 44, className, decorative = true }: Props) {
   const { light, dark } = await getBrandLogos();
 
   if (!light && !dark) return null;

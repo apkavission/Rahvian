@@ -23,6 +23,7 @@ import {
   Menu,
   NotebookText,
   Tag,
+  Palette,
   UserCog,
   Users,
   type LucideIcon,
@@ -76,6 +77,7 @@ const ADMIN_ICONS: Record<string, LucideIcon> = {
   "help-circle": CircleHelp,
   users: Users,
   "user-cog": UserCog,
+  palette: Palette,
 };
 
 const ICONS: Record<string, LucideIcon> = { ...CONTENT_ICONS, ...ADMIN_ICONS };

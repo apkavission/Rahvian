@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { requestedPage } from "@/lib/pagination";
+import { Pagination } from "@/components/admin/pagination";
 import Link from "next/link";
 import { AssetPreview } from "@/components/admin/asset-preview";
 import { requireMenu } from "@/lib/auth/session";
@@ -51,11 +53,7 @@ export default async function MediaScreen({ searchParams }: Props) {
 
   const query = await searchParams;
 
-  const [assets, folders, usage] = await Promise.all([
-    getAdminMedia(),
-    mediaFolders(),
-    mediaUsageMap(),
-  ]);
+  const folders = await mediaFolders();
 
   const requestedFolder = typeof query.folder === "string" ? query.folder : null;
   const folder =
@@ -63,7 +61,14 @@ export default async function MediaScreen({ searchParams }: Props) {
       ? ""
       : (folders.find((entry) => entry.folder === requestedFolder)?.folder ?? "");
 
-  const shown = folder ? assets.filter((asset) => asset.folder === folder) : assets;
+  /* The folder narrows the query, not the array — otherwise the count under
+     the list describes the whole library while showing one folder. */
+  const [page, usage] = await Promise.all([
+    getAdminMedia(requestedPage(query), folder || null),
+    mediaUsageMap(),
+  ]);
+
+  const shown = page.rows;
 
   const requested = typeof query.asset === "string" ? query.asset : null;
   const selectedSummary = shown.find((asset) => asset.id === requested) ?? shown[0] ?? null;
@@ -109,7 +114,10 @@ export default async function MediaScreen({ searchParams }: Props) {
             <FolderPill
               href="/admin/media?folder="
               label="Everything"
-              count={assets.length}
+              /* Every folder's count added up. The page itself only holds
+                 twenty-five rows now, so it cannot answer "how many are
+                 there" — and `mediaFolders` already counted them all. */
+              count={folders.reduce((sum, entry) => sum + entry.count, 0)}
               active={folder === ""}
             />
             {folders.map((entry) => (
@@ -126,7 +134,7 @@ export default async function MediaScreen({ searchParams }: Props) {
       )}
 
       <div className="mt-8 grid gap-8 xl:grid-cols-[17rem_minmax(0,1fr)_minmax(0,1fr)]">
-        <div className="xl:sticky xl:top-24 xl:self-start">
+        <div className="min-w-0 xl:sticky xl:top-24 xl:self-start">
           <h2 className="font-mono text-[0.65rem] uppercase tracking-[0.16em] text-text-subtle">
             Newest first
           </h2>
@@ -150,6 +158,16 @@ export default async function MediaScreen({ searchParams }: Props) {
                   : "No files yet. Upload the first one below."
               }
             />
+
+            {/* Under the grid and above the upload box: the pages belong to
+                what is shown, and uploading is a separate act. */}
+            <Pagination
+              paged={page}
+              pathname="/admin/media"
+              query={query}
+              className="mt-4"
+            />
+
             <UploadForm folder={folder || "general"} />
           </div>
         </div>
