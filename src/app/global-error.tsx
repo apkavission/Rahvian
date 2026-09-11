@@ -47,12 +47,12 @@ export default function GlobalError({
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <span style={{ fontSize: "1.5rem", fontWeight: 600 }}>Apka</span>
+          <span style={{ fontSize: "1.5rem", fontWeight: 600 }}>Rahvian</span>
           {/* eslint-disable-next-line @next/next/no-img-element -- no bundler
               guarantees at this point; a committed file and a plain tag are the
               only things certain to work. */}
-          <img src="/brand/symbol-dark.svg" alt="" width={40} height={40} />
-          <span style={{ fontSize: "1.5rem", fontWeight: 600 }}>Vission</span>
+          <img src="/brand/symbol-dark.png" alt="" width={40} height={40} />
+          <span style={{ fontSize: "1.5rem", fontWeight: 600 }}>Technologies</span>
         </div>
 
         <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 600 }}>

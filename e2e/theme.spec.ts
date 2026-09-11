@@ -117,7 +117,7 @@ test("the admin sign-in screen carries the theme too", async ({ page }) => {
 /**
  * The hero samples its wordmark once, not for ever.
  *
- * `AssembleScene` rasterises "APKA VISSION" to a 2D canvas and reads the pixels
+ * `AssembleScene` rasterises "RAHVIAN TECHNOLOGIES" to a 2D canvas and reads the pixels
  * back to find the points its fragments fly into. That is expensive and it is
  * meant to happen once, when the font finishes loading.
  *

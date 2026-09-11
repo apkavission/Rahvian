@@ -21,7 +21,7 @@
   color-scheme: light;
 
   /* -- Surface ----------------------------------------------------------- */
-  --bg: #f4f6f8;
+  --bg: #f5f7fa;
   --surface: #ffffff;
   --surface-2: #eef1f4;
   --surface-3: #e3e8ed;
@@ -43,16 +43,29 @@
   --ring: #0c6f6e;
 
   /* -- Text -------------------------------------------------------------- */
-  --text: #0b1220;
+  --text: #0b1f26;
   --text-muted: #334155;
   --text-subtle: #475569;
   --text-inverse: #ffffff;
+
+  /* -- Brand -------------------------------------------------------------
+     The teal on the identity sheet, and the one colour that is the same in
+     both themes — it is the mark's own colour, so it has no light version and
+     no dark one.
+
+     It is deliberately **not** `--accent`. Measured against white it gives
+     1.95:1, so a button or a link in it cannot be read; what it is for is the
+     mark, a rule, a chip, a graphic edge. `--accent` below is the darker teal
+     that carries white text at 5.98:1. Two tokens, so the distinction cannot
+     be lost by somebody reaching for "the brand colour".                     */
+  --brand: #00d1b2;
+  --brand-soft: #e4f7f3;
 
   /* -- Accent ------------------------------------------------------------ */
   --accent: #0c6f6e;
   --accent-hover: #0a6362;
   --accent-fg: #ffffff;
-  --accent-soft: #e6f4f4;
+  --accent-soft: #e4f7f3;
 
   /* -- Semantic ---------------------------------------------------------- */
   --success: #067647;
@@ -110,27 +123,30 @@
   :root:not([data-theme="light"]) {
     color-scheme: dark;
 
-    --bg: #07090c;
-    --surface: #0e1218;
-    --surface-2: #151b23;
-    --surface-3: #1d242e;
+    --bg: #061318;
+    --surface: #0b1f26;
+    --surface-2: #123039;
+    --surface-3: #17404b;
     --overlay: rgb(3 5 8 / 0.7);
 
-    --skeleton: #1d242e;
+    --skeleton: #17404b;
     --skeleton-sheen: rgb(255 255 255 / 0.07);
 
-    --border: #232b36;
-    --border-strong: #323c4a;
-    --ring: #2dd4bf;
+    --border: #1c3b45;
+    --border-strong: #2a5561;
+    --ring: #00d1b2;
 
-    --text: #f3f6fb;
+    --text: #f5f7fa;
     --text-muted: #c8d3e0;
-    --text-subtle: #a9b6c6;
-    --text-inverse: #07090c;
+    --text-subtle: #9fb4bd;
+    --text-inverse: #061318;
 
-    --accent: #2dd4bf;
+    --brand: #00d1b2;
+    --brand-soft: rgb(0 209 178 / 0.14);
+
+    --accent: #00d1b2;
     --accent-hover: #5eead4;
-    --accent-fg: #04201f;
+    --accent-fg: #04211d;
     --accent-soft: rgb(45 212 191 / 0.12);
 
     --success: #34d399;
@@ -163,27 +179,30 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --bg: #07090c;
-  --surface: #0e1218;
-  --surface-2: #151b23;
-  --surface-3: #1d242e;
+  --bg: #061318;
+  --surface: #0b1f26;
+  --surface-2: #123039;
+  --surface-3: #17404b;
   --overlay: rgb(3 5 8 / 0.7);
 
-  --skeleton: #1d242e;
+  --skeleton: #17404b;
   --skeleton-sheen: rgb(255 255 255 / 0.07);
 
-  --border: #232b36;
-  --border-strong: #323c4a;
-  --ring: #2dd4bf;
+  --border: #1c3b45;
+  --border-strong: #2a5561;
+  --ring: #00d1b2;
 
-  --text: #f3f6fb;
+  --text: #f5f7fa;
   --text-muted: #c8d3e0;
-  --text-subtle: #a9b6c6;
-  --text-inverse: #07090c;
+  --text-subtle: #9fb4bd;
+  --text-inverse: #061318;
 
-  --accent: #2dd4bf;
+  --brand: #00d1b2;
+  --brand-soft: rgb(0 209 178 / 0.14);
+
+  --accent: #00d1b2;
   --accent-hover: #5eead4;
-  --accent-fg: #04201f;
+  --accent-fg: #04211d;
   --accent-soft: rgb(45 212 191 / 0.12);
 
   --success: #34d399;
@@ -239,6 +258,8 @@
   --color-text-subtle: var(--text-subtle);
   --color-text-inverse: var(--text-inverse);
 
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-fg: var(--accent-fg);

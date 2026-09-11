@@ -18,7 +18,7 @@ interface PageSeo {
   /**
    * Whether to run `title` through the admin's title template. The home page
    * opts out — its title already names the company, and templating it would
-   * produce "Apka Vission … | Apka Vission".
+   * produce "Rahvian … | Rahvian".
    */
   templated?: boolean;
 }
@@ -44,7 +44,7 @@ export async function buildMetadata(page: PageSeo): Promise<Metadata> {
     ? page.templated === false
       ? page.title
       : applyTitleTemplate(defaults?.title_template, page.title)
-    : (defaults?.default_title ?? "Apka Vission");
+    : (defaults?.default_title ?? "Rahvian");
 
   const description = page.description || defaults?.default_description || undefined;
   const url = `${SITE_URL}${page.path}`;
@@ -76,7 +76,7 @@ export async function buildMetadata(page: PageSeo): Promise<Metadata> {
       : { index: true, follow: true },
     openGraph: {
       type: "website",
-      siteName: "Apka Vission",
+      siteName: "Rahvian",
       title,
       description,
       url,

@@ -66,7 +66,7 @@ export async function resolveEmailLogo(): Promise<EmailLogo> {
 /**
  * Where the configured logo actually lives on disk.
  *
- * `media.public_url` is a site-root path (`/brand/logo-dark.svg`) while the
+ * `media.public_url` is a site-root path (`/brand/logo-dark.png`) while the
  * media library is served from `public/`. Once uploads move to R2 those become
  * absolute URLs, and this is the one place that has to learn to fetch them.
  */

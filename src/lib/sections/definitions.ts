@@ -165,7 +165,8 @@ export const SECTION_DEFINITIONS: Record<string, SectionDefinition> = {
 
   product_promo: {
     label: "Product promo",
-    description: "Apka Saathi, labelled as ours. Never presents the product as client work.",
+    description:
+      "A product of our own, labelled as ours. Never presents it as client work.",
     fields: [
       ...HEADING_FIELDS,
       { kind: "text", name: "productName", label: "Product name", required: true, max: 80 },

@@ -19,7 +19,6 @@ export const PUBLIC_ROUTES = [
   { path: "/pricing", name: "Pricing" },
   { path: "/contact", name: "Contact" },
   { path: "/request-a-quote", name: "Request a quote" },
-  { path: "/products/apka-saathi", name: "Product" },
   { path: "/privacy-policy", name: "Privacy policy" },
   { path: "/terms-and-conditions", name: "Terms" },
 ];
@@ -43,8 +42,10 @@ export const PUBLIC_ROUTES = [
  * sitemap.
  */
 export const CONTENT_ROUTES = [
-  { path: "/portfolio/apka-saathi", name: "Portfolio entry" },
-  { path: "/portfolio/apka-vission", name: "Portfolio entry" },
+  /* One portfolio entry, not two: the company's own product was removed on
+     2026-09-11 along with its portfolio piece, and the remaining entry — this
+     website — was re-slugged with the company's new name. */
+  { path: "/portfolio/rahvian", name: "Portfolio entry" },
   { path: "/case-studies/editable-company-website", name: "Case study" },
   { path: "/blog/website-should-not-need-a-developer", name: "Blog post" },
   { path: "/blog/three-layers-of-access-control", name: "Blog post" },

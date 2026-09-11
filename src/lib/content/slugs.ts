@@ -73,7 +73,6 @@ const ROOT_ROUTES = new Set([
   "portfolio",
   "pricing",
   "privacy-policy",
-  "products",
   "request-a-quote",
   "services",
   "terms-and-conditions",
@@ -113,10 +112,9 @@ async function fetchSlugs(
    * One more PostgREST filter, for the root-page lookup.
    *
    * That one asks for `is_system=eq.false`, because a system page is one this
-   * repository routes for itself: `products-apka-saathi` is real at
-   * `/products/apka-saathi` and must not also answer at `/products-apka-saathi`,
-   * and `home` is the front page and must not answer at `/home`. Both are rows
-   * in `pages`, so without this they would look like addresses.
+   * repository routes for itself: `home` is the front page and must not also
+   * answer at `/home`. It is a row in `pages`, so without this filter its slug
+   * would look like an address.
    */
   extra?: [string, string],
 ): Promise<Set<string> | null> {
@@ -207,11 +205,10 @@ export async function contentExists(
     /*
       Only pages that have no route of their own.
 
-      `is_system` marks the eleven that ship with the product and are folders
-      in this repository. Their slugs are rows in `pages` too, so counting them
-      as addresses would make `/home` answer beside `/`, and
-      `/products-apka-saathi` answer beside `/products/apka-saathi` — two
-      addresses for one page, competing in search results for the same words.
+      `is_system` marks the ones that ship with the site and are folders in
+      this repository. Their slugs are rows in `pages` too, so counting them as
+      addresses would make `/home` answer beside `/` — two addresses for one
+      page, competing in search results for the same words.
     */
     return await slugExists(
       "custom-pages",
@@ -298,24 +295,24 @@ export const POLICED_PREFIXES = SOURCES.map((source) => source.prefix);
  * **A slug is not always an address, and assuming it is put a 404 in the
  * admin.** The Pages screen linked every row to `/<slug>`, which is right for
  * the pages the owner creates and wrong for the ones this repository routes
- * itself. `products-apka-saathi` is a row whose page lives at
- * `/products/apka-saathi`; `home` is a row whose page lives at `/`. Both were
- * offered as "Open on the site" and both went nowhere.
+ * itself. `home` is a row whose page lives at `/`, and it was offered as "Open
+ * on the site" pointing at `/home`, which went nowhere.
  *
  * ---------------------------------------------------------------------------
- * **Why this is a list rather than a rule.** There is no derivation that gets
- * `/products/apka-saathi` out of `products-apka-saathi` without guessing —
- * replacing the first hyphen with a slash happens to work for this one slug and
- * would break the moment a page called `case-studies` were made a system page.
- * The address of a system page is decided by a folder, so the only honest
- * source is a list that a test compares against those folders.
+ * **Why this is a list rather than a rule.** It held two entries until the
+ * company's own product page was removed on 2026-09-11, and the second one is
+ * why a list is the right shape: a row slugged `products-apka-saathi` answered
+ * at `/products/apka-saathi`, and no derivation gets one out of the other
+ * without guessing — replacing the first hyphen with a slash happened to work
+ * for that slug and would break the moment a page called `case-studies` became
+ * a system page. The address of a system page is decided by a folder, so the
+ * only honest source is a list that a test compares against those folders.
  *
  * Everything not named here is a page the owner made, and its slug is its
  * address. `is_system` is what separates the two, so the caller passes it.
  */
 const SYSTEM_PATHS: Record<string, string> = {
   home: "/",
-  "products-apka-saathi": "/products/apka-saathi",
 };
 
 /** Exported so a test can check every one of these folders exists. */

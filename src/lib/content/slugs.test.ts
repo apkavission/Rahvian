@@ -168,11 +168,15 @@ describe("POLICED_PREFIXES", () => {
 describe("publicPathFor", () => {
   /*
     The bug this exists for: the admin's Pages screen offered "Open on the site"
-    for every row and built the address as `/<slug>`. For
-    `products-apka-saathi` — a row whose page is a folder at
-    `/products/apka-saathi` — that link went to a 404, in the admin, on a page
+    for every row and built the address as `/<slug>`. For a row whose page is a
+    folder somewhere else, that link went to a 404 — in the admin, on a page
     that was published and perfectly fine. Found by opening every screen in a
     browser, which no suite had ever done.
+
+    The example it was found on was `products-apka-saathi`, a row whose page sat
+    at `/products/apka-saathi`. That product was removed on 2026-09-11, so
+    `home` is the only mapping left — which makes the case below the one that
+    still has to hold: a slug is not an address.
   */
   it("sends a page the owner made to its own slug", () => {
     expect(publicPathFor({ slug: "our-story" })).toBe("/our-story");
@@ -183,7 +187,10 @@ describe("publicPathFor", () => {
   });
 
   it("sends a page this repository routes itself to where the folder is", () => {
-    expect(publicPathFor({ slug: "products-apka-saathi" })).toBe("/products/apka-saathi");
+    /* Not a real row: the mapping is exercised through the exported table so
+       this keeps testing the mechanism now that only `home` is mapped. */
+    expect(publicPathFor({ slug: "home", is_system: true })).toBe("/");
+    expect(Object.keys(SYSTEM_PAGE_PATHS)).toContain("home");
   });
 
   it("every address it names is a real folder", () => {

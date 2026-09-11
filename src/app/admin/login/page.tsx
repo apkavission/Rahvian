@@ -27,9 +27,12 @@ export default async function LoginPage() {
             the company name is printed underneath rather than beside it —
             the screen is correct either way. */}
         <div className="flex flex-col items-center gap-4">
+          {/* The mark, and "Admin" rather than the company name beside it: the
+              name is in the mark, and what this screen has to say is which
+              door this is. */}
           <BrandLogo height={40} decorative={false} />
           <p className="font-mono text-xs uppercase tracking-[0.2em] text-text-subtle">
-            {settings?.company_name ?? "Admin"}
+            Admin
           </p>
         </div>
 

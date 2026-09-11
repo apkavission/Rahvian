@@ -97,6 +97,11 @@ const OWNER_MENU: MenuKey[] = [
     off an admin with one tick.
   */
   "studio",
+
+  /* The letterhead, on the same terms as the studio and for the same reason:
+     it is grantable, and an owner starts with it because nobody holds
+     `super_admin` and a screen nobody can reach cannot be handed out. */
+  "letterhead",
 ];
 
 /**

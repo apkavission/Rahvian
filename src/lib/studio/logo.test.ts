@@ -43,7 +43,7 @@ describe("initials", () => {
        wrongness somebody notices and cannot explain. */
     expect(initials("The Smile Care Clinic")).toBe("SC");
     expect(initials("Kumar & Sons")).toBe("KS");
-    expect(initials("Apka Saathi Private Limited")).toBe("AS");
+    expect(initials("Rahvian Technologies Private Limited")).toBe("RT");
   });
 
   it("falls back rather than returning nothing", () => {

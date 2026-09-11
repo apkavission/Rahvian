@@ -7,7 +7,7 @@ import { SITE_URL } from "@/lib/env";
  * A card per service, so a shared service link previews with that service's
  * own name and summary rather than the generic site card.
  */
-export const alt = "Apka Vission service";
+export const alt = "Rahvian service";
 export const size = OG_SIZE;
 export const contentType = "image/png";
 

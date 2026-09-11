@@ -19,6 +19,15 @@ import { cn } from "@/lib/utils";
 interface Props {
   items: NavNode[];
   companyName: string;
+  /**
+   * Whether to print the name beside the mark.
+   *
+   * Off whenever there is a mark, on the owner's instruction: "jo side me
+   * rahvian likh rahe ho usko hata do". It stays as the fallback for a
+   * database with no logo in it, because a header with nothing in the corner
+   * is worse than one with a name in it.
+   */
+  showName: boolean;
   /** Pre-rendered on the server; null until a logo is configured. */
   logo?: ReactNode;
   ctaLabel: string;
@@ -44,6 +53,7 @@ function isScrolled() {
 export function HeaderNav({
   items,
   companyName,
+  showName,
   logo,
   ctaLabel,
   ctaHref,
@@ -108,15 +118,17 @@ export function HeaderNav({
         )}
       >
         <div className="container-page flex h-24 items-center gap-6 md:h-26">
-          {/* Mark and name together. The mark alone is not yet known enough to
-            identify the company, and the name alone wastes the mark. */}
+          {/* The mark, on its own. The name is printed beside it only when
+              there is no mark to print — the link's accessible name carries the
+              company either way, so a screen reader still says where this
+              goes. */}
           <Link
             href="/"
             aria-label={`${companyName} — home`}
             className="flex items-center gap-2.5 font-display text-base font-semibold tracking-tight"
           >
             {logo}
-            <span>{companyName}</span>
+            {showName && <span>{companyName}</span>}
           </Link>
 
           <nav

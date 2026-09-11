@@ -201,22 +201,37 @@ describe("readImageFacts", () => {
 });
 
 describe("the brand marks that are already committed", () => {
-  // Real files, read off disk. The fixtures above prove the offsets; these
-  // prove the reader survives what an actual export from a real tool looks
-  // like — which is where a header parser usually falls over.
-  it.each(["symbol-light.svg", "symbol-dark.svg", "logo-light.svg", "logo-dark.svg"])(
+  /*
+    Real files, read off disk. The fixtures above prove the offsets; these
+    prove the reader survives what an actual export from a real tool looks
+    like — which is where a header parser usually falls over.
+
+    **They were SVGs until 2026-09-11 and are PNGs now**, and that is worth
+    knowing rather than just seeing: the company's identity arrived as a
+    single raster presentation sheet, and `scripts/extract-brand.mjs` cuts
+    these out of it. When the designer sends vectors these become SVGs again
+    and this list says so.
+  */
+  it.each(["symbol-light.png", "symbol-dark.png", "logo-light.png", "logo-dark.png"])(
     "reads %s",
     (name) => {
       const bytes = readFileSync(resolve(process.cwd(), "public", "brand", name));
       const facts = readImageFacts(new Uint8Array(bytes));
 
-      expect(facts?.format).toBe("svg");
-      expect(facts?.vector).toBe(true);
-      // Every one of them was trimmed to its ink, so all four carry a viewBox.
+      expect(facts?.format).toBe("png");
+      expect(facts?.vector).toBe(false);
       expect(facts?.width).toBeGreaterThan(0);
       expect(facts?.height).toBeGreaterThan(0);
     },
   );
+
+  it("has a mark big enough to print and to scale down from", () => {
+    /* Cut from a 1254px sheet, so these are as large as they can honestly be.
+       Under about 400px the mark starts to soften in a letterhead, which is
+       the one place it is printed rather than displayed. */
+    const bytes = readFileSync(resolve(process.cwd(), "public", "brand", "symbol-light.png"));
+    expect(readImageFacts(new Uint8Array(bytes))?.width).toBeGreaterThanOrEqual(400);
+  });
 
   it("reads the committed apple touch icon as a 180 square", () => {
     const bytes = readFileSync(resolve(process.cwd(), "src", "app", "apple-icon.png"));

@@ -6,6 +6,7 @@
   "redirects",
   "roles",
   "leave_types",
+  "designations",
   "profiles",
   "technologies",
   "process_steps",
@@ -24,5 +25,7 @@
   "leads",
   "lead_notes",
   "lead_activity",
-  "form_submissions"
+  "form_submissions",
+  "letterhead_settings",
+  "letters"
 ]

@@ -187,14 +187,19 @@ describe("menuOverrides", () => {
 
       This list is written out rather than derived, and it is meant to fail
       when a screen is added that an editor does not get — `studio` landed on
-      2026-09-03 and this is where that showed up. The failure is the point: it
-      makes somebody confirm the new screen really is owner-default, rather than
-      the test quietly agreeing with whatever the code now does.
+      2026-09-03 and `letterhead` on 2026-09-11, and this is where both showed
+      up. The failure is the point: it makes somebody confirm the new screen
+      really is owner-default, rather than the test quietly agreeing with
+      whatever the code now does.
+
+      Confirmed for `letterhead`: it writes on company paper, carries the CIN
+      and the registered address, and is handed to whoever does that job. An
+      editor does not get it by default and can be given it.
 
       `users` and `estate` are absent because they are owner-only rather than
       grantable, and nothing that cannot be granted is ever stored.
     */
-    expect([...menu_denied].sort()).toEqual(["seo", "settings", "studio"]);
+    expect([...menu_denied].sort()).toEqual(["letterhead", "seo", "settings", "studio"]);
   });
 
   it("never writes a screen that cannot be granted", () => {

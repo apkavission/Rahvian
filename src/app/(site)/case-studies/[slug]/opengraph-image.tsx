@@ -3,7 +3,7 @@ import { OG_SIZE, OgCard, readLogoDataUri } from "@/lib/og-template";
 import { getCaseStudy } from "@/lib/queries/case-studies";
 import { SITE_URL } from "@/lib/env";
 
-export const alt = "Case study — Apka Vission";
+export const alt = "Case study — Rahvian";
 export const size = OG_SIZE;
 export const contentType = "image/png";
 

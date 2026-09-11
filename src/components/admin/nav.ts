@@ -24,7 +24,8 @@ export type MenuKey =
   | "seo"
   | "users"
   | "estate"
-  | "studio";
+  | "studio"
+  | "letterhead";
 
 export interface AdminNavItem {
   key: MenuKey;
@@ -129,6 +130,25 @@ export const ADMIN_NAV: AdminNavGroup[] = [
         label: "Logo & banners",
         href: "/admin/studio",
         icon: "palette",
+      },
+      {
+        /*
+          The letterhead, and the letters written on it.
+
+          In the Studio group because it is the same kind of thing — something
+          the company produces rather than something the website shows — and
+          its own key for the same reason the studio has one: writing a letter
+          on company paper is a job for whoever does it, which is not
+          necessarily whoever edits the blog.
+
+          It reads `site_settings`, which is the point: the registered address
+          and the CIN on the paper are the ones on the website, because they
+          are the same row.
+        */
+        key: "letterhead",
+        label: "Letterhead",
+        href: "/admin/letterhead",
+        icon: "file-signature",
       },
     ],
   },

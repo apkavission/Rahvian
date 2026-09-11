@@ -198,12 +198,12 @@ async function seedSiteSettings() {
     await db
       .from("site_settings")
       .update({
-        // Brand for the services business. The legal entity stays Apka Saathi
+        // Brand for the services business. The legal entity is Rahvian
         // Private Limited and is named separately wherever it matters —
         // contracts, invoices, the footer — so a visitor always knows who they
         // would actually be contracting with.
-        company_name: "Apka Vission",
-        legal_name: "Apka Saathi Private Limited",
+        company_name: "Rahvian",
+        legal_name: "Rahvian Technologies Private Limited",
         tagline: "Your Vision. We Make It Happen.",
         country: "India",
         default_mode: "system",
@@ -250,7 +250,7 @@ const BRAND_MEDIA = [
     filename: "symbol-light.svg",
     width: 1022,
     height: 566,
-    alt_text: "Apka Vission",
+    alt_text: "Rahvian",
     caption: "Symbol only — light backgrounds. Header, avatars, app icon.",
   },
   {
@@ -259,7 +259,7 @@ const BRAND_MEDIA = [
     filename: "symbol-dark.svg",
     width: 1022,
     height: 566,
-    alt_text: "Apka Vission",
+    alt_text: "Rahvian",
     caption: "Symbol only — dark backgrounds.",
   },
   {
@@ -268,7 +268,7 @@ const BRAND_MEDIA = [
     filename: "logo-light.svg",
     width: 1246,
     height: 764,
-    alt_text: "Apka Vission — Your Vision. We Make It Happen.",
+    alt_text: "Rahvian — Your Vision. We Make It Happen.",
     caption:
       "Full lockup with wordmark and tagline — light backgrounds. Needs roughly 380px of width before the tagline is legible, so it belongs in a hero, a document or a signature, never in the header.",
   },
@@ -278,7 +278,7 @@ const BRAND_MEDIA = [
     filename: "logo-dark.svg",
     width: 1246,
     height: 764,
-    alt_text: "Apka Vission — Your Vision. We Make It Happen.",
+    alt_text: "Rahvian — Your Vision. We Make It Happen.",
     caption: "Full lockup with wordmark and tagline — dark backgrounds.",
   },
 ];
@@ -366,10 +366,9 @@ async function seedNavigation() {
       sort_order: i + 1,
     })),
     { location: "header", label: "Portfolio", href: "/portfolio", sort_order: 2 },
-    { location: "header", label: "Our Product", href: "/products/apka-saathi", sort_order: 3 },
-    { location: "header", label: "Pricing", href: "/pricing", sort_order: 4 },
-    { location: "header", label: "Blog", href: "/blog", sort_order: 5 },
-    { location: "header", label: "Contact", href: "/contact", sort_order: 6 },
+    { location: "header", label: "Pricing", href: "/pricing", sort_order: 3 },
+    { location: "header", label: "Blog", href: "/blog", sort_order: 4 },
+    { location: "header", label: "Contact", href: "/contact", sort_order: 5 },
 
     ...SERVICE_LINKS.map(([label, href], i) => ({
       location: "footer_primary",
@@ -381,9 +380,8 @@ async function seedNavigation() {
     { location: "footer_secondary", label: "About Us", href: "/about", sort_order: 1 },
     { location: "footer_secondary", label: "Portfolio", href: "/portfolio", sort_order: 2 },
     { location: "footer_secondary", label: "Case Studies", href: "/case-studies", sort_order: 3 },
-    { location: "footer_secondary", label: "Our Product", href: "/products/apka-saathi", sort_order: 4 },
-    { location: "footer_secondary", label: "Blog", href: "/blog", sort_order: 5 },
-    { location: "footer_secondary", label: "Contact", href: "/contact", sort_order: 6 },
+    { location: "footer_secondary", label: "Blog", href: "/blog", sort_order: 4 },
+    { location: "footer_secondary", label: "Contact", href: "/contact", sort_order: 5 },
 
     { location: "footer_legal", label: "Privacy Policy", href: "/privacy-policy", sort_order: 1 },
     { location: "footer_legal", label: "Terms & Conditions", href: "/terms-and-conditions", sort_order: 2 },
@@ -631,7 +629,7 @@ const SERVICES = [
     approach: [
       "We automate a task with a measurable cost, not the most impressive one",
       "A human stays in the loop wherever a mistake would be expensive",
-      "Built on our own experience — Apka Saathi runs OCR and AI in production",
+      "Built on work we have shipped — OCR and AI running in production, not a demo",
     ],
     is_custom_quote: true,
     price_note: "Depends entirely on the process being automated.",
@@ -823,7 +821,7 @@ const HOME_SECTIONS = [
     type: "hero",
     background_variant: "default",
     content: {
-      eyebrow: "Apka Vission — by Apka Saathi Private Limited",
+      eyebrow: "Rahvian — by Rahvian Technologies Private Limited",
       heading: "Your Vision. We Make It Happen.",
       highlight: "We Make It Happen.",
       subheading:
@@ -917,35 +915,6 @@ const HOME_SECTIONS = [
           body: "Software rarely fails because of bugs. It fails from neglect. We stay available afterwards, and we put that in writing before you pay anything.",
         },
       ],
-    },
-  },
-  {
-    type: "product_promo",
-    background_variant: "muted",
-    content: {
-      eyebrow: "Our product",
-      heading: "We build for ourselves too",
-      description:
-        "Apka Saathi is our own software, running in production with real users. What we learned building it goes into what we build for you.",
-      productName: "Apka Saathi",
-      productTagline:
-        "An AI-powered personal assistant that reads your documents, remembers what expires when, and tells you before it does.",
-      features: [
-        {
-          title: "Document reminders",
-          body: "Insurance, licences, warranties and subscriptions tracked and surfaced before the deadline, not after it.",
-        },
-        {
-          title: "OCR extraction",
-          body: "Point a camera at a document and the dates, numbers and names are read straight out of it.",
-        },
-        {
-          title: "Built and maintained by us",
-          body: "Not a concept. A live product with users, updates and support — held to the same standard as client work.",
-        },
-      ],
-      href: "/products/apka-saathi",
-      linkLabel: "See how it works",
     },
   },
   {
@@ -1093,7 +1062,7 @@ const HOME_PAGE = {
   // A code route depends on this row, so deletion is blocked by trigger.
   is_system: true,
   schema_type: "WebPage",
-  seo_title: "Apka Vission — Website, App & Custom Software Development",
+  seo_title: "Rahvian — Website, App & Custom Software Development",
   seo_description:
     "We build websites, mobile apps, custom software and AI-powered solutions for businesses and startups. Written scope, fixed price, and you own the code.",
 };
@@ -1124,7 +1093,7 @@ const ABOUT_SECTIONS = [
       eyebrow: "About us",
       heading: "A small team, deliberately",
       description:
-        "Apka Vission is the services arm of Apka Saathi Private Limited. We build websites, applications and custom software for Indian businesses — with the scope written down first, a fixed price attached to it, and the source code handed over at the end.",
+        "Rahvian is the services arm of Rahvian Technologies Private Limited. We build websites, applications and custom software for Indian businesses — with the scope written down first, a fixed price attached to it, and the source code handed over at the end.",
       points: ["Written scope", "Fixed price", "You own the code"],
       ctaPrimary: { label: "Start Your Project", href: "/request-a-quote" },
       ctaSecondary: { label: "See what we do", href: "/services" },
@@ -1329,9 +1298,9 @@ const ABOUT_PAGE = {
   status: "published",
   is_system: true,
   schema_type: "AboutPage",
-  seo_title: "About Apka Vission",
+  seo_title: "About Rahvian",
   seo_description:
-    "Apka Vission is the services arm of Apka Saathi Private Limited — websites, applications and custom software built to a written scope, at a fixed price, with the source code handed over.",
+    "Rahvian is the services arm of Rahvian Technologies Private Limited — websites, applications and custom software built to a written scope, at a fixed price, with the source code handed over.",
 };
 
 const CONTACT_PAGE = {
@@ -1774,121 +1743,6 @@ const CASE_STUDIES_PAGE = {
 const seedCaseStudiesPage = () => seedPage(CASE_STUDIES_PAGE, CASE_STUDIES_SECTIONS);
 
 // ---------------------------------------------------------------------------
-// Apka Saathi — our own product
-//
-// The URL is /products/apka-saathi; the slug is one segment because `pages`
-// constrains it to one, deliberately, so a route in code and a row in the
-// database can never disagree about what a slash means.
-// ---------------------------------------------------------------------------
-
-const PRODUCT_SECTIONS = [
-  {
-    type: "page_intro",
-    background_variant: "default",
-    content: {
-      eyebrow: "Our product",
-      heading: "Apka Saathi",
-      description:
-        "An assistant for the paperwork nobody enjoys: insurance, licences, warranties and subscriptions, read out of the documents themselves and surfaced before they expire rather than after. We built it, we run it, and we maintain it — it is not client work and it is not a concept.",
-      points: ["Built in-house", "Maintained by us", "Not client work"],
-      ctaPrimary: { label: "Want something like this?", href: "/request-a-quote" },
-      ctaSecondary: { label: "See our services", href: "/services" },
-    },
-  },
-  {
-    type: "feature_grid",
-    background_variant: "muted",
-    content: {
-      eyebrow: "What it does",
-      heading: "Four things, done properly",
-      description:
-        "Deliberately narrow. A reminder app that also does notes, budgets and chat is four half-built products.",
-      columns: 4,
-      features: [
-        {
-          icon: "file-text",
-          title: "Document reminders",
-          body: "Insurance, licences, warranties and subscriptions tracked with their real expiry dates, and surfaced before the deadline instead of after it.",
-        },
-        {
-          icon: "search",
-          title: "Reads the document",
-          body: "Point a camera at a policy or a bill and the dates, numbers and names are extracted from it, so nothing depends on someone typing them in correctly.",
-        },
-        {
-          icon: "sparkles",
-          title: "Answers about your own papers",
-          body: "Ask what a document actually says or when something is due, and get an answer drawn from your own files rather than a general one.",
-        },
-        {
-          icon: "check-circle",
-          title: "A reminder engine you can trust",
-          body: "Notice periods rather than a single alarm on the day, because renewing an insurance policy is not a same-morning task.",
-        },
-      ],
-    },
-  },
-  {
-    type: "story",
-    background_variant: "default",
-    content: {
-      eyebrow: "How it works",
-      heading: "Add a document, forget about it",
-      description:
-        "The whole design goal is that the thing you have to remember is nothing.",
-      blocks: [
-        {
-          heading: "You add the document",
-          body: "Photograph it or upload the file. Nothing has to be typed in, and nothing has to be filed into the right folder first.",
-        },
-        {
-          heading: "It reads what matters out of it",
-          body: "Dates, policy and account numbers, names and amounts are extracted from the document itself. You confirm what it found, correct anything it got wrong, and that correction is what it stores.",
-        },
-        {
-          heading: "It tells you in time to act",
-          body: "Reminders are set from the notice period the document actually needs, not from a fixed number of days, so a renewal reaches you while there is still time to compare options.",
-        },
-      ],
-      aside: {
-        heading: "Why it is on a services website",
-        items: [
-          "It is the same standard of work we do for clients, on something we cannot walk away from",
-          "Everything we learned building it — OCR, reminders, background jobs — goes into what we build for you",
-          "It is labelled as ours everywhere it appears, and never presented as a client project",
-        ],
-      },
-    },
-  },
-  {
-    type: "cta_band",
-    background_variant: "contrast",
-    content: {
-      eyebrow: "For your business",
-      heading: "Want something like this, for your work?",
-      description:
-        "Document reading, reminders and automation are ordinary requirements in most businesses. Tell us the process you are trying to get off paper and we will scope it.",
-      ctaPrimary: { label: "Discuss Your Project", href: "/request-a-quote" },
-      showWhatsapp: true,
-      whatsappLabel: "Ask on WhatsApp",
-    },
-  },
-];
-
-const PRODUCT_PAGE = {
-  slug: "products-apka-saathi",
-  title: "Apka Saathi",
-  status: "published",
-  is_system: true,
-  schema_type: "SoftwareApplication",
-  seo_title: "Apka Saathi — Document Reminders & AI Assistant",
-  seo_description:
-    "Apka Saathi is our own software: it reads your documents, tracks what expires when, and reminds you in time to act. Built, run and maintained in-house.",
-};
-
-const seedProductPage = () => seedPage(PRODUCT_PAGE, PRODUCT_SECTIONS);
-
-// ---------------------------------------------------------------------------
 // Privacy policy
 //
 // Written from what the application actually does, clause by clause, and not
@@ -1918,7 +1772,7 @@ const PRIVACY_SECTIONS = [
     content: {
       updatedOn: "2026-08-27",
       intro: [
-        "This policy covers this website and the enquiry forms on it. Apka Vission is the operating brand of Apka Saathi Private Limited, and the company is the data fiduciary for everything described below.",
+        "This policy covers this website and the enquiry forms on it. Rahvian is the operating brand of Rahvian Technologies Private Limited, and the company is the data fiduciary for everything described below.",
         "Work delivered to a client is governed by that project's own agreement, which sets out how data inside the delivered system is handled. Where the two differ, the project agreement governs the project.",
       ],
       clauses: [
@@ -2075,7 +1929,7 @@ const TERMS_SECTIONS = [
     content: {
       updatedOn: "2026-08-27",
       intro: [
-        "These terms govern the use of this website and set out how we engage on work. Apka Vission is the operating brand of Apka Saathi Private Limited, and the company is the contracting party.",
+        "These terms govern the use of this website and set out how we engage on work. Rahvian is the operating brand of Rahvian Technologies Private Limited, and the company is the contracting party.",
         "Every project is governed by its own written proposal and scope. Where these terms and a signed proposal differ, the proposal governs that project — a website footer cannot bind an engagement, and pretending otherwise helps nobody.",
       ],
       clauses: [
@@ -2210,14 +2064,14 @@ async function seedSeoDefaults() {
       .from("seo_defaults")
       .update({
         // The column defaults name the legal entity, which is right on a
-        // contract and wrong in a browser tab. The public brand is Apka
-        // Vission; Apka Saathi Private Limited is named in the footer, the
+        // contract and wrong in a browser tab. The public brand is
+        // Rahvian; the full legal name is in the footer, the
         // legal pages and the Organization document below.
-        title_template: "%s | Apka Vission",
+        title_template: "%s | Rahvian",
         default_title:
-          "Apka Vission — Website, App & Custom Software Development",
+          "Rahvian — Website, App & Custom Software Development",
         default_description:
-          "Apka Vission builds modern websites, mobile apps, custom software and AI-powered digital solutions for businesses and startups. Your Vision. We Make It Happen.",
+          "Rahvian builds modern websites, mobile apps, custom software and AI-powered digital solutions for businesses and startups. Your Vision. We Make It Happen.",
         /*
           Deliberately empty.
 
@@ -2261,7 +2115,6 @@ await step("portfolio page + sections", seedPortfolioPage);
 await step("pricing page + sections", seedPricingPage);
 await step("blog page + sections", seedBlogPage);
 await step("case studies page + sections", seedCaseStudiesPage);
-await step("product page + sections", seedProductPage);
 await step("privacy policy + sections", seedPrivacyPage);
 await step("terms page + sections", seedTermsPage);
 
@@ -2307,7 +2160,6 @@ async function revalidate() {
     "page:pricing",
     "page:blog",
     "page:case-studies",
-    "page:products-apka-saathi",
     "page:privacy-policy",
     "page:terms-and-conditions",
   ];

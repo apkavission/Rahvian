@@ -13,7 +13,7 @@ import { SITE_URL } from "@/lib/env";
  * which is also the right scope — the admin and portal routes should not
  * preview as the marketing site.
  */
-export const alt = "Apka Vission — Your Vision. We Make It Happen.";
+export const alt = "Rahvian — Your Vision. We Make It Happen.";
 export const size = OG_SIZE;
 export const contentType = "image/png";
 

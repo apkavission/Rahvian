@@ -1,17 +1,23 @@
 import Link from "next/link";
 import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { BrandLogo } from "@/components/site/brand-logo";
+import { getBrandLogos } from "@/lib/queries/brand";
 import { getNavigation } from "@/lib/queries/navigation";
 import { getSiteSettings } from "@/lib/queries/site-settings";
 import { whatsappLink, whatsappTemplateOf } from "@/lib/whatsapp";
 
 export async function Footer() {
-  const [services, company, legal, settings] = await Promise.all([
+  const [services, company, legal, settings, logos] = await Promise.all([
     getNavigation("footer_primary"),
     getNavigation("footer_secondary"),
     getNavigation("footer_legal"),
     getSiteSettings(),
+    getBrandLogos(),
   ]);
+
+  /* Whether there is a mark to show instead of the name. Same cached query
+     `BrandLogo` uses, so asking costs nothing. */
+  const hasMark = Boolean(logos.light || logos.dark);
 
   const year = new Date().getFullYear();
 
@@ -32,9 +38,11 @@ export async function Footer() {
       <div className="container-page py-16">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
           <div className="space-y-4">
+            {/* The mark alone. The legal entity is still named two lines
+                down, which is what a visitor actually needs from a footer. */}
             <p className="flex items-center gap-3 font-display text-lg font-semibold tracking-tight">
               <BrandLogo height={72} />
-              <span>{settings?.company_name ?? "Apka Saathi"}</span>
+              {!hasMark && <span>{settings?.company_name ?? "Rahvian"}</span>}
             </p>
             <p className="max-w-xs text-sm leading-relaxed text-text-muted">
               {settings?.tagline ||
@@ -43,7 +51,7 @@ export async function Footer() {
             {/* The legal entity is named separately from the brand, so a
                 visitor can always tell who they would actually contract with. */}
             <p className="text-xs text-text-subtle">
-              A unit of {settings?.legal_name ?? "Apka Saathi Private Limited"}
+              A unit of {settings?.legal_name ?? "Rahvian Technologies Private Limited"}
             </p>
           </div>
 
@@ -89,7 +97,7 @@ export async function Footer() {
 
         <div className="mt-14 flex flex-col gap-4 border-t border-border pt-8 text-xs text-text-subtle sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {year} {settings?.legal_name ?? "Apka Saathi Private Limited"}. All
+            © {year} {settings?.legal_name ?? "Rahvian Technologies Private Limited"}. All
             rights reserved.
             {settings?.cin ? ` CIN: ${settings.cin}.` : ""}
             {settings?.gst ? ` GST: ${settings.gst}.` : ""}

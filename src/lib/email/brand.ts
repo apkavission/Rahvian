@@ -25,7 +25,7 @@ export async function getEmailBrand(): Promise<EmailBrand> {
   ].filter((line) => line.length > 0);
 
   return {
-    companyName: settings?.company_name ?? "Apka Vission",
+    companyName: settings?.company_name ?? "Rahvian",
     legalName: settings?.legal_name ?? null,
     email: settings?.email ?? null,
     phone: settings?.phone ?? null,

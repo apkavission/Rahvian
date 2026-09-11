@@ -58,7 +58,6 @@ const ROUTES = [
   "/pricing",
   "/contact",
   "/request-a-quote",
-  "/products/apka-saathi",
   "/privacy-policy",
   "/terms-and-conditions",
 ];

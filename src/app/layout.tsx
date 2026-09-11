@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono, Sora } from "next/font/google";
+import { JetBrains_Mono, Montserrat, Poppins } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { BusyProvider } from "@/components/brand/busy-overlay";
 import { ConfirmProvider } from "@/components/ui/confirm-dialog";
@@ -9,15 +9,30 @@ import { getSeoDefaults } from "@/lib/queries/seo";
 import { themeInitScript } from "@/lib/theme/constants";
 import "./globals.css";
 
-const sora = Sora({
+/*
+  The two faces the brand sheet names: "Montserrat / Poppins (Modern · Clean ·
+  Professional)" for the name, "Poppins Medium / Regular (Clean & Readable)"
+  for everything else.
+
+  The wordmark in the logo is set in Montserrat, so the headings on the site
+  being set in anything else is the small wrongness that makes a page look
+  assembled rather than designed — it was Sora and Inter until the identity
+  arrived, which were chosen before there was one to follow.
+
+  Weights are named rather than taken as a variable range: Poppins is used at
+  400 and 500 for prose and 600 for a strong label, and shipping nine weights
+  of a geometric face to save typing three is a slower page for no reason.
+*/
+const montserrat = Montserrat({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["600", "700", "800"],
   variable: "--font-heading",
   display: "swap",
 });
 
-const inter = Inter({
+const poppins = Poppins({
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
   variable: "--font-body",
   display: "swap",
 });
@@ -34,7 +49,7 @@ const jetbrainsMono = JetBrains_Mono({
  * Deliberately declares no `title.template`. The template string is admin
  * content and is applied inside `buildMetadata`, which every route uses. A
  * template here as well would apply twice, and `/services` would render as
- * "Software Development Services | Apka Saathi Private Limited | Apka Vission".
+ * "Software Development Services | Rahvian Technologies Private Limited | Rahvian".
  *
  * What this does own is `metadataBase` — the single value every canonical URL,
  * sitemap entry and Open Graph tag is resolved against.
@@ -44,7 +59,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     metadataBase: new URL(SITE_URL),
-    title: defaults?.default_title ?? "Apka Vission",
+    title: defaults?.default_title ?? "Rahvian",
     description: defaults?.default_description ?? undefined,
     robots: defaults?.site_noindex
       ? { index: false, follow: false }
@@ -74,7 +89,7 @@ export default async function RootLayout({
          still scrolls smoothly; that is what the CSS rule was added for and it
          is untouched. */
       data-scroll-behavior="smooth"
-      className={`${sora.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+      className={`${montserrat.variable} ${poppins.variable} ${jetbrainsMono.variable}`}
     >
       <head>
         {/*
@@ -100,13 +115,13 @@ export default async function RootLayout({
         <link
           rel="preload"
           as="image"
-          href="/brand/symbol-light.svg"
+          href="/brand/symbol-light.png"
           media="(prefers-color-scheme: light)"
         />
         <link
           rel="preload"
           as="image"
-          href="/brand/symbol-dark.svg"
+          href="/brand/symbol-dark.png"
           media="(prefers-color-scheme: dark)"
         />
       </head>

@@ -26,7 +26,7 @@ import { AdditiveBlending, BufferAttribute, BufferGeometry } from "three";
 /**
  * Loader scene — a gaze, and the arrow it follows.
  *
- * The brand is called Vission and its mark is a rising arrow, so the wait
+ * The mark is a rising arrow, so the wait
  * animates the two things that name means: someone looking, and a direction.
  *
  * An elliptical field of points reads as an iris. It drifts on a slow path,

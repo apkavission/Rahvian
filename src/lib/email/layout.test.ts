@@ -15,12 +15,12 @@ import { escapeHtml, renderEmail, type EmailBrand } from "./layout";
  */
 
 const BRAND: EmailBrand = {
-  companyName: "Apka Vission",
-  legalName: "Apka Saathi Private Limited",
-  email: "hello@apkavission.com",
+  companyName: "Rahvian",
+  legalName: "Rahvian Technologies Private Limited",
+  email: "hello@rahvian.com",
   phone: "+91 98765 43210",
   addressLines: ["12 Main Road", "Ranchi 834001"],
-  siteUrl: "https://apkavission.com",
+  siteUrl: "https://rahvian.com",
 };
 
 const base = {
@@ -136,9 +136,9 @@ describe("renderEmail", () => {
   it("says who sent it", () => {
     const html = renderEmail(base);
 
-    expect(html).toContain("Apka Vission");
-    expect(html).toContain("Apka Saathi Private Limited");
-    expect(html).toContain("hello@apkavission.com");
+    expect(html).toContain("Rahvian");
+    expect(html).toContain("Rahvian Technologies Private Limited");
+    expect(html).toContain("hello@rahvian.com");
     expect(html).toContain("Ranchi 834001");
   });
 

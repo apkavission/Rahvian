@@ -1,5 +1,5 @@
 {
-  "name": "apkasaathi-services",
+  "name": "rahvian-services",
   "version": "0.1.0",
   "private": true,
   "description": "Apka Saathi Private Limited — company services website, admin panel and client portal.",
@@ -31,7 +31,8 @@
     "crawl": "node scripts/crawl.mjs",
     "check:copies": "node scripts/check-copies.mjs",
     "check:speed": "node scripts/check-speed.mjs",
-    "check:loaders": "node scripts/check-loaders.mjs"
+    "check:loaders": "node scripts/check-loaders.mjs",
+    "check:letterhead": "node scripts/check-letterhead.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.941.0",

@@ -11,7 +11,7 @@ import { SITE_URL } from "@/lib/env";
  * parent segment's image, only one in its own segment. Every route here goes
  * through `buildMetadata`, so every route that wants a card declares one.
  */
-export const alt = "Services — Apka Vission";
+export const alt = "Services — Rahvian";
 export const size = OG_SIZE;
 export const contentType = "image/png";
 

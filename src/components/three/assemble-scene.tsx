@@ -285,7 +285,7 @@ function Fragments({
 export default function AssembleScene({
   quality = 1,
   /** The word the fragments resolve into. One entry per line. */
-  lines = ["APKA", "VISSION"],
+  lines = ["RAHVIAN", "TECHNOLOGIES"],
 }: {
   quality?: number;
   lines?: string[];

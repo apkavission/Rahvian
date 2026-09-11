@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
  * The brand loader.
  *
  * Every wait in the estate looks like this one: the symbol resolves in the
- * centre while the two halves of the name close in on it — "Apka" from the
- * left, "Vission" from the right — and a thin sweep underneath keeps a long
+ * centre while the two halves of the name close in on it — "Rahvian" from the
+ * left, "Technologies" from the right — and a thin sweep underneath keeps a long
  * wait from looking frozen. Route transitions, error and not-found screens,
  * and the admin and the demos when they exist all use it, because a wait is
  * one of the few moments a visitor is definitely looking at the screen.
@@ -46,7 +46,7 @@ const MARK_SIZE: Record<BrandLoaderSize, string> = {
 
 /*
   The name grows with the viewport rather than with the size prop alone. A
-  320px phone still has to fit "Apka", the mark and "Vission" on one line —
+  320px phone still has to fit "Rahvian", the mark and "Technologies" on one
   wrapping the lockup would break the very gesture it exists for.
 */
 const WORD_SIZE: Record<BrandLoaderSize, string> = {
@@ -96,7 +96,7 @@ export function BrandLoader({
   label = "Loading",
   showLabel = false,
   mark,
-  words = ["Apka", "Vission"],
+  words = ["Rahvian", "Technologies"],
   scene,
   children,
   className,
@@ -140,7 +140,7 @@ export function BrandLoader({
         The scene is `vision`: an iris that drifts, blinks, and then draws the
         mark's arrow through itself. The hero's `assemble` was tried here
         first and was wrong — it renders the words itself, so a second, half-
-        formed "Apka Vission" sat behind the real one and read as a rendering
+        formed "Rahvian" sat behind the real one and read as a rendering
         fault rather than as depth.
 
         It costs nothing before it appears. `SceneMount` loads three.js after
@@ -263,14 +263,14 @@ function DefaultMark({ className }: { className?: string }) {
           of known size served from our own origin; there is nothing for the
           optimiser to do, and this must never be deferred. */}
       <img
-        src="/brand/symbol-light.svg"
+        src="/brand/symbol-light.png"
         alt=""
         aria-hidden
         className={cn("theme-light-only", className)}
       />
       {/* eslint-disable-next-line @next/next/no-img-element -- see above */}
       <img
-        src="/brand/symbol-dark.svg"
+        src="/brand/symbol-dark.png"
         alt=""
         aria-hidden
         className={cn("theme-dark-only", className)}

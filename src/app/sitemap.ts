@@ -43,11 +43,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly" as const,
       priority: 0.7,
     })),
-    {
-      url: `${SITE_URL}/products/apka-saathi`,
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-    },
     { url: `${SITE_URL}/case-studies`, changeFrequency: "monthly" as const, priority: 0.7 },
     ...caseStudies.map((study) => ({
       url: `${SITE_URL}/case-studies/${study.slug}`,

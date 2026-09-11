@@ -273,6 +273,36 @@ export type Database = {
           }
         ]
       }
+      designations: {
+        Row: {
+          key: string
+          label: string
+          family: string
+          sort_order: number
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          key: string
+          label: string
+          family?: string
+          sort_order?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          key?: string
+          label?: string
+          family?: string
+          sort_order?: number
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_templates: {
         Row: {
           key: string
@@ -608,6 +638,98 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      letterhead_settings: {
+        Row: {
+          id: number
+          layout: string
+          accent: string
+          logo_scale: number
+          footer_note: string
+          updated_at: string
+          fields: Json
+        }
+        Insert: {
+          id?: number
+          layout?: string
+          accent?: string
+          logo_scale?: number
+          footer_note?: string
+          updated_at?: string
+          fields: Json
+        }
+        Update: {
+          id?: number
+          layout?: string
+          accent?: string
+          logo_scale?: number
+          footer_note?: string
+          updated_at?: string
+          fields?: Json
+        }
+        Relationships: []
+      }
+      letters: {
+        Row: {
+          id: string
+          title: string
+          recipient: string
+          reference: string
+          letter_date: string | null
+          subject: string
+          salutation: string
+          body_html: string
+          signatory_name: string
+          signatory_role: string
+          layout: string | null
+          status: string
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          recipient?: string
+          reference?: string
+          letter_date?: string | null
+          subject?: string
+          salutation?: string
+          body_html?: string
+          signatory_name?: string
+          signatory_role?: string
+          layout?: string | null
+          status?: string
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          recipient?: string
+          reference?: string
+          letter_date?: string | null
+          subject?: string
+          salutation?: string
+          body_html?: string
+          signatory_name?: string
+          signatory_role?: string
+          layout?: string | null
+          status?: string
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "letters_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       media: {
         Row: {

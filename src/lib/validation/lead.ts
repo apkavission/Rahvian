@@ -38,7 +38,7 @@ export const TIMELINES = [
  * were on screen when they were submitted.
  */
 export const CONSENT_TEXT =
-  "I agree that Apka Vission may use the details above to contact me about " +
+  "I agree that Rahvian may use the details above to contact me about " +
   "this enquiry. I understand I can ask for my details to be corrected or " +
   "deleted at any time.";
 

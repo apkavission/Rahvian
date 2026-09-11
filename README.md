@@ -1,7 +1,7 @@
-# Apka Vission — company website
+# Rahvian — company website
 
 The services site, admin panel and client portal for **Apka Saathi Private
-Limited**, trading as Apka Vission.
+Limited**, trading as Rahvian.
 
 Everything on the public site is database-driven and editable from the admin
 panel — the copy, the images, the menus, the pricing, the SEO and the switch

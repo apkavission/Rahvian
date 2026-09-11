@@ -3,7 +3,7 @@ import { OG_SIZE, OgCard, readLogoDataUri } from "@/lib/og-template";
 import { getBlogPost } from "@/lib/queries/blog";
 import { SITE_URL } from "@/lib/env";
 
-export const alt = "Blog — Apka Vission";
+export const alt = "Blog — Rahvian";
 export const size = OG_SIZE;
 export const contentType = "image/png";
 

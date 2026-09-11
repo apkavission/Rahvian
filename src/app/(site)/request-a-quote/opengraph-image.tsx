@@ -9,7 +9,7 @@ import { SITE_URL } from "@/lib/env";
  * `openGraph` in `generateMetadata` stops a parent segment's image from
  * applying.
  */
-export const alt = "Request a quote — Apka Vission";
+export const alt = "Request a quote — Rahvian";
 export const size = OG_SIZE;
 export const contentType = "image/png";
 

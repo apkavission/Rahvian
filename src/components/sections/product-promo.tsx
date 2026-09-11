@@ -18,7 +18,7 @@ export interface ProductPromoContent {
  * Our own product.
  *
  * Labelled unambiguously as ours throughout — the brief is explicit that
- * Apka Saathi must never read as client work. It earns its place on a services
+ * A product of our own must never read as client work. It earns its place on a services
  * homepage for a specific reason: a company that ships and maintains its own
  * production software is a different proposition from one that only bills
  * hours, and this is the section that makes that argument.

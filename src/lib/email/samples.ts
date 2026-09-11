@@ -88,14 +88,14 @@ export async function emailSamples(): Promise<EmailSample[]> {
         preferredContact: "whatsapp",
         sourcePage: "/services/websites",
       },
-      brand.email ?? "hello@apkavission.com",
+      brand.email ?? "hello@rahvian.com",
       brand,
     ),
 
     buildAccountCredentials(
       {
         name: "Rahul Kumar",
-        email: "rahul@apkavission.com",
+        email: "rahul@rahvian.com",
         password: "wander-lentil-42",
         roleLabel: "Editor",
         reason: "created",
@@ -106,7 +106,7 @@ export async function emailSamples(): Promise<EmailSample[]> {
     buildAccountCredentials(
       {
         name: "Rahul Kumar",
-        email: "rahul@apkavission.com",
+        email: "rahul@rahvian.com",
         password: "copper-window-19",
         roleLabel: "Editor",
         reason: "reset",

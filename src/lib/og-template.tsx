@@ -160,7 +160,7 @@ export function OgCard({
         }}
       >
         <div style={{ display: "flex", fontSize: 24, color: COLOR.textMuted }}>
-          Apka Saathi Private Limited
+          Rahvian Technologies Private Limited
         </div>
         {footer ? (
           <div style={{ display: "flex", fontSize: 24, color: COLOR.accent }}>
