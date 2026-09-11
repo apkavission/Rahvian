@@ -54,7 +54,7 @@ button on the site** — there are three, and with no number stored none of them
 is rendered. All of it currently reads as absent, correctly, but as absent.
 
 Once the number is in, a WhatsApp button opens the chat **with the first
-sentence already written** — "Hi, I'd like to talk about Apka Saathi" on the
+sentence already written** — "Hi, I'd like to talk about Rahvian" on the
 product page, a generic opener elsewhere. The wording of each one is editable on
 the section in the page builder.
 
@@ -275,7 +275,7 @@ These have no deadline but they block particular things.
 | 1 | Which domain? | Everything in launch | A placeholder, `apkasaathitech.com`, in one constant |
 | 2 | Logo and brand colours — keep the handshake mark and the teal? | Nothing; it is already built and wired in | The current mark and teal stay |
 | 3 | Vercel Hobby now, Pro later? | Nothing today | Hobby now, move to Pro when revenue starts. Note that Hobby's terms are non-commercial |
-| 4 | Name on the git commits? | Nothing today | `Apka Saathi`, already configured |
+| 4 | Name on the git commits? | Nothing today | `Rahvian`, already configured |
 | 5 | Working hours and office location | A small block on the contact page | The block is left out |
 
 ---

@@ -19,7 +19,7 @@
 >    look like, and saying what to do instead.
 >
 > This is the owner's standing instruction and it binds the company website,
-> the Apka Saathi task tracker, and every demo site.
+> the Rahvian task tracker, and every demo site.
 
 **Status: locked. Owner's instruction, 2026-08-27.**
 **Applies to every project in the estate** — the company website, the Apka
@@ -231,7 +231,7 @@ The precise commitment is:
    portfolio, case studies, blog, team, pricing, settings and the page builder,
    plus the logo and the social-preview images. **This is what the media library
    has to be built to do**; it is not a polish pass afterwards.
-2. **Apka Saathi task tracker** — avatars, attachments, any project thumbnail.
+2. **Rahvian task tracker** — avatars, attachments, any project thumbnail.
 3. **Every demo site** — the demos are the shop window. A cropped hero on a demo
    is a cropped hero a client sees before they ever talk to us.
 

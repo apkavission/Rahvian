@@ -1,4 +1,4 @@
-# Progress — Apka Saathi Company Website
+# Progress — Rahvian Company Website
 
 **Last updated:** 2026-08-28
 **Current block:** A — Company website
@@ -587,13 +587,13 @@ panel (Phase 3), the super admin and the client portal.
 
 Owner's instruction, 2026-08-28:
 
-> Jab ye Apka Vission ka service wala ho jayega to bata dena ki sab kuch ho gaya
+> Jab ye Rahvian ka service wala ho jayega to bata dena ki sab kuch ho gaya
 > hai — uske baad tum testing karoge browser pe, local me. Aur jab task tracker
 > aur demos ka kaam chalu hoga tab docs me update karna ki end me kitna
 > percentage kaam hua aur kitna baaki, wo show hoga. Same — sab ho jayega poora
 > to completed karke uske baad testing karoge browser me.
 
-**This binds all three projects**: this company website, the Apka Saathi task
+**This binds all three projects**: this company website, the Rahvian task
 tracker, and the fifteen demo sites.
 
 ### The order, and it does not move
@@ -795,7 +795,7 @@ same `replace(/\D/g, "")`.
 
 One builder now, in `lib/whatsapp.ts`, and the message comes with it. The
 subject is merged through the section renderer the same way `background` already
-is, so `/products/apka-saathi` opens *"Hi, I'd like to talk about Apka Saathi."*
+is, so `/products/apka-saathi` opens *"Hi, I'd like to talk about Rahvian."*
 and everything else opens a generic line. **The page title is deliberately not
 used as the subject everywhere** — "I'd like to talk about Privacy policy" reads
 badly — so it is passed only where it names something a person would discuss,
@@ -871,7 +871,7 @@ exactly where fabrication creeps in:
 - **Portfolio has two entries and both are ours** — the product and this
   website. No client work was made up. The type field already distinguishes
   `client` / `demo` / `inhouse` / `previous`, and both are `inhouse`.
-- **Apka Saathi's write-up came from its own product page**, not from
+- **Rahvian's write-up came from its own product page**, not from
   imagination — document reading, notice-period reminders, questions answered
   from your own files.
 - **The case study's numbers are real and countable** — the test counts, the
@@ -3192,7 +3192,7 @@ for as long as the wait lasts. Behind the lockup, a new WebGL scene.
   decoration. One `Points` object holding the iris and the arrow together, so
   the whole scene is one draw call and nothing is allocated in the frame loop.
 - The hero's `assemble` scene was tried behind the lockup first and was wrong:
-  it renders the words itself, so a second, half-formed "Apka Vission" sat
+  it renders the words itself, so a second, half-formed "Rahvian" sat
   behind the real one and read as a rendering fault. The scene is also scoped
   to the lockup rather than to the overlay — centred on the container it
   drifted down over the copy on the not-found and error screens.
@@ -3323,7 +3323,7 @@ email.
 - Supports label/value rows, quoted free-text blocks, numbered steps, one CTA
   button (background on the `<td>`, because Outlook ignores padding on inline
   elements) and a contact link row.
-- Footer carries the trading name, "A unit of Apka Saathi Private Limited", the
+- Footer carries the trading name, "A unit of Rahvian Technologies Private Limited", the
   address and the contact details, all read from `site_settings`.
 
 **Two emails per enquiry, sent concurrently:**
@@ -3483,7 +3483,7 @@ space-free root such as `C:\nvm` would fix version switching.
   `test`, `test:e2e`, `format`.
 - **Verified:** `tsc --noEmit` passes clean, `npm run build` succeeds
   (compiled in 1.6s, 4 static pages generated).
-- `git init` done with **repo-local** author config (`Apka Saathi` /
+- `git init` done with **repo-local** author config (`Rahvian` /
   `apkavission@gmail.com`). **Nothing committed yet** — owner asked to hold.
 - Tooling ignore patterns moved out of the repo's `.gitignore` into a **global**
   ignore file at `~/.gitignore_global`, registered via `core.excludesFile`. The
@@ -3553,7 +3553,7 @@ Live verification run against the deployed database — every check passed:
 
 | Check | Result |
 |---|---|
-| Seeded singletons readable by `service_role` | ✅ `Apka Saathi Private Limited` |
+| Seeded singletons readable by `service_role` | ✅ `Rahvian Technologies Private Limited` |
 | Demo project carrying a client name | ✅ **rejected**, `23514` |
 | Client project with no client name | ✅ **rejected** |
 | Testimonial published without consent | ✅ **rejected** |
@@ -3576,7 +3576,7 @@ changes nothing downstream. **Run it after every migration.**
 **End-to-end proven.** `src/lib/queries/site-settings.ts` is the first cached
 query; the home page renders from it. The production build prerenders `/` as
 **static**, and the emitted HTML contains live database values
-(`default mode "system"`, `3D on`, `Apka Saathi Private Limited`).
+(`default mode "system"`, `3D on`, `Rahvian Technologies Private Limited`).
 
 That single result validates the central architectural bet: content is fully
 database-driven *and* the page is statically served, with no query on the
@@ -3645,10 +3645,10 @@ select (`pages.select("*, page_sections(*)")`) resolves to `SelectQueryError`
 instead of the joined shape. Same-schema targets only; cross-schema references
 are skipped rather than emitted as relations to tables the types do not carry.
 
-### Brand set — Apka Vission
+### Brand set — Rahvian
 
-**Name:** Apka Vission · **Hook line:** *Your Vision. We Make It Happen.*
-**Legal entity:** Apka Saathi Private Limited (unchanged, named separately in the
+**Name:** Rahvian · **Hook line:** *Your Vision. We Make It Happen.*
+**Legal entity:** Rahvian Technologies Private Limited (unchanged, named separately in the
 footer and in `Organization` schema).
 
 The doubled S was kept for a concrete reason, not a stylistic one:
@@ -3664,7 +3664,7 @@ Seeded through `site_settings.company_name`, the hero section content and
 
 | Scene | Where | What it is |
 |---|---|---|
-| `assemble` | Hero | Scattered fragments converge into the words **APKA VISSION**, hold while a band of light sweeps through the letterforms, then disperse. 8-second cycle. |
+| `assemble` | Hero | Scattered fragments converge into the words **RAHVIAN**, hold while a band of light sweeps through the letterforms, then disperse. 8-second cycle. |
 | `lattice` | Closing CTA | A node-and-edge sphere with a pulse travelling through it |
 | `wave` | available, unused | A rippling point field |
 
@@ -3871,7 +3871,7 @@ Not blocking development. Fallbacks are in place for all of them.
 
 - Company domain
 - Logo (light + dark), brand colours
-- Apka Saathi app screenshots (5–8) and feature list
+- Rahvian app screenshots (5–8) and feature list
 - Founder's real project experience and technologies — **no invention; section stays
   hidden until real content exists**
 - Phone, WhatsApp number, email, registered address, CIN, GST
@@ -3956,7 +3956,7 @@ The SEO layer:
 - **The root layout no longer declares `title.template`.** The template string
   is database content and `buildMetadata` applies it; a template at the root as
   well applied it twice, and `/services` would have rendered as
-  `Software Development Services | Apka Saathi Private Limited | Apka Vission`.
+  `Software Development Services | Rahvian Technologies Private Limited | Rahvian`.
 - `seo_defaults` reseeded to the public brand. The column defaults named the
   legal entity — right on a contract, wrong in a browser tab.
 - `robots.ts` and `sitemap.ts` both read `site_noindex`, so going live is one

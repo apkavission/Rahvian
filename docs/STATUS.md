@@ -1,5 +1,10 @@
 # Where everything stands
 
+> **What is still to do now lives in [../PENDING.md](../PENDING.md)**, updated
+> 2026-09-11 — start there. The most urgent item on it is that five of the six
+> demos render no content at all, which every check in this file was green
+> through.
+
 **One page, updated 2026-08-31.** How much of each project is built, how much of
 it has actually been tested, and what is left. Read this first; the reasoning
 behind any line of it is in [estate-status.md](estate-status.md).

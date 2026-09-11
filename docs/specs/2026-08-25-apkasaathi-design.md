@@ -1,4 +1,4 @@
-# Apka Saathi Private Limited — Company Website & Demo Portfolio
+# Rahvian Technologies Private Limited — Company Website & Demo Portfolio
 ## Design Specification
 
 - **Date:** 2026-08-25
@@ -12,7 +12,7 @@
 
 ### 1.1 What we are building
 
-A company website that presents Apka Saathi Private Limited as a software services
+A company website that presents Rahvian Technologies Private Limited as a software services
 company, generates business enquiries, and demonstrates capability through five
 self-built demo applications. Everything visible on every site — text, images, logo,
 navigation, colours, section order — is editable from an admin panel without
@@ -744,7 +744,7 @@ that lets us be ambitious without lying about performance.
    drifting particle field, and light that responds to cursor position. Distorted
    material that reacts subtly to pointer velocity. Two full palettes so it reads
    correctly in both themes.
-2. **Product showcase.** A 3D phone model displaying the Apka Saathi app, rotating as
+2. **Product showcase.** A 3D phone model displaying the Rahvian app, rotating as
    the section scrolls, with screens swapping at scroll checkpoints.
 3. **Process section.** A scroll-linked scene where geometry assembles step by step as
    the reader advances through Discovery to Support. The 3D explains the content, which
@@ -806,7 +806,7 @@ The company site is single-tenant. It has no variants.
 /case-studies                         Case studies index
 /case-studies/[slug]                  Individual case study
 /products                             Products index
-/products/apka-saathi                 Apka Saathi product page
+/products/apka-saathi                 Rahvian product page
 /demos                                Demo projects index
 /demos/[slug]                         Demo detail, variant list, live links
 /pricing                              Pricing and engagement models
@@ -873,7 +873,7 @@ seed data we ship; the owner can change any of it afterwards.
 | 2 | `what_we_build_bento` | Bento grid, five tiles of varying size: Business Websites, Web Applications, Mobile Apps, Custom Software, AI Automation. Each tile tilts toward the cursor. |
 | 3 | `services_grid` | Live from `services`; seven cards with icon, name, one line, link. |
 | 4 | `why_choose_us` | Four points grounded in fact: custom development not templates, direct access to the developer, built for maintenance, honest scoping. No numbers we cannot support. |
-| 5 | `product_showcase_3d` | Apka Saathi, labelled "Our Product". 3D phone rotating through screens on scroll. Three key features. Link to the product page. |
+| 5 | `product_showcase_3d` | Rahvian, labelled "Our Product". 3D phone rotating through screens on scroll. Three key features. Link to the product page. |
 | 6 | `demo_projects` | Five demo cards from `projects` where type is `demo`, each showing its variant count — "3 industry versions". |
 | 7 | `founder_experience` | Positioning paragraph plus technology chips. Labelled "Previous Professional Experience". |
 | 8 | `process_scroll` | Sticky 3D scene assembling through Discovery, Proposal, Design, Development, Testing, Launch, Support. |
@@ -883,7 +883,7 @@ seed data we ship; the owner can change any of it afterwards.
 
 ### 11.2 About
 
-Company introduction, what Apka Saathi Private Limited does, how we work, our
+Company introduction, what Rahvian Technologies Private Limited does, how we work, our
 principles, founder and team, technologies, CTA. No invented founding milestones, no
 employee counts we cannot support.
 
@@ -911,7 +911,7 @@ Transitions. Detail pages show problem, solution, features, technologies, screen
 and CTA. Demo items additionally show a persistent "Self-developed Demo Project" banner
 and links to each live variant.
 
-### 11.6 Products / Apka Saathi
+### 11.6 Products / Rahvian
 
 Labelled "Our Product" throughout. 3D device showcase, feature grid (document
 reminders, OCR extraction, AI assistance, reminder engine), how it works, subscription
@@ -1496,7 +1496,7 @@ Twitter card and robots directives. Dynamic OG images generated per route with
 | `BreadcrumbList` | Every page below the root |
 | `Article` | Each blog post |
 | `FAQPage` | Any page carrying a `faq` section |
-| `SoftwareApplication` | Apka Saathi product page |
+| `SoftwareApplication` | Rahvian product page |
 | `CreativeWork` | Portfolio and demo detail pages |
 | `MedicalBusiness` / `Dentist` | Clinic demo, chosen per variant |
 | `Restaurant` with `Menu` | Restaurant demo |
@@ -1536,7 +1536,7 @@ engines penalise.
 Instead:
 
 - Every demo carries a persistent, visible banner identifying it as a demo built by
-  Apka Saathi Private Limited, linking back to the company site.
+  Rahvian Technologies Private Limited, linking back to the company site.
 - Demo sites are `noindex, follow` by default, controlled per variant from the super
   admin so the decision can be revisited.
 - The company site hosts the pages that target real search demand:
@@ -1856,7 +1856,7 @@ Needed before phase 4 (launch), not before phase 0 (development start).
 | Company domain | Phase 4 | Single config constant, `apkasaathitech.com` placeholder |
 | Logo and brand colours, light and dark | Phase 1 | Neutral wordmark, provisional accent for each mode |
 | Supabase, Vercel, Cloudflare, Resend accounts | Phase 0 | Local Supabase via CLI |
-| Apka Saathi screenshots and feature list | Phase 1 | Placeholder frames |
+| Rahvian screenshots and feature list | Phase 1 | Placeholder frames |
 | Founder's real project experience and technologies | Phase 1 | Section hidden rather than filled with invention |
 | Phone, WhatsApp, email, registered address, CIN, GST | Phase 1 | Placeholders flagged in the admin dashboard |
 | Working hours and office location | Phase 1 | Section hidden |
@@ -2289,13 +2289,13 @@ This inbox is also the one the super admin surfaces across all six applications
 
 ---
 
-## 26. Brand — Apka Vission
+## 26. Brand — Rahvian
 
-**Brand name:** Apka Vission
+**Brand name:** Rahvian
 **Hook line:** *Your Vision. We Make It Happen.*
-**Legal entity:** Apka Saathi Private Limited
+**Legal entity:** Rahvian Technologies Private Limited
 
-The services business trades as **Apka Vission**. The legal entity is unchanged
+The services business trades as **Rahvian**. The legal entity is unchanged
 and is named explicitly wherever it matters — the footer, contracts, invoices,
 `Organization` schema — so a visitor can always tell who they would actually be
 contracting with. `site_settings` already separated `company_name` from
@@ -2323,9 +2323,9 @@ a decision that can be taken away.
 
 ### 26.2 Family
 
-- **Apka Saathi** — the product, an AI personal assistant
-- **Apka Vission** — the services business
-- **Apka Saathi Private Limited** — the company that owns both
+- **Rahvian** — the product, an AI personal assistant
+- **Rahvian** — the services business
+- **Rahvian Technologies Private Limited** — the company that owns both
 
 The shared prefix is an asset: the two brands reinforce each other rather than
 competing for recognition.

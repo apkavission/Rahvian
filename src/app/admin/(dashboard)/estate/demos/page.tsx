@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Eye, Globe, Lock, X } from "lucide-react";
+import { ExternalLink, Eye, Globe, Lock, X } from "lucide-react";
 import { Pagination } from "@/components/admin/pagination";
 import { requireMenu } from "@/lib/auth/session";
 import { PAGE_SIZE, requestedPage, resolve, type Query } from "@/lib/pagination";
@@ -164,6 +164,46 @@ export default async function DemoAccessPage({
                   ? "No live links"
                   : `${business.live_links} live ${business.live_links === 1 ? "link" : "links"}`}
               </p>
+
+              {/*
+                The two doors into this demo, from the screen that decides who
+                may open it.
+
+                The owner asked for the second one: *"mene ek link banaya kisi
+                demo ka to us demo ka admin chalna chaiye"*. It always did —
+                what was missing was a way to get there. This screen already
+                knows every demo's address, so not offering its panel was the
+                one screen in the estate that talked about a demo and could not
+                open the back of it.
+
+                **The panel is not behind the share link**, and that is worth
+                knowing rather than discovering: a share link admits a visitor
+                to one business's *public* pages. The panel answers to the
+                account, so it opens for a colleague with that demo in their
+                access list and for nobody else — which is why this pair of
+                links is safe to put on a page.
+              */}
+              <div className="mt-3 flex flex-wrap gap-3 text-xs">
+                <a
+                  href={`${business.base_url}/${business.slug}`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="inline-flex items-center gap-1 font-medium text-accent hover:underline"
+                >
+                  Open the site
+                  <ExternalLink className="size-3" aria-hidden />
+                </a>
+
+                <a
+                  href={`${business.base_url}/admin`}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="inline-flex items-center gap-1 font-medium text-accent hover:underline"
+                >
+                  Open its panel
+                  <ExternalLink className="size-3" aria-hidden />
+                </a>
+              </div>
 
               <VisibilitySwitch
                 appKey={business.app_key}

@@ -132,14 +132,14 @@ tracker and the demos when they exist.
 
 **Given by the owner on 2026-08-30, and it binds every project in the estate.**
 
-> logo bhi Apka Vission ka hi use karna hai — text me "Apka Vission" mat likho,
+> logo bhi Rahvian ka hi use karna hai — text me "Rahvian" mat likho,
 > logo use karo jo services me hai. Aur yahi logo aur loader services wala hi
 > sab jagah, har project me.
 
 **The logo is the file, never the name typed out.** Wherever the brand appears,
 it is the mark from `public/brand/` — `logo-light.svg` and `logo-dark.svg` for
 the full lockup, `symbol-*.svg` for the mark alone inside the loader. Two styled
-words reading "Apka Vission" are a description of the brand, not the brand.
+words reading "Rahvian" are a description of the brand, not the brand.
 
 **Neither the logo nor this loader is redesigned per project.** Not adapted, not
 simplified for a smaller application. A second loader is a second brand.

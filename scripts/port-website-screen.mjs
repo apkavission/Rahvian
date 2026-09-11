@@ -17,13 +17,11 @@
  *
  * Run from `services`:  node scripts/port-website-screen.mjs [--dry-run]
  */
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import { projectDir } from "./estate.mjs";
 
 const DRY = process.argv.includes("--dry-run");
-const HERE = dirname(fileURLToPath(import.meta.url));
 const CLINIC = projectDir("demo-clinic");
 
 if (!CLINIC) throw new Error("The clinic demo is not on this machine, and it is the source.");
@@ -56,7 +54,7 @@ const VERBATIM = [
 const DEMOS = [
   {
     name: "demo-restaurant",
-    schema: "demo_restaurant",
+    schema: "demo_resto",
     port: 3400,
     bookingLabel: "Book a table",
     emergency: false,
@@ -70,7 +68,7 @@ const DEMOS = [
   },
   {
     name: "demo-realestate",
-    schema: "demo_realestate",
+    schema: "demo_estate",
     port: 3600,
     bookingLabel: "Book a viewing",
     emergency: false,
@@ -91,6 +89,18 @@ const DEMOS = [
     emergency: false,
   },
 ];
+
+/*
+  The schema names above are the real ones, and they are not the folder names.
+
+  The first run of this script took them from the folders — `demo_restaurant`,
+  `demo_realestate` — and neither schema exists. A service client connects
+  happily to a schema with no tables in it, so nothing failed loudly: the
+  checks that were ported reported two working features as broken and left the
+  restaurant demo on a colour nobody chose. `check-website.mjs` now reads
+  `DB_SCHEMA` out of each demo's own `constants.ts` rather than being told; this
+  list is kept correct for anything else that needs it.
+*/
 
 /** The clinic's own values, which every copy has to have replaced. */
 const CLINIC_SCHEMA = "demo_clinic";

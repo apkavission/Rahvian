@@ -117,7 +117,7 @@ Clinic first, then restaurant, school, real estate, CRM, store.
 
 | Demo | Website screen | Fonts wired | Redesign | Checks, from a run |
 |---|---|---|---|---|
-| Clinic | **done** | **done** | **done** | typecheck · lint · **159 unit** · build · **62 browser** · **13/13** website · **9/9** copy · **9/9** motion |
+| Clinic | **done** | **done** | **done** | typecheck · lint · **178 unit** · build · **60 browser** · **13/13** website · **9/9** copy · **11/11** motion · **10/10** hero |
 | Restaurant | **done** | **done** | — | typecheck · lint · **143 unit** · build · **13/13 browser** |
 | School | **done** | **done** | — | typecheck · lint · **143 unit** · build · **13/13 browser** |
 | Real estate | **done** | **done** | — | typecheck · lint · **143 unit** · build · **13/13 browser** |
@@ -192,10 +192,10 @@ Not part of this plan when it was written, and it arrived in the middle of it:
 > apne company ka naam jo h RAHVIAN TECHNOLOGIES PRIVATE LIMITED ye mila h to
 > ye use karna h … apka saathi wala hata dena … sab project me dekh lena
 
-**`Apka Vission` → `Rahvian`**, legal name **Rahvian Technologies Private
+**`Rahvian` → `Rahvian`**, legal name **Rahvian Technologies Private
 Limited**, the loader's two halves **RAHVIAN + TECHNOLOGIES**, and the tagline
 kept. 100 files and 191 occurrences across the nine projects; 22 rows in the
-live database, by `scripts/rename-to-rahvian.mjs`. The **Apka Saathi product is
+live database, by `scripts/rename-to-rahvian.mjs`. The **Rahvian product is
 removed** — its page, its promo band, both menu entries, its portfolio piece,
 its seed data and its route.
 
@@ -362,3 +362,156 @@ The structural labels — "Your first visit", "Opening hours", "Where to come",
 "Experience", "You will see", "Treatments". They name the layout rather than say
 anything about the business, and making all forty editable would be a panel
 nobody finishes filling in. Worth a decision rather than an assumption.
+
+---
+
+## 8. The banner hero, and the scroll trigger
+
+### The animation now waits, which is what was asked for
+
+*"animation scroll pe lago na, warna wo pahle hi ho jata h."* He was right, and
+the mechanism was wrong. `animation-timeline: view()` ties an animation's
+**progress** to the scroll position, which gives two failures and no setting
+that avoids both: a short range finishes while the band is still arriving, so
+the movement is over before the reader gets there; a long range draws a band
+that is half in view at half its opacity, so a page nobody has scrolled looks
+half-painted.
+
+What was wanted is a **trigger**. One `IntersectionObserver`, inline in
+`[variant]/layout.tsx` so the class it needs is added before first paint, and a
+CSS transition rather than an animation — a transition cannot be left stuck
+half-way, and it answers to the reduced-motion rule already in the stylesheet.
+
+`check:motion` asks the question directly now: **the last band on the page is
+at opacity 0 before anybody scrolls, and 1 after** — 11 of 11.
+
+### Three bugs, all mine, all found by looking
+
+**The observer revealed everything at once.** It measured each band by hand —
+`getBoundingClientRect().top` against the viewport height — and ran on
+`DOMContentLoaded`, before the stylesheet had been applied. Every element
+measured as though it were at the top of the page, including one 3,233 pixels
+down a 3,987-pixel page. The hand measurement is gone: an observer measures
+after layout and cannot make that mistake.
+
+**Every screenshot came out blank below the hero.** The camera walked the page
+with `for (let y = 0; y < document.body.scrollHeight; y += step)` — and
+`scrollHeight` read before the webfonts arrive is roughly `innerHeight`, so the
+loop ran once and exited. It took a bisect to find, because it was flaky: with
+enough delay before it, the same code worked. Both the camera and
+`check:motion` now wait for two consecutive equal heights and then walk until
+they are actually at the bottom.
+
+**`check:copy` failed on a feature that was working.** It read the body text the
+instant the page loaded, which is a page nobody has scrolled — so the band it
+had just edited was not there to find. It walks the page first now, the way a
+reader does.
+
+### The banner
+
+`variants.hero_image_id` and `hero_video_url`, one migration, applied through a
+direct connection. Three states: a **video** if the business has one, a
+**banner** if it has a picture, and — the ordinary case, because every `media`
+table in this estate is empty — a **wash built from that business's own seven
+colours**. Not a placeholder: a finished hero that a palette change restyles,
+and the day a banner is uploaded it appears with nothing deployed.
+
+No stock photography. A smiling stranger in a waiting room is what makes a demo
+look like every other template, and it is the one thing a business cannot keep
+when the site becomes theirs.
+
+**The scrim is load-bearing.** Contrast over a photograph cannot be measured in
+advance — the words are one colour and the banner is whatever was uploaded — so
+a gradient scrim is what lets the headline be promised readable over a bright
+waiting room and a dark one. `overlay: "none"` is the one setting that can
+produce an unreadable hero, and the panel says so beside it.
+
+**And it leaked once.** The band replaces `--text` and `--muted` with light
+values so its own words read over the picture, and the white card inside the
+first screen inherited them: the price of a first visit printed near-white on
+near-white, in the one place a prospect looks first. The palette is now also
+published as `--ink` — the same colours under a name no band shadows — and a
+card inside the band asks for them back. `theme.test.ts` asserts it.
+
+`check:hero` is what proves the state nothing else exercises: it makes a
+banner from the business's own palette, puts it on, checks the layer covers,
+the scrim is drawn, the headline is light ink, the band is tall enough to read
+as a banner, and that "strong and centred" is what the panel chose — then
+deletes the file, the media row and the column, and asserts the business was
+left as it was found. **10 of 10.**
+
+---
+
+## 9. The banner, the demo panels, and search
+
+### The demo panels were never broken
+
+*"mene ek link banaya kisi demo ka to us demo ka admin chalna chaiye."* It
+does. One sign-in opened the clinic's panel and the restaurant's, including
+`/admin/website` and `/admin/links` — checked in a browser, not assumed. Two
+things were true at once and only one of them was a fault:
+
+**The dev servers were stopped.** All of them but the clinic's, by me, when the
+machine had 53 node processes on it and every command was timing out. A panel on
+a port with nothing listening does not open, and that is the whole of what was
+happening.
+
+**And the estate screen offered no way in.** It is the screen that decides who
+may open a demo, it already knows every demo's address from
+`control.applications.base_url`, and it linked only to the public site. It now
+offers both doors per business — the site and its panel — which is what was
+actually missing.
+
+Worth knowing rather than discovering: **the panel is not behind the share
+link.** A link admits a visitor to one business's public pages; the panel
+answers to the account, so it opens for a colleague with that demo in their
+access list and nobody else. The owner's account has all six keys. On
+`localhost` one sign-in serves every demo because cookies ignore the port; on
+separate domains each demo needs its own.
+
+### A banner that is made, not bought
+
+`npm run make:hero` draws one from the business's own seven colours and puts it
+on: shaded balls, a ring seen at an angle, a vignette, and two per cent of grain
+because a gradient with none in it bands visibly on an eight-bit screen.
+
+"3D" is honest about itself — there is no scene and no renderer. These are
+circles shaded the way a sphere is shaded: a radial gradient offset toward one
+light, a terminator opposite it, a rim where the light wraps the edge, and a
+contact shadow beneath. Drop any one and it reads as a circle.
+
+**"Fits every screen" is a composition rule, not a size.** The band crops with
+`object-fit: cover`, so every form sits inside the middle 70% — a 9:16 crop
+still contains all of them — and the left third is left calm, because that is
+where the headline sits and detail under type is what makes a hero unreadable.
+Measured at 390, 768, 1280 and 1920: no sideways scroll, the headline inside the
+band at every width.
+
+### Search, and the two things it refuses to say
+
+The meta title, description, share card and `robots.txt` were already here and
+already editable. What was missing was structured data — the block an SEO person
+looks for. `lib/seo.ts` emits one graph: the clinic, its six treatments with
+prices, the five questions it answers, the three people who work there. Every
+field derived from a row.
+
+**No `aggregateRating`.** The reviews on these demos are labelled, on the page,
+as examples written for a demonstration. Turning three invented quotes into
+"4.7 from 3 reviews" would put a fabricated trust signal into a search result —
+the commonest piece of structured-data fraud, and one Google issues manual
+penalties for.
+
+**No `openingHoursSpecification`.** The hours are free text somebody typed —
+"9:30 am – 8:00 pm", "Emergencies only". Parsing that into machine times means
+guessing, and a wrong closing time in structured data sends somebody to a locked
+door. The hours are on the page, in words, where they are true.
+
+**And it stays `noindex`**, which is not a contradiction. A demo that outranked
+the business it was built for would take months to undo. This is what a real
+site inherits the day one of these becomes it — same panel, same fields, same
+block, one line removed — and what a prospect's own SEO person is shown when
+they ask what we do about search.
+
+Read off the live page: `MedicalClinic, FAQPage, ItemList` · price range
+₹300 – ₹35,000 · 6 offers · 5 questions · 3 people · no rating · no machine
+hours · still `noindex`.

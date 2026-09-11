@@ -1,7 +1,9 @@
 # Rahvian — company website
 
-The services site, admin panel and client portal for **Apka Saathi Private
-Limited**, trading as Rahvian.
+The services site, admin panel and client portal for **Rahvian Technologies
+Private Limited**, trading as Rahvian.
+
+**What is left to do: [PENDING.md](PENDING.md).** Read that first.
 
 Everything on the public site is database-driven and editable from the admin
 panel — the copy, the images, the menus, the pricing, the SEO and the switch

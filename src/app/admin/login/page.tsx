@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { BrandLogo } from "@/components/site/brand-logo";
-import { getSiteSettings } from "@/lib/queries/site-settings";
 import { LoginForm } from "./login-form";
 
 /**
@@ -18,7 +17,6 @@ export const metadata: Metadata = {
 };
 
 export default async function LoginPage() {
-  const settings = await getSiteSettings();
 
   return (
     <main className="flex min-h-dvh items-center justify-center px-4 py-16">

@@ -1,4 +1,4 @@
-# Apka Saathi Private Limited — Documentation
+# Rahvian Technologies Private Limited — Documentation
 
 **Start here: [STATUS.md](STATUS.md)** — one page. Every project, how much is
 built, how much is actually tested, and what is waiting on the owner. The

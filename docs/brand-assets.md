@@ -193,7 +193,7 @@ Rendered side by side at 24px, round 1 still reads and round 2 does not.
    unchanged. The square lockup has to be a genuinely different composition —
    stack the arrow over the `A`, or crop to the `A` and handshake alone — not the
    horizontal mark dropped into a square box.
-5. **`<title>` is mojibake** — `APKA VISSION â Your Vision…`. The em dash was
+5. **`<title>` is mojibake** — `RAHVIAN â Your Vision…`. The em dash was
    saved as latin-1 instead of UTF-8. A screen reader will read it aloud. Save the
    file as UTF-8.
 
@@ -343,12 +343,12 @@ plus `<link rel="icon">` for both `favicon.ico` and `icon.svg`, and
 
 ## Naming
 
-`Apka Saathi Private Limited` is the company. **`Apka Vission` is the services
-brand inside it** — and `Apka Saathi` is the document-and-reminder web and app
+`Rahvian Technologies Private Limited` is the company. **`Rahvian` is the services
+brand inside it** — and `Rahvian` is the document-and-reminder web and app
 product already built under the same company.
 
-So `APKA VISSION` on the mark is correct for this site. The legal entity is
+So `RAHVIAN` on the mark is correct for this site. The legal entity is
 named separately, in the footer, the legal pages and the invoice template, so a
 visitor always knows who they would be contracting with. `site_settings` already
-carries both: `company_name` is `Apka Vission`, `legal_name` is
-`Apka Saathi Private Limited`.
+carries both: `company_name` is `Rahvian`, `legal_name` is
+`Rahvian Technologies Private Limited`.
