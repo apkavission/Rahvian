@@ -296,7 +296,31 @@ if (missing.length) {
 
 for (const line of ungated) console.log(`  nothing to test: ${line}`);
 
+/*
+  Nothing walked, and two very different reasons for it.
+
+  This said "no demo was running. Start one and run this again" whichever it
+  was — and after every business in every demo was opened to the public on
+  2026-09-12, it said that with all six demos running and answering, three lines
+  below its own list of the six it had just reached and found ungated. A check
+  that contradicts itself in its last sentence is a check people stop reading.
+
+  There is no door left to test because there is no door, which is the state the
+  owner asked for. That is reported as exactly that, and it exits clean: an
+  invitation-only demo is a feature that was deliberately removed, not one that
+  has silently broken.
+*/
 if (walked === 0) {
+  if (ungated.length > 0 && missing.length === 0) {
+    console.log(
+      "  every business in every demo is open to the public, so there is no door\n" +
+        "  to shut and nothing here to test. Close one on the estate screen if you\n" +
+        "  want this check to have something to do.\n",
+    );
+    await db.end();
+    process.exit(0);
+  }
+
   console.log("  no demo was running. Start one and run this again.\n");
   await db.end();
   process.exit(1);

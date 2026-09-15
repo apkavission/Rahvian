@@ -557,6 +557,31 @@
     }
   }
 
+  /*
+    On paper, and anywhere else that renders without scrolling.
+
+    A scroll-driven animation has no progress where there is no scrolling, so
+    an element whose range it never reached stays on its first keyframe —
+    opacity 0. For a reader that is the effect working: measured on the home
+    page, a reader who scrolls sees all fifty reveals. For a printer, a PDF, a
+    screenshot service or a crawler rendering at a tall viewport it is not: the
+    same page measured eight of fifty still invisible, all of them at the foot
+    of the page, where the FAQ and the closing call to action live.
+
+    One rule, and it is the same rule the demos carry for the same reason. The
+    content is in the document either way — which is what matters to a search
+    engine that reads the DOM — but a blank half-page out of a printer is a
+    real failure and this costs nothing to prevent.
+  */
+  @media print {
+    .reveal,
+    .reveal-group > * {
+      opacity: 1 !important;
+      transform: none !important;
+      animation: none !important;
+    }
+  }
+
   /* Elevated dark surfaces carry a 1px top highlight to fake a light source.
      In light mode --highlight is transparent, so this is inert.           */
   .surface-raised {
@@ -663,5 +688,79 @@
   }
   to {
     transform: translateX(100%);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   A scrollable panel that says so.
+
+   ---------------------------------------------------------------------------
+   **The bug this fixes was reported as a missing menu.** The admin rail has
+   twenty-four links in five groups and it has scrolled since it was built —
+   `min-h-0` and `overflow-y-auto`, with a comment calling that load-bearing.
+   What it never had was any *sign* that it scrolls. Windows draws an overlay
+   scrollbar that appears while the wheel is moving and vanishes a second later,
+   so on a 1080p screen the rail simply ended after "Logo & banners" and the
+   whole estate group — the screens that decide who may open a demo — looked as
+   though they had not been built. The owner's words: "sidebar me saare menu
+   nahi aa raha h".
+
+   ---------------------------------------------------------------------------
+   **Two shadows and no JavaScript.** The trick is `background-attachment`: the
+   two *cover* layers are `local`, so they scroll with the content and slide out
+   of the way at the top and bottom; the two *shadow* layers are `scroll`, so
+   they stay pinned to the edges of the box. The covers sit on top of the
+   shadows, which means each shadow is only visible when there is content past
+   that edge. A panel that fits shows neither.
+
+   This is worth more than a permanently faded edge, which lies in the one state
+   that matters — "you have reached the end" has to look different from "there
+   is more".
+
+   The gradients are built from `--surface`, so the covers match whatever the
+   panel is painted with in either theme.
+   --------------------------------------------------------------------------- */
+@layer utilities {
+  .scroll-hint {
+    background-image:
+      linear-gradient(to bottom, var(--surface) 30%, transparent),
+      linear-gradient(to top, var(--surface) 30%, transparent),
+      linear-gradient(
+        to bottom,
+        color-mix(in oklab, var(--text) 14%, transparent),
+        transparent
+      ),
+      linear-gradient(
+        to top,
+        color-mix(in oklab, var(--text) 14%, transparent),
+        transparent
+      );
+
+    background-position:
+      0 0,
+      0 100%,
+      0 0,
+      0 100%;
+    background-size:
+      100% 1.75rem,
+      100% 1.75rem,
+      100% 0.75rem,
+      100% 0.75rem;
+    background-repeat: no-repeat;
+    background-attachment: local, local, scroll, scroll;
+  }
+
+  /*
+    And a scrollbar that is actually there.
+
+    The hint above says "there is more"; this is what a reader then reaches for.
+    Thin, in the palette's own greys, and `stable` so the rail does not reflow
+    by fifteen pixels the moment it becomes scrollable — which is what happens
+    when one more screen is added to a menu that exactly fitted.
+  */
+  .scroll-thin {
+    scrollbar-width: thin;
+    scrollbar-gutter: stable;
+    scrollbar-color: color-mix(in oklab, var(--text) 22%, transparent) transparent;
   }
 }

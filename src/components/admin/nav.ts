@@ -27,6 +27,33 @@ export type MenuKey =
   | "studio"
   | "letterhead";
 
+/**
+ * A screen that lives inside another one.
+ *
+ * ---------------------------------------------------------------------------
+ * **It has no key of its own, and that is the whole design.** A `MenuKey` is a
+ * piece of schema — it is stored in `roles.default_menu` and in two arrays on
+ * every profile — so giving the blog's categories screen a key of its own would
+ * mean a migration, a new checkbox on the users screen, and a screen that is
+ * invisible to everybody until somebody remembers to tick it. Worse, it would
+ * be possible to grant "Blog" and deny "Blog categories", which is not a
+ * permission anybody wants to express.
+ *
+ * A child is reachable exactly when its parent is. `requireMenu()` on the page
+ * itself asks the parent's key, which is what those four pages already do.
+ *
+ * ---------------------------------------------------------------------------
+ * **Why they are listed at all.** Six screens existed with no link in the
+ * sidebar — the estate's three, the blog's categories and the enquiry sources —
+ * reachable only from a link inside their parent page. The owner's complaint was
+ * exactly that: *"sidebar me saare menu nahi aa raha h"*. A screen nobody can
+ * find is a screen that was not built.
+ */
+export interface AdminNavChild {
+  label: string;
+  href: string;
+}
+
 export interface AdminNavItem {
   key: MenuKey;
   label: string;
@@ -45,6 +72,9 @@ export interface AdminNavItem {
   ownerOnly?: boolean;
   /** Not built yet. Rendered as a disabled row rather than a broken link. */
   planned?: boolean;
+
+  /** Screens inside this one. Reachable exactly when this one is. */
+  children?: AdminNavChild[];
 }
 
 export interface AdminNavGroup {
@@ -76,7 +106,13 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     label: "Overview",
     items: [
       { key: "dashboard", label: "Dashboard", href: "/admin", icon: "layout-dashboard" },
-      { key: "leads", label: "Enquiries", href: "/admin/leads", icon: "inbox" },
+      {
+        key: "leads",
+        label: "Enquiries",
+        href: "/admin/leads",
+        icon: "inbox",
+        children: [{ label: "Where they came from", href: "/admin/leads/sources" }],
+      },
     ],
   },
   {
@@ -88,7 +124,13 @@ export const ADMIN_NAV: AdminNavGroup[] = [
       { key: "portfolio", label: "Portfolio", href: "/admin/portfolio", icon: "image" },
       { key: "case-studies", label: "Case studies", href: "/admin/case-studies", icon: "notebook" },
       { key: "testimonials", label: "Testimonials", href: "/admin/testimonials", icon: "quote" },
-      { key: "blog", label: "Blog", href: "/admin/blog", icon: "pen-tool" },
+      {
+        key: "blog",
+        label: "Blog",
+        href: "/admin/blog",
+        icon: "pen-tool",
+        children: [{ label: "Categories", href: "/admin/blog/categories" }],
+      },
       { key: "pricing", label: "Pricing", href: "/admin/pricing", icon: "tag" },
       { key: "faqs", label: "FAQs", href: "/admin/faqs", icon: "help-circle" },
       { key: "team", label: "Team", href: "/admin/team", icon: "users" },
@@ -170,6 +212,22 @@ export const ADMIN_NAV: AdminNavGroup[] = [
         href: "/admin/estate",
         icon: "layers",
         ownerOnly: true,
+
+        /*
+          The three screens the estate actually consists of.
+
+          They were reachable only from three links in the middle of
+          `/admin/estate`, which meant the screen that decides who may open a
+          demo — the one used in front of a prospect — took two clicks and a
+          memory. They are children rather than keys for the reason the type
+          above gives, and they are owner-only by inheritance: `requireMenu("estate")`
+          at the top of each page is what actually refuses them.
+        */
+        children: [
+          { label: "Who may open a demo", href: "/admin/estate/demos" },
+          { label: "One inbox for everything", href: "/admin/estate/inbox" },
+          { label: "Audit", href: "/admin/estate/audit" },
+        ],
       },
     ],
   },

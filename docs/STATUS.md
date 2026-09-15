@@ -1,11 +1,18 @@
 # Where everything stands
 
 > **What is still to do now lives in [../PENDING.md](../PENDING.md)**, updated
-> 2026-09-11 — start there. The most urgent item on it is that five of the six
-> demos render no content at all, which every check in this file was green
-> through.
+> 2026-09-13 — start there. Five things changed in three days: the five demos
+> that rendered no content were fixed and looked at; all six were rebuilt on one
+> design system, each with a layout of its own trade; the words, the banner and
+> the structured data of every one of them became editable from its own panel;
+> the portal and the tracker were given a design of their own; and the checks
+> that were supposed to be watching all nine projects were themselves audited,
+> which is where most of §3 of this page went.
+>
+> The sections below are dated where they were measured. Anything undated is
+> from 2026-08-31 and should be treated as history rather than as the state.
 
-**One page, updated 2026-08-31.** How much of each project is built, how much of
+**One page, updated 2026-09-13.** How much of each project is built, how much of
 it has actually been tested, and what is left. Read this first; the reasoning
 behind any line of it is in [estate-status.md](estate-status.md).
 
@@ -20,15 +27,15 @@ believed, and was repeated to the owner.
 
 | Project | Port | Built | Unit tests | Browser tests | Left to do |
 |---|---|---|---|---|---|
-| **Company website** | 3000 | **80%** | 259 ✅ | 220 ✅ | Phase 4 — launch. Almost none of it is code |
-| **Internal panel** | 3100 | **100%** | 47 ✅ | 4 ✅, 4 skipped | Nothing in code |
-| **Task tracker** | 3200 | **100%** | 37 ✅ | 49 ✅, 13 skipped | Nothing in code |
-| **Clinic demo** | 3300 | **100%** | 27 ✅ | 42 ✅ | Nothing |
-| **Restaurant demo** | 3400 | **100%** | 27 ✅ | 42 ✅ | Nothing |
-| **School demo** | 3500 | **100%** | 27 ✅ | 42 ✅ | Nothing |
-| **Property demo** | 3600 | **100%** | 27 ✅ | 42 ✅ | Nothing |
-| **CRM demo** | 3700 | **100%** | 27 ✅ | 42 ✅ | Nothing |
-| **Store demo** | 3800 | **83%** | 48 ✅ | 52 ⏳ never run | **One SQL file** — §3 |
+| **Company website** | 3000 | **80%** | 456 ✅ | 389 ✅, 1 flaky | Phase 4 — launch. Almost none of it is code |
+| **Internal panel** | 3100 | **100%** | 66 ✅ | 39 ✅ | Nothing in code |
+| **Task tracker** | 3200 | **100%** | 65 ✅ | 131 ✅, 1 ❌ | One realtime chat test, failing at `HEAD` too |
+| **Clinic demo** | 3300 | **100%** | 178 ✅ | 133 ✅ | Nothing |
+| **Restaurant demo** | 3400 | **100%** | 161 ✅ | 133 ✅ | Nothing |
+| **School demo** | 3500 | **100%** | 161 ✅ | 133 ✅ | Nothing |
+| **Property demo** | 3600 | **100%** | 161 ✅ | 133 ✅ | Nothing |
+| **CRM demo** | 3700 | **100%** | 161 ✅ | 133 ✅ | Nothing |
+| **Store demo** | 3800 | **100%** | 182 ✅ | 119 ✅ | Nothing |
 
 **The whole estate: 13 of 17 phases, about 76%.** Three of the four that remain
 are not developer work at all — a domain, a lawyer, and content. The only code
@@ -43,10 +50,11 @@ domain exists.
 
 | | |
 |---|---|
-| **Typecheck, lint, unit tests, production build** | Nine projects, four checks each — **36 of 36 pass** |
-| **Unit tests** | **526 in total**, all green |
-| **Browser tests** | **430 written**, **378 green**, 17 skipped, 52 never run |
-| **The database, asked directly** | `verify:estate`, `check:effects`, `check:demos`, `check:queries`, `check:schema`, `check:policies` |
+| **Typecheck, lint, unit tests** | Nine projects — all green, 2026-09-13 |
+| **Unit tests** | **1,236 in total**: 456 company · 66 portal · 65 tracker · 178 clinic · 161 × 4 demos · 182 store |
+| **Browser tests** | **1,090 green**, 2026-09-13: 389 company (1 flaky, 1 skipped) · 39 portal · 131 tracker (1 failing) · 133 × 5 demos · 119 store. **Nothing is "never run" any more** — the store's suite was run for the first time on 2026-09-13 and failed 49 of 119 before two fixes the other demos already had |
+| **The database, asked directly** | `verify:estate` 117 applied, 0 pending · `check:effects` every seed row present · `check:demos` **all 6** · `check:queries` 6 demos, 20 queries · `check:schema` · `check:policies` 13 holding · `check:routes` 4 people, 14 routes · `check:privileges` **2 findings, for the owner** |
+| **And the checks themselves** | Audited on 2026-09-13. Six of them were reporting something other than the truth — a list of five demos called "all", 13 security violations that were a missing password, a conformance test passing against a generated file 520 lines out of date. PENDING §6 has each one |
 
 **All of it again, on a different computer.** Everything above was first measured
 on the machine it was built on, where a passing check can be a fact about that
@@ -88,69 +96,51 @@ none of the three can be proven from this machine.
 
 ## 3. What is waiting on the owner
 
-### One SQL file — five minutes
+Updated 2026-09-13. **Everything that used to be in this section is done**, and
+it is worth saying what, because this page claimed otherwise for a fortnight.
 
-```
-demo-ecommerce/supabase/migrations/20260902000003_demo_shop_content.sql
-```
+The store's content migration — the one that failed on paste with `ERROR: 42P01:
+relation "a" does not exist`, because the editor split statements before
+stripping comments and read an apostrophe in an English sentence as the start of
+a string literal — **is applied.** `check:effects` says *demo_shop has 3
+businesses* and *the store has stock on its shelves*. Its types are generated,
+and its 119 browser tests were run for the first time on 2026-09-13 and pass.
+The six demos are ticked on the owner's account and every business in every one
+of them is public. `.env.test.local` exists in both the portal and the tracker.
 
-Everything else is applied: `npm run verify:estate` says **49 applied, 0 still
-to run**, and `control` and `demo_shop` are both in the exposed-schema list.
+### What is left, and every item is a decision rather than a task
 
-This one file failed on paste with `ERROR: 42P01: relation "a" does not exist`,
-and **the file was never wrong.** Postgres strips `--` comments before it looks
-for strings, so an apostrophe in a comment is nothing to it — but the editor
-splits statements before stripping comments, treats that apostrophe as the start
-of a string literal, swallows several hundred lines of real SQL up to the next
-one, and resumes reading SQL in the middle of an English sentence. The first
-word it finds becomes a table name:
+1. **`noindex` on the demos.** Every demo still says `noindex`, and since
+   2026-09-12 they are also public and linked from the company's own site. The
+   original reason — a demo outranking the real business it was built for — does
+   not apply to invented businesses. Turning it off puts six industry demos into
+   search results; leaving it on keeps them a thing we send. Flagged three times,
+   undecided each time.
 
-```
--- ...a real customer's words is a lie with a signature on it.
-                      ^opens                    ^closes   →  relation "a"
-```
+2. **Rahul Kumar is `developer` in the portal and `admin` on the website.**
+   `check:privileges` calls it wrong, and it is: that combination hands over the
+   whole estate, everybody's salary slips included, while every tracker screen
+   calls them a developer. Whichever of the two is right, the other should match
+   it — and that is a decision about a colleague's access, so nothing was
+   changed.
 
-The school demo's content file failed the same way on 2026-08-30 with
-`relation "the"`. **Every apostrophe in every `--` comment across all 51
-migration files is now a typographic quote instead** — 182 of them. The prose
-reads identically and there is nothing left for a splitter to trip on.
+3. **The same account is on the staff list *and* is a client user**
+   ("8683081955"), so every rule of the form "staff or client" matches it twice.
+   Harmless today; the kind of thing that makes a future permission question
+   unanswerable.
 
-**Check it worked, rather than assuming:**
+4. **Seven layout labels on each demo's home page are still literals** — "Your
+   first visit", "Opening hours", "Where to come" and so on. They name the
+   layout rather than say anything about a business. Making all forty editable
+   would be a panel nobody finishes filling in. Left as a question.
 
-```
-cd services && npm run check:effects
-```
+### Walking it yourself
 
-Two lines in it are red right now and go green the moment that file runs:
-*demo_shop has 3 businesses* and *the store has stock on its shelves*. That check
-exists because `verify:estate` cannot see a content migration at all — a file of
-`insert` statements creates nothing a catalogue can be asked about, which is how
-the store ended up with a schema, working functions, a clean verification, and
-not one row in it.
-
-### Then, in this order
-
-1. `cd demo-ecommerce && npm run gen:types` — the store's types are hand-written
-   from the migration, because a generator cannot read a schema that does not
-   exist. Until this runs, its type safety is a claim about the SQL rather than
-   about the database.
-2. `cd demo-ecommerce && npx playwright test` — 52 tests that have never run.
-3. Tick the six demos on your own account: **Users → Applications**.
-4. `cd tracker && node e2e/save-admin-session.mjs`, and the same in `portal` —
-   un-skips the 17. A session saved anywhere in the estate serves the rest:
-   these cookies are scoped to `localhost` without a port, so the one the
-   company site's own suite writes to `services/e2e/.auth/owner.json` can simply
-   be copied to `tracker/e2e/.auth/admin.json`, and the tracker's admin screens
-   go green — 12 of them, verified this way on 2026-08-31 with no password read
-   from anywhere.
-5. **On a machine that is not the one this was built on**, write
-   `.env.test.local` in `portal` and `tracker` first. It holds
-   `PORTAL_TEST_CLIENT_EMAIL` / `_PASSWORD` and `TRACKER_TEST_EMPLOYEE_EMAIL` /
-   `_PASSWORD` — the two accounts that exist only for testing, and the only
-   passwords in this estate that belong in a file at all. It is git-ignored, so
-   it does not travel with a clone, and without it both suites fail at sign-in
-   on an undefined password: 65 tests that look broken and are merely locked.
-6. Walk the screens. Each project has its own `docs/testing.md`.
+Each project has its own `docs/testing.md`. The estate runs on ports 3000, 3100,
+3200 and 3300-3800, and every server should be started from the `com` folder and
+nowhere else: older copies of this estate sitting directly under the home
+directory were still answering three of those ports on 2026-09-13, which is how
+a fortnight of work came to be looked at in the wrong application.
 
 ---
 

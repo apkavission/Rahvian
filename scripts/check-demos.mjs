@@ -42,6 +42,17 @@ const DEMOS = [
   { schema: "demo_school", offer: "courses", people: "faculty", enquiry: "admissions" },
   { schema: "demo_estate", offer: "listings", people: "agents", enquiry: "viewings" },
   { schema: "demo_crm", offer: "features", people: "team", enquiry: "trials" },
+  /*
+    The store, added 2026-09-13.
+
+    It was built last and never added here, so this check covered five of six
+    demos while its closing line said "All five demos" — which read as a
+    complete pass and was a complete pass of an incomplete list. Its private
+    table is `orders`: a stranger reading those would be reading other people's
+    names, addresses and baskets, which is the worst of the six things on this
+    list to leave unasked.
+  */
+  { schema: "demo_shop", offer: "products", people: "team", enquiry: "orders" },
 ];
 
 if (!SERVICE) {
@@ -180,7 +191,7 @@ for (const demo of DEMOS) {
 console.log(
   "\n" +
     (bad === 0
-      ? "All five demos open to a link and to nothing else."
+      ? `All ${DEMOS.length} demos open to a link and to nothing else.`
       : `${bad} demo(s) wrong.`),
 );
 

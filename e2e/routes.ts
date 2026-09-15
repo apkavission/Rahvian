@@ -148,10 +148,16 @@ export const ADMIN_SCREENS: {
    * The sidebar link that leads here, when there is one.
    *
    * Most screens are their own menu item and their heading is its label, so
-   * this is left out. The estate is one item with three pages under it — its
-   * sub-pages are reached from the estate screen itself, and looking for a
-   * sidebar link named after each of their headings is looking for something
-   * that was never meant to exist.
+   * this is left out. Where a screen lives inside another one its sidebar row
+   * is a child link with a label of its own — "Who may open a demo" under
+   * Estate, "Categories" under Blog — and that label is what goes here, because
+   * the heading and the row are allowed to read differently.
+   *
+   * `null` means a screen with no row of its own at all. Nothing is `null` any
+   * more: until 2026-09-12 the estate's three pages were, and the sidebar was
+   * the poorer for it — they were reachable only from three links in the middle
+   * of the estate screen, which is how "sidebar me saare menu nahi aa raha h"
+   * happened.
    */
   nav?: string | null;
 }[] = [
@@ -159,6 +165,11 @@ export const ADMIN_SCREENS: {
   // for an account with none, so this is the one heading that is not fixed.
   { path: "/admin", heading: /^(Dashboard|Hello,)/ },
   { path: "/admin/leads", heading: "Enquiries" },
+  {
+    path: "/admin/leads/sources",
+    heading: "Where enquiries come from",
+    nav: "Where they came from",
+  },
   { path: "/admin/pages", heading: "Pages" },
   { path: "/admin/navigation", heading: "Navigation" },
   { path: "/admin/services", heading: "Services" },
@@ -166,6 +177,7 @@ export const ADMIN_SCREENS: {
   { path: "/admin/case-studies", heading: "Case studies" },
   { path: "/admin/testimonials", heading: "Testimonials" },
   { path: "/admin/blog", heading: "Blog" },
+  { path: "/admin/blog/categories", heading: "Categories", nav: "Categories" },
   { path: "/admin/pricing", heading: "Pricing" },
   { path: "/admin/faqs", heading: "FAQs" },
   { path: "/admin/team", heading: "Team" },
@@ -184,10 +196,15 @@ export const ADMIN_SCREENS: {
     honest one, because the number at the end of a run is believed.
   */
   { path: "/admin/estate", heading: "The estate", nav: "Estate" },
-  { path: "/admin/estate/inbox", heading: "One inbox", nav: null },
-  { path: "/admin/estate/audit", heading: "What was done", nav: null },
-  { path: "/admin/estate/demos", heading: "Who may open a demo", nav: null },
+  { path: "/admin/estate/inbox", heading: "One inbox", nav: "One inbox for everything" },
+  { path: "/admin/estate/audit", heading: "What was done", nav: "Audit" },
+  { path: "/admin/estate/demos", heading: "Who may open a demo", nav: "Who may open a demo" },
 
   /* Its own menu key, granted per person — see 20260903000029. */
   { path: "/admin/studio", heading: "Logo & banners", nav: "Logo & banners" },
+
+  /* Missing from this list until 2026-09-12, which is the failure the note at
+     the top of the estate block describes: a suite reporting that every admin
+     screen opens while never requesting this one. */
+  { path: "/admin/letterhead", heading: "Letterhead", nav: "Letterhead" },
 ];

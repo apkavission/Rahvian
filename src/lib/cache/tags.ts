@@ -24,6 +24,14 @@ export const CACHE_TAGS = {
   /** The role master list: labels, capabilities and default menus. */
   roles: "roles",
 
+  /**
+   * The demos that are open to anybody, as the website shows them.
+   *
+   * Read from `control.public_demos()`, which crosses six schemas — so it is
+   * cached, and this is the tag the estate screen's visibility switch clears.
+   */
+  demos: "demos",
+
   /** Title template, default description, verification codes. */
   seoDefaults: "seo-defaults",
 

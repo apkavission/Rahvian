@@ -1,6 +1,7 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
+import { CACHE_TAGS } from "@/lib/cache/tags";
 import { getStaffSession } from "@/lib/auth/session";
 import { createControlClient } from "@/lib/supabase/control";
 import type { RecordActionState, ShareActionState } from "@/lib/validation/records";
@@ -170,9 +171,25 @@ export async function setDemoVisibility(
 
   revalidatePath("/admin/estate/demos");
 
+  /*
+    And the company's own website, which now lists these.
+
+    The "Live demos" section reads `control.public_demos()` through a cache
+    tagged `demos`, so this switch is the only thing that can change what is in
+    that grid — and a switch whose effect a visitor cannot see for five minutes
+    is a switch somebody presses twice.
+
+    `updateTag` rather than `revalidateTag`: in this version the second is a
+    scheduled revalidation and takes a lifetime profile, while this one expires
+    the tag now and gives the action read-your-own-writes. Pressing the switch
+    and reloading the site has to show the change, or the switch is not the
+    thing that decides.
+  */
+  updateTag(CACHE_TAGS.demos);
+
   return OK(
     open
-      ? "Open to anybody with the address. Live links keep working."
-      : "Closed. Only a live link opens it now.",
+      ? "Open to anybody with the address, and listed on the website. Live links keep working."
+      : "Closed. Only a live link opens it now, and it is off the website.",
   );
 }

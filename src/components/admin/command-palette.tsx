@@ -238,18 +238,46 @@ export function CommandPalette({ groups }: { groups: AdminNavGroup[] }) {
   const rows: Row[] = useMemo(() => {
     const term = query.trim().toLowerCase();
 
+    /*
+      The screens inside a screen are searchable too.
+
+      A palette that knows "Blog" but not "Categories" sends somebody to the
+      blog to look for a link, which is the same journey the sidebar used to
+      force. A child is listed under its parent's icon and names its parent as
+      its detail, so "demos" finds "Who may open a demo · Estate".
+    */
     const screens: Row[] = groups.flatMap((group) =>
       group.items
         .filter((item) => !item.planned)
-        .filter((item) => !term || item.label.toLowerCase().includes(term))
-        .map((item) => ({
-          id: `screen:${item.key}`,
-          label: item.label,
-          detail: group.label,
-          href: item.href,
-          group: "Screens",
-          icon: <Icon name={item.icon} className="size-4 shrink-0" />,
-        })),
+        .flatMap((item) => {
+          const rows: Row[] = [];
+
+          if (!term || item.label.toLowerCase().includes(term)) {
+            rows.push({
+              id: `screen:${item.key}`,
+              label: item.label,
+              detail: group.label,
+              href: item.href,
+              group: "Screens",
+              icon: <Icon name={item.icon} className="size-4 shrink-0" />,
+            });
+          }
+
+          for (const child of item.children ?? []) {
+            if (term && !child.label.toLowerCase().includes(term)) continue;
+
+            rows.push({
+              id: `screen:${item.key}:${child.href}`,
+              label: child.label,
+              detail: item.label,
+              href: child.href,
+              group: "Screens",
+              icon: <Icon name={item.icon} className="size-4 shrink-0" />,
+            });
+          }
+
+          return rows;
+        }),
     );
 
     const actions: Row[] = ACTIONS.filter(

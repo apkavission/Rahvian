@@ -275,6 +275,25 @@ export const SECTION_DEFINITIONS: Record<string, SectionDefinition> = {
     ],
   },
 
+  demo_grid: {
+    label: "Live demos",
+    description:
+      "The demo sites that are open to anybody, read live from the estate. Nothing to type: a demo appears here the moment it is switched to “Open to anybody” on the Estate screen.",
+    fields: [
+      ...HEADING_FIELDS,
+      {
+        kind: "number",
+        name: "limit",
+        label: "Maximum shown",
+        hint: "Blank shows every demo that is open to the public.",
+        min: 1,
+        max: 20,
+      },
+      EMPTY_STATE,
+      MORE_LINK,
+    ],
+  },
+
   case_studies_grid: {
     label: "Case studies grid",
     description: "Published case studies, read live.",

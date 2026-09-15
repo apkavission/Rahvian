@@ -75,7 +75,7 @@ export function AdminShell({
           underneath the account card on any 900-pixel-tall laptop: present in
           the markup, reachable by keyboard, and unclickable.
         */}
-        <div className="min-h-0 flex-1 overflow-y-auto px-3 py-6">
+        <div className="scroll-hint scroll-thin min-h-0 flex-1 overflow-y-auto px-3 py-6">
           <AdminNav groups={groups} />
         </div>
         <UserPanel user={user} signOutAction={signOutAction} />
@@ -94,7 +94,7 @@ export function AdminShell({
           <div className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col border-r border-border bg-surface">
             <Brand onClose={close} />
             {/* `min-h-0` for the same reason as the rail above. */}
-            <div className="min-h-0 flex-1 overflow-y-auto px-3 py-6">
+            <div className="scroll-hint scroll-thin min-h-0 flex-1 overflow-y-auto px-3 py-6">
               <AdminNav groups={groups} onNavigate={close} />
             </div>
             <UserPanel user={user} signOutAction={signOutAction} />

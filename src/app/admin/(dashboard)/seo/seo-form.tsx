@@ -501,8 +501,18 @@ function Section({
   description: string;
   children: React.ReactNode;
 }) {
+  /*
+    `minmax(0, …)` on both columns, and on the single-column case too.
+
+    A grid column is `auto` by default, which means "at least min-content" — so
+    one long word, one input with a long value, one unbreakable URL makes the
+    column wider than the screen and the whole page scrolls sideways. At 360px
+    this screen measured 520px wide. Naming a minimum of zero is what lets the
+    column shrink and the text wrap, and it is the fix for every one of these
+    rather than a width picked per screen.
+  */
   return (
-    <section className="grid gap-6 lg:grid-cols-[minmax(0,18rem)_1fr] lg:gap-12">
+    <section className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] lg:gap-12">
       <div>
         <h2 className="font-display text-base font-semibold">{title}</h2>
         <p className="mt-2 text-sm leading-relaxed text-text-muted">{description}</p>

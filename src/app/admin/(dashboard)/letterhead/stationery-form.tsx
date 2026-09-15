@@ -93,8 +93,15 @@ export function StationeryForm({
     ].map((field) => field.id),
   );
 
+  /*
+    The single-column case needs its minimum named too.
+
+    An `auto` grid column is at least min-content, and the preview beside this
+    form is A4 — so on a phone the form inherited the sheet's width and the whole
+    page scrolled sideways. Measured at 360px: 460px wide.
+  */
   return (
-    <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_auto]">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-8 xl:grid-cols-[minmax(0,1fr)_auto]">
       <form action={action} className="space-y-8">
         {/* The blocks travel as one JSON field: they are an ordered list, and
             a form cannot post an order any other way without inventing index
@@ -487,7 +494,7 @@ export function StationeryForm({
             blank
           />
         </SheetPreview>
-        <p className="mt-2 max-w-[112mm] text-xs text-text-subtle">
+        <p className="mt-2 max-w-full text-xs text-text-subtle sm:max-w-[112mm]">
           The dashed box is where the letter goes and is never printed.
           Everything else is exactly what comes out of the printer.
         </p>

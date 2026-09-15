@@ -173,6 +173,25 @@ export type DemoVariantRow = {
   live_links: number;
 };
 
+/**
+ * One demo business as the company website may see it.
+ *
+ * Deliberately narrower than `DemoVariantRow`: no id, no link counts, no
+ * visibility. A public caller has no business holding any of them, and a shape
+ * that cannot express them cannot leak them by being passed somewhere new.
+ */
+export type PublicDemoRow = {
+  app_key: string;
+  app_name: string;
+  base_url: string;
+  slug: string;
+  name: string;
+  business_name: string;
+  industry_label: string;
+  tagline: string | null;
+  description: string | null;
+};
+
 /** One invitation to open a demo. */
 export type DemoLinkRow = {
   app_key: string;
@@ -307,6 +326,16 @@ export type ControlDatabase = {
 
       /** Every business in every demo, and whether it is open to the world. */
       demo_variants: { Args: Record<string, never>; Returns: DemoVariantRow[] };
+
+      /**
+       * The businesses that are open to anybody, for the company website.
+       *
+       * The one function in this schema `anon` may execute. It filters to
+       * `is_active` and `visibility = 'public'` inside its own body, so there is
+       * no argument a caller can pass to widen it — which is what makes the
+       * grant safe rather than the caller.
+       */
+      public_demos: { Args: Record<string, never>; Returns: PublicDemoRow[] };
 
       /** Every link ever issued, across every demo. Dead ones included. */
       demo_links: { Args: { p_app_key?: string | null }; Returns: DemoLinkRow[] };

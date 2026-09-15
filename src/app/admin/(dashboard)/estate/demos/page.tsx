@@ -129,11 +129,11 @@ export default async function DemoAccessPage({
           </p>
         </div>
 
-        <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid grid-cols-[minmax(0,1fr)] gap-3 md:grid-cols-2 xl:grid-cols-3">
           {businesses.map((business) => (
             <li
               key={business.variant_id}
-              className="rounded-2xl border border-border bg-surface p-4"
+              className="min-w-0 rounded-2xl border border-border bg-surface p-4"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">

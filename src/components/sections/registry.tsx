@@ -3,6 +3,7 @@ import { BlogList } from "@/components/sections/blog-list";
 import { CaseStudiesGrid } from "@/components/sections/case-studies-grid";
 import { ContactChannels } from "@/components/sections/contact-channels";
 import { CtaBand } from "@/components/sections/cta-band";
+import { DemoGrid } from "@/components/sections/demo-grid";
 import { Faq } from "@/components/sections/faq";
 import { FeatureGrid } from "@/components/sections/feature-grid";
 import { Hero } from "@/components/sections/hero";
@@ -58,6 +59,10 @@ export const SECTION_REGISTRY: Record<string, SectionComponent> = {
   team: Team,
   testimonials: Testimonials,
   portfolio_grid: PortfolioGrid,
+
+  /* Read live from the estate rather than from this site's own tables — see
+     `queries/demos.ts`. The only section here that links off the site. */
+  demo_grid: DemoGrid,
   case_studies_grid: CaseStudiesGrid,
   blog_list: BlogList,
   pricing_table: PricingTable,

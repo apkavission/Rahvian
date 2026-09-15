@@ -58,3 +58,38 @@ export async function createControlClient() {
     },
   );
 }
+
+/**
+ * The same schema, with no session at all.
+ *
+ * ---------------------------------------------------------------------------
+ * **For the public website, which has no visitor to authenticate.** The client
+ * above carries the signed-in owner's cookies, which is what every estate
+ * screen needs and what `control.is_owner()` reads. A page on rahvian.com has
+ * neither, and asking for cookies there would make the read uncacheable for the
+ * sake of a session that is never there.
+ *
+ * The only function `anon` may execute in this schema is `public_demos()`,
+ * which filters to businesses somebody deliberately opened. Everything else in
+ * `control` refuses an anonymous caller at the first line of its body.
+ *
+ * Mirrors `createCachedClient()` in `server.ts` exactly, including the reason
+ * its cookie handlers are empty: a client that reads cookies cannot be cached.
+ */
+export function createCachedControlClient() {
+  return createServerClient<ControlDatabase, "control">(
+    clientEnv.NEXT_PUBLIC_SUPABASE_URL,
+    clientEnv.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      db: { schema: "control" },
+      cookies: {
+        getAll() {
+          return [];
+        },
+        setAll() {
+          // No session, by design. See the note above.
+        },
+      },
+    },
+  );
+}

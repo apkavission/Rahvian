@@ -409,10 +409,22 @@ export function SheetPreview({
       style={{
         width: `${PAGE.width * scale}mm`,
         height: `${PAGE.height * scale}mm`,
-        overflow: "hidden",
+        /*
+          The page is A4 and A4 is wider than a phone.
+
+          At 52% an A4 preview is about 412px, which is fifty pixels more than a
+          360px screen — and a `flex-shrink: 0` box that wide made the whole
+          admin page scroll sideways. The rule this estate already follows is
+          that wide content may scroll inside its own box but the document may
+          not: so the box is capped at the width it has and the sheet scrolls
+          within it. Shrinking the scale instead would make the preview
+          unreadable on the screen it is most likely to be checked on.
+        */
+        maxWidth: "100%",
+        overflowX: "auto",
+        overflowY: "hidden",
         borderRadius: "6px",
         boxShadow: "0 1px 2px rgb(0 0 0 / 0.12), 0 18px 40px -18px rgb(0 0 0 / 0.35)",
-        flexShrink: 0,
       }}
     >
       <div style={{ transform: `scale(${scale})`, transformOrigin: "top left" }}>{children}</div>
