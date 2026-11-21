@@ -190,7 +190,7 @@ export const SECTION_DEFINITIONS: Record<string, SectionDefinition> = {
 
   process_steps: {
     label: "Process steps",
-    description: "The seven steps, read live from the process table.",
+    description: "The seven steps, read live from the processes table.",
     fields: HEADING_FIELDS,
   },
 
